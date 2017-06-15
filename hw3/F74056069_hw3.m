@@ -1,1 +1,10 @@
+fprintf('Prob1:\n\n');
 F74056069_hw3_prob1;
+fprintf('\nProb2:\n\n');
+F74056069_hw3_prob2;
+fprintf('\nProb3:\n\n');
+F74056069_hw3_prob3;
+fprintf('\nProb4:\n\n');
+F74056069_hw3_prob4;
+fprintf('\nProb5:\n\n');
+F74056069_hw3_prob5;
