@@ -28,9 +28,9 @@ end
 hold off;
 legend('Vs', 'Vr');
 
-%prob(b)
+%prob(c)
 figure(6);
-title('Prob4(b)');
+title('Prob4(c)');
 ylabel('V');
 xlabel('t(ms)');
 L = 2*10^(-3);
@@ -50,13 +50,12 @@ for j = 0:h:10
     iii = (-10000*sin(10000*t) - i/C - R*ii)/L;
     ii = ii + iii*h/1000;
     i = i + h/1000*ii;
-    plot(j, Vs, '.R', j, i*R, '.B');
-    
+    plot(j, Vs, '.R', j, i*R, '.B');    
 end
 hold off;
 legend('Vs', 'Vr');
 
-%prob(b)
+%prob(d)
 figure(7);
 title('Prob4(b)');
 ylabel('V');

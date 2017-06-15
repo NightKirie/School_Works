@@ -1,62 +1,22 @@
-%prob(d)
-figure(4);
-N = 10^6;   %set the steps in a second
-h = 1/N;    %length of each step
-E = 0;
-t = 0;
-s = 0.5;
-Vc = 0;
-Vcc = 0;
-Vccc = 0;
-RC = 10^(-4);
-title('Prob3(d)');
-ylabel('Vc(t)');
-xlabel('t(s)');
-hold on;
-for i = 0:1:N/100*6
-    Vcc = (E - Vc)/RC;
-    Vccc = (s - (E - Vc)/RC)/RC;
-    Vc = Vc + h*Vcc + ((h^2)/2)*Vccc; 
-    Vr = E - Vc;
-    plot(t,E - Vc,'.B');
-    t = t + h;
-    if(rem(floor((i + N/100)/(N/50)),2) == 1)
-        E = E - 500/N;
-        s = -500/N;
-    elseif(rem(floor((i + N/100)/(N/50)),2) == 0)   
-        E = E + 500/N;
-        s = 500/N;
-    end
+v0 = 0;
+t0 = 0;
+C = 10^-4;
+R = 10000;
+figure
+hold on
+for t = 0:0.00001:0.05
+if rem(t*1000,20) < 10               %when t%20 < 10   e = 5
+    e = 5;
+else
+    e = -5;                         %when t%20 > 10   e = -5
 end
-hold off;
-
-%prob(d)
-figure(5);
-N = 10^4;   %set the steps in a second
-h = 1/N;    %length of each step
-E = 0;
-t = 0;
-s = 0.5;
-Vc = 0;
-Vcc = 0;
-Vccc = 0;
-RC = 10^(-4);
-title('Prob3(d)');
-ylabel('Vc(t)');
-xlabel('t(s)');
-hold on;
-for i = 0:1:N/100*6
-    Vcc = (E - Vc)/RC;
-    Vccc = (s - (E - Vc)/RC)/RC;
-    Vc = Vc + h*Vcc + ((h^2)/2)*Vccc; 
-    plot(t,E - Vc,'.B');
-    t = t + h;
-    if(rem(floor((i + N/100)/(N/50)),2) == 1)
-        E = E - 500/N;
-        s = -500/N;
-    elseif(rem(floor((i + N/100)/(N/50)),2) == 0)   
-        E = E + 500/N;
-        s = 500/N;
-    end
+v = v0 + (((e/(C*R))-(v0/(C*R)))*(t-t0)) + ((-(e/((C*R)^2)) + (v0/((C*R)^2)))*((t-t0)^2)/2);
+%v = v0 + (((e)-(v0))*(t-t0)) + ((-(e) + (v0))*((t-t0)^2)/2);
+t0 = t;
+v0 = v;
+plot(t,v,'b.');
 end
-hold off;
+hold off
+title('Prob3(3)');
+xlabel('t(s)');
+ylabel('Vc(t)');
