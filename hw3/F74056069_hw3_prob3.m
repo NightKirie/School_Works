@@ -13,7 +13,7 @@ Vc = 0;
 Vcc = 0;    %Vc'(t)
 Vccc = 0;   %Vc"(t)
 %RC = 1
-title('Prob3(b)');
+title('Fig.2');
 ylabel('Vc(t)');
 xlabel('t(s)');
 hold on;
@@ -36,7 +36,7 @@ Vc = 0;
 Vcc = 0;    %Vc'(t)
 Vccc = 0;   %Vc"(t)
 %RC = 1
-title('Prob3(c)');
+title('Fig.3');
 ylabel('Vc(t)');
 xlabel('t(s)');
 hold on;
@@ -66,7 +66,7 @@ Vc = 0;
 Vcc = 0;    %Vc'(t)
 Vccc = 0;   %Vc"(t)
 RC = 10^(-4);
-title('Prob3(d)');
+title('Fig.4');
 ylabel('Vc(t)');
 xlabel('t(s)');
 hold on;

@@ -1,12 +1,14 @@
 function[] = F74056069_hw3_prob2()
 %prob(a)
 figure(1);
+title('Fig.1');
+ylabel('x(t)');
+xlabel('t(s)');
 m = 1.200*(10^3);
 k = 58.00*(10^3);
 b = 4.000*(10^3);
-N = 10^4;   %set the steps in a second
+N = 10^3;   %set the steps in a second
 h = 1/N;    %the length of each step
-x0 = 10;
 x = 10;
 xx = 0; %x'
 xxx = 0; %F/m
