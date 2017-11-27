@@ -8,11 +8,11 @@
 #define TCP_IP_PHONE "192.168.0.35"
 #define TCP_PORT 5000
 
-static bool timetogo = true;
+static bool timetogo = true; //false for waiting for start, true for can remote
 WiFiClient wifiClient;
 WiFiClient wifiClientPh;
 static char buf[48],bufPh[48],buf_send[32],buf_phsend[32];
-static char client_ID[] = "NightKirie",Team[] = "WTF";
+static char client_ID[] = "NightKirie",Team[] = "DWLT";
 static int messageLen,phmessageLen;
 static int MyPosX,MyPosY,DstPosX,DstPosY;
 static char *recv_ID,*recv_buf;
@@ -83,7 +83,7 @@ void setup(){
                     "askPos",        /* String with name of task. */
                     10000,            /* Stack size in words. */
                     NULL,             /* Parameter passed as input of the task */
-                    1,                /* Priority of the task. */
+                    0,                /* Priority of the task. */
                     NULL);            /* Task handle. */
 }  
 
