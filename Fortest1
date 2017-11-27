@@ -1,10 +1,11 @@
 #include <WiFiClient.h>
 #include <LWiFi.h>
 #include <task.h>
+#include <math.h>
 
 #define SSID "1scream2.4G"
 #define PASSWD "2017scream"
-#define TCP_IP "192.168.0.46"
+#define TCP_IP "192.168.0.29"
 #define TCP_IP_PHONE "192.168.0.31"
 #define TCP_PORT 5000
 
@@ -14,8 +15,9 @@ WiFiClient wifiClientPh;
 static char buf[48],bufPh[48],buf_send[32],buf_phsend[32];
 static char client_ID[] = "NightKirie",Team[] = "DWLT";
 static int messageLen,phmessageLen;
-static int MyPosX,MyPosY,DstPosX,DstPosY;
+static int MyPosX, MyPosY, DstPosX, DstPosY, detection = 0;
 static char *recv_ID,*recv_buf;
+
 
 enum MotorPinID {
     L_F = 0,
@@ -129,7 +131,7 @@ void askPos( void * parameter )
                 sscanf(recv_buf,"POS:(%d,%d)(%d,%d)",&MyPosX,&MyPosY,&DstPosX,&DstPosY);
             Serial.println(MyPosX);
             Serial.println(MyPosY);
-            send_phone(MyPosX,MyPosY); 
+            //send_phone(MyPosX,MyPosY); 
             send_mes("Position","");
         }
     }
@@ -205,6 +207,7 @@ void ultrasonictest(int t, float df, float dl, float dr){
     delay(t);
 }
 
+//for remote
 void remoteCommand()
 {
     if(timetogo == true){
@@ -244,9 +247,34 @@ void loop()
     df = ultrasonicGetDistance(usTrigPins[U_F], usEchoPins[U_F]);
     dl = ultrasonicGetDistance(usTrigPins[U_L], usEchoPins[U_L]);
     dr = ultrasonicGetDistance(usTrigPins[U_R], usEchoPins[U_R]);
+    //for remote
     /*if ((phmessageLen = wifiClientPh.available()) > 0) {
         bufPh[0] = wifiClientPh.read();
         bufPh[1] = wifiClientPh.read();
         remoteCommand();
     }*/
+    //for self-moving
+    if(timetogo == true){   //for game start
+        static const int InitPosX = MyPosX;
+        static const int InitPosY = MyPosY;
+        static const int InitDirX = DstPosX - InitPosX;
+        static const int InitDirY = DstPosY - InitPosY;
+        static const double InitDir = atan2(InitDirY, InitDirX);
+        if(detection == 0){
+            forward(500);
+            detection = 1;
+        }
+        if(detection == 1){
+            double MyDir = atan2(MyPosY - InitPosY, MyPosX - InitPosX);
+            if(MyDir - InitDir < 0 || MyDir - InitDir > PI)
+                slightly_right(100);
+            else if(MyDir - InitDir > 0)
+                slightly_left(100);
+            else
+                forward(100);    
+        }
+    }
+    else if(timetogo == false){     //for game end
+        freeze(0);
+    }
 } 
