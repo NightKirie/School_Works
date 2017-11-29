@@ -132,10 +132,14 @@ void askPos( void * parameter )
             //Serial.print(":");
             recv_buf = strtok(NULL,"|\0");
             //Serial.println(recv_buf);
-            if(strcmp(recv_buf, "Start") == 0)
+            if(strcmp(recv_buf, "Start") == 0){
                 timetogo = true;
-            else if(strcmp(recv_buf, "Done") == 0)
+                detection = 0;
+            }
+            else if(strcmp(recv_buf, "Done") == 0){
                 timetogo = false;
+                detection = 0;
+            }
             else
                 sscanf(recv_buf,"POS:(%d,%d)(%d,%d)",&MyPosX,&MyPosY,&DstPosX,&DstPosY);
             //Serial.println(MyPosX);
@@ -257,7 +261,7 @@ void loop()
         static const int InitPosY = MyPosY;
         if(detection == 0){
             forward(0);
-            if(abs(InitPosX - MyPosX) > 256 || abs(InitPosY - MyPosY) > 256){
+            if(abs(InitPosX - MyPosX) > 200 || abs(InitPosY - MyPosY) > 200){
                 freeze(100);
                 static const int MidDirX = MyPosX - InitPosX;
                 static const int MidDirY = MyPosY - InitPosY;
@@ -282,11 +286,11 @@ void loop()
             delay(50);
             double MyDir = atan2(MyPosY - MidPosY, MyPosX - MidPosX);
             if(MyDir - EndDir < 0 || MyDir - EndDir > PI){
-                slightly_right(30);
+                slightly_right(50);
                 forward(50);
             }
             else if(MyDir - EndDir > 0){
-                slightly_left(30);
+                slightly_left(50);
                 forward(50);
             }
             else{
