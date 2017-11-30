@@ -5,7 +5,7 @@
 
 #define SSID "1scream2.4G"
 #define PASSWD "2017scream"
-#define TCP_IP "192.168.0.33"
+#define TCP_IP "192.168.0.38"
 //#define TCP_IP_PHONE "192.168.0.31"
 #define TCP_PORT 5000
 
@@ -91,7 +91,7 @@ double ultrasonicGetDistance(uint8_t trig, uint8_t echo){
     pinMode(trig, OUTPUT);
     pinMode(echo, INPUT);
     digitalWrite(trig, HIGH);
-    delayMicroseconds(5);
+    delayMicroseconds(10);
     digitalWrite(trig, LOW);
     duration = pulseIn(echo, HIGH, 20000L);
     return duration / 29 / 2;
