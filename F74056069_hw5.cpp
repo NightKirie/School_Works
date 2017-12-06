@@ -12,6 +12,7 @@ struct node{
 typedef struct node* Link;
 
 Link create_tree(Link, int);
+void print_tree(Link);
 
 int main(){
 	Link top = NULL;
@@ -53,3 +54,6 @@ Link create_tree(Link top, int value){
 	return top;
 }
 
+void print_tree(Link top){
+    
+}
