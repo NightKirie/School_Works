@@ -8,8 +8,8 @@ struct node{
 	int value;
 	struct node* left;
 	struct node* right;
-}
-typedef node* Link;
+};
+typedef struct node* Link;
 
 Link create_tree(Link, int);
 
@@ -33,11 +33,11 @@ Link create_tree(Link top, int value){
 	newnode->value = value;
 	newnode->left = NULL;
 	newnode->right = NULL;
-	if(top == NULL){
+	if(top == NULL){	//if there's no top
 		top = newnode;
 		return top;
 	}
-	else{
+	else{	//for going through the tree
 		for(last = top; last != NULL;){
 			temp = last;
 			if(last->value > value)
@@ -45,7 +45,7 @@ Link create_tree(Link top, int value){
 			else
 				last = last->right;
 		}
-		if(temp->value > value)
+		if(temp->value > value)	//for put the node at the end
 			temp->left = newnode;
 		else
 			temp->right = newnode;
