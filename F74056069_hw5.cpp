@@ -15,7 +15,8 @@ Link create_tree(Link, int);
 void print_tree(Link);
 
 int main(){
-	Link top = NULL;
+	char sel;
+    Link top = NULL;
 	string element, temp;
 	stringstream sstream;
 	cin >> element;
@@ -24,12 +25,19 @@ int main(){
 		getline(sstream, temp, ',');
 		if(sstream.fail())
 			break;
-		create_tree(top, atoi(temp.c_str()));
+		top = create_tree(top, atoi(temp.c_str()));
 	}
+    cout << "Create Binary search tree" << endl;
+    print_tree(top);
+    cout << "Delete element?(Y/N):";
+    while(cin >> sel != 'N'){
+  
 }
 
 Link create_tree(Link top, int value){
-	Link newnode, last, temp;
+    if(value == -1)
+        return top;
+    Link newnode, last, temp;
 	newnode = new node;
 	newnode->value = value;
 	newnode->left = NULL;
@@ -54,6 +62,16 @@ Link create_tree(Link top, int value){
 	return top;
 }
 
-void print_tree(Link top){
-
+void print_tree(Link node){
+    if(node != NULL){
+        cout << node->value;
+        if(node->left){
+            cout << ", ";
+            print_tree(node->left);
+        }
+        if(node->right){
+            cout << ", ";
+            print_tree(node->right);
+        }
+    }
 }
