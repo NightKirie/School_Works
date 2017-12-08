@@ -13,11 +13,12 @@ typedef struct node* Link;
 
 Link create_tree(Link, int);
 void print_tree(Link);
-Link delete_tree(Link, int);
+bool delete_tree(Link, int);
 
 int main(){
 	char sel;
 	int chosen;
+    bool del_check;
     Link top = NULL;
 	string element, temp;
 	stringstream sstream;
@@ -36,8 +37,12 @@ int main(){
 	while(sel != 'N'){
 		cout << "Choice element:";
 		cin >> chosen;
-		top = delete_tree(top, chosen);
-		print_tree(top);
+		del_check = delete_tree(top, chosen);
+		if(del_check)
+            print_tree(top);
+        else
+            cout << chosen << " is not in the tree";
+	    cout << "Delete element?(Y/N):";
 		cin >> sel;
 	}
 }
@@ -72,14 +77,44 @@ Link create_tree(Link top, int value){
 
 void print_tree(Link top){
 	int count = 1;
-	while(1){
-		if(count == 1){
-			Link 
-		}
-		count *= 2;
+    Link* upper = NULL;
+    Link* lower = new Link[count];
+    lower[0] = top;
+	bool end = false;
+    while(!end){
+	    end = true;
+        delete []upper;
+        upper = lower;
+        lower = new Link[count*2];
+        for(int i = 0; i < count; i++){
+            if(upper[i] == NULL){
+                cout.width(3);
+                cout << std::left <<"*";
+                lower[i*2] = NULL;
+                lower[i*2 + 1] = NULL;
+                
+            }
+            else{
+                cout.width(3);
+                cout << std::left << upper[i]->value;
+                lower[i*2] = upper[i]->left;
+                lower[i*2 + 1] = upper[i]->right;
+                if(lower[i*2] != NULL)
+                    end = false;
+                if(lower[i*2 + 1] != NULL)
+                    end = false;
+            }
+        }
+        cout << endl;
+        count *= 2;
 	}
+    delete []upper;
+    delete []lower;
 }
 
-Link delete_tree(Link top, int chosen){
-
+bool delete_tree(Link top, int chosen){
+    Link findnode = top;
+    while(findnode){
+        if(findnode)
+    }
 }
