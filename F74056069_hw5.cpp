@@ -13,9 +13,11 @@ typedef struct node* Link;
 
 Link create_tree(Link, int);
 void print_tree(Link);
+Link delete_tree(Link, int);
 
 int main(){
 	char sel;
+	int chosen;
     Link top = NULL;
 	string element, temp;
 	stringstream sstream;
@@ -29,9 +31,15 @@ int main(){
 	}
     cout << "Create Binary search tree" << endl;
     print_tree(top);
-    cout << "Delete element?(Y/N):";
-    while(cin >> sel != 'N'){
-  
+	cout << "Delete element?(Y/N):";
+    cin >> sel;
+	while(sel != 'N'){
+		cout << "Choice element:";
+		cin >> chosen;
+		top = delete_tree(top, chosen);
+		print_tree(top);
+		cin >> sel;
+	}
 }
 
 Link create_tree(Link top, int value){
@@ -62,16 +70,16 @@ Link create_tree(Link top, int value){
 	return top;
 }
 
-void print_tree(Link node){
-    if(node != NULL){
-        cout << node->value;
-        if(node->left){
-            cout << ", ";
-            print_tree(node->left);
-        }
-        if(node->right){
-            cout << ", ";
-            print_tree(node->right);
-        }
-    }
+void print_tree(Link top){
+	int count = 1;
+	while(1){
+		if(count == 1){
+			Link 
+		}
+		count *= 2;
+	}
+}
+
+Link delete_tree(Link top, int chosen){
+
 }
