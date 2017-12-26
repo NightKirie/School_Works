@@ -17,11 +17,10 @@ WiFiClient wifiClientPh;
 static char buf[48],bufPh[48],buf_send[32],buf_phsend[32];
 static char client_ID[] = " NightKirie",Team[] = "DWLT";
 static int messageLen,phmessageLen;
-static int MyPosX, MyPosY, DstPosX, DstPosY, TempPosX, TempPosY, treasure[4][2];
+static int MyPosX, MyPosY, DstPosX, DstPosY, TempPosX, TempPosY, treasure[4][2] = {0};
 static char *recv_ID, *recv_buf, *recv_mod, *recv_name;
 
 xTaskHandle xaskPos;
-
 
 enum MotorPinID {
     L_F = 0,
@@ -42,8 +41,6 @@ static const uint8_t usTrigPins[NUM_OF_ULTRASONIC_PIN] = {2, 4, 6};  // F, L, R
 static const uint8_t usEchoPins[NUM_OF_ULTRASONIC_PIN] = {3, 5, 7};  // F, L, R
 static const uint8_t motorPins[NUM_OF_MOTOR_PIN] = {14, 15, 16, 17};  //  L_F, L_B, R_F, R_B
 
-
-IPAddress ip;
 void setup(){
     int motorpins = 0;
     while(motorpins < NUM_OF_MOTOR_PIN){
@@ -181,8 +178,8 @@ void askPos( void * parameter )
                TempPosX = -1;
                TempPosY = -1;
             }
-            Serial.println(MyPosX);
-            Serial.println(MyPosY);
+            Serial.println(TempPosX);
+            Serial.println(TempPosY);
             //send_phone(MyPosX,MyPosY); 
             send_mes("Position","");
         }
@@ -241,9 +238,12 @@ void slightly_right(int t){
     analogWrite(motorPins[R_B], 0);
     delay(t);
 } 
-void ultrasonictest(int t, float df, float dl, float dr){
+void ultrasonictest(int t, double df, double dl, double dr){
+    Serial.print("front: ");
     Serial.println(df);
+    Serial.print("left: ");
     Serial.println(dl);
+    Serial.print("right: ");
     Serial.println(dr);
     delay(t);
 }
@@ -296,55 +296,11 @@ void loop()
       }*/
 
     //ultrasonic testing
-    /*Serial.print("front: ");
-    Serial.println(df);
-    Serial.print("left: ");
-    Serial.println(dl);
-    Serial.print("right: ");
-    Serial.println(dr);
-    delay(1000);*/
-
+    //ultrasonictest(1000, df, dl, dr);
 
     //for self-moving
     /*if(timetogo == true){   //for game start
-        static const int InitPosX = MyPosX;
-        static const int InitPosY = MyPosY;
-            forward(0);
-            if(abs(InitPosX - MyPosX) > 200 || abs(InitPosY - MyPosY) > 200){
-                freeze(100);
-                static const int MidDirX = MyPosX - InitPosX;
-                static const int MidDirY = MyPosY - InitPosY;
-                static const double MidDir = atan2(MidDirY, MidDirX);
-                static const int InitDirX = DstPosX - InitPosX;
-                static const int InitDirY = DstPosY - InitPosY;
-                static const double InitDir = atan2(InitDirY, InitDirX);
-                if(MidDir - InitDir < 0 || MidDir - InitDir > PI)
-                    right(250);
-                else if(MidDir - InitDir > 0)
-                    left(250);    
-            }
-
-
-
-            static int MidPosX = MyPosX;
-            static int MidPosY = MyPosY; 
-            static const int EndDirX = DstPosX - MidPosX;
-            static const int EndDirY = DstPosY - MidPosY;
-            static const double EndDir = atan2(EndDirY, EndDirX);
-            forward(0);
-            delay(50);
-            double MyDir = atan2(MyPosY - MidPosY, MyPosX - MidPosX);
-            if(MyDir - EndDir < 0 || MyDir - EndDir > PI){
-                slightly_right(50);
-                forward(50);
-            }
-            else if(MyDir - EndDir > 0){
-                slightly_left(50);
-                forward(50);
-            }
-            else{
-                forward(0);    
-            }
+        
     }
     else if(timetogo == false){     //for game end
         freeze(0);
