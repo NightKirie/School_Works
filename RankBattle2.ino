@@ -17,7 +17,8 @@ WiFiClient wifiClientPh;
 static char buf[64],bufPh[64],buf_send[64],buf_phsend[64];
 static char client_ID[] = "NightKirie",Team[] = "DWLT";
 static int messageLen,phmessageLen;
-static int MyPosX, MyPosY, DstPosX, DstPosY, TempPosX, TempPosY, treasure[4][2] = {0};
+static int MyPosX, MyPosY, Dst1PosX = -1, Dst1PosY = -1, Dst2PosX = -1, Dst2PosY = -1, treasure[4][2] = {0}, step = 0;
+//Dst1 for first destination(may not be my treasure), Dst2 for my treasure
 static char *recv_ID, *recv_buf, *recv_mod, *recv_name;
 
 xTaskHandle xaskPos;
@@ -97,30 +98,26 @@ double ultrasonicGetDistance(uint8_t trig, uint8_t echo){
     vTaskResume(xaskPos);
     return duration / 29 / 2;
 }
-void reg_ID()
-{
+void reg_ID(){
     strcpy(buf,"Register|");
     strcat(buf,client_ID);
     wifiClient.write(buf, strlen(buf));
     wifiClient.flush();
 }
 
-/*void send_phone(int x,int y)
-{
+/*void send_phone(int x,int y){
     sprintf(buf_phsend,"(%d,%d)",x,y);
     wifiClientPh.write(buf_phsend, strlen(buf_phsend));
     wifiClientPh.flush();
 }*/
 
-void send_mes(char ID[],char mes[])
-{
+void send_mes(char ID[],char mes[]){
     sprintf(buf,"%s|%s",ID,mes);
     wifiClient.write(buf, strlen(buf));
     wifiClient.flush();
 }
 
-void askPos( void * parameter )
-{
+void askPos( void * parameter ){
     while(1){
         if ((messageLen = wifiClient.available()) > 0) {
             int i = 0;
@@ -147,32 +144,32 @@ void askPos( void * parameter )
                         recv_mod = strtok(NULL, ":");
                         sscanf(recv_mod, "(%d, %d)(%d, %d)(%d, %d)(%d, %d)", &treasure[0][0], &treasure[0][1], &treasure[1][0], &treasure[1][1], &treasure[2][0], &treasure[2][1], &treasure[3][0], &treasure[3][1]);
                         if(MyPosX >= 192 && MyPosX <= 256 && MyPosY <=192){
-                            TempPosX = treasure[0][0];
-                            TempPosY = treasure[0][1];
+                            Dst1PosX = treasure[0][0];
+                            Dst1PosY = treasure[0][1];
                         }
                         else if(MyPosX >= 256 && MyPosY >= 192 && MyPosY <= 256){
-                            TempPosX = treasure[1][0];
-                            TempPosY = treasure[1][1];
+                            Dst1PosX = treasure[1][0];
+                            Dst1PosY = treasure[1][1];
                         }
                         else if(MyPosX >= 192 && MyPosX <= 256 && MyPosY >= 256){
-                            TempPosX = treasure[2][0];
-                            TempPosY = treasure[2][1];
+                            Dst1PosX = treasure[2][0];
+                            Dst1PosY = treasure[2][1];
                         }
                         else if(MyPosX <= 192 && MyPosY >= 192 && MyPosY <= 256){
-                            TempPosX = treasure[3][0];
-                            TempPosY = treasure[3][1];
+                            Dst1PosX = treasure[3][0];
+                            Dst1PosY = treasure[3][1];
                         }
                     }
                     else if(!strcmp(recv_mod, "False")){    //get false
                         recv_mod = strtok(NULL, ":\0");
                         sscanf(recv_mod, "%c", recv_name);
                         char *name = "(";
-                        char *tempposx, *tempposy;
-                        sprintf(tempposx, "%d", TempPosX);
-                        sprintf(tempposy, "%d", TempPosY);
-                        strcat(name, tempposx);
+                        char *dst1posx, *dst1posy;
+                        sprintf(dst1posx, "%d", Dst1PosX);
+                        sprintf(dst1posy, "%d", Dst1PosY);
+                        strcat(name, dst1posx);
                         strcat(name, ", ");
-                        strcat(name, tempposy);
+                        strcat(name, dst1posy);
                         strcat(name, ")");
                         send_mes(recv_name, name);
                     }
@@ -182,18 +179,18 @@ void askPos( void * parameter )
                     }
                 }
             }
-            /*else{   //get my treasure position
-               sscanf(recv_buf, "(%d, %d)", &DstPosX, &DstPosY); 
+            else{   //get my treasure position
+               sscanf(recv_buf, "(%d, %d)", &Dst2PosX, &Dst2PosY); 
                
                //for stop to go to real position
-               TempPosX = -1;
-               TempPosY = -1;
-            }*/
+               Dst1PosX = -1;
+               Dst1PosY = -1;
+            }
             Serial.println(recv_ID);
             Serial.println(recv_buf);
             Serial.println(recv_mod);
-            Serial.println(TempPosX);
-            Serial.println(TempPosY);
+            Serial.println(Dst1PosX);
+            Serial.println(Dst1PosY);
             //send_phone(MyPosX,MyPosY); 
             send_mes("Position","");
         }
@@ -296,8 +293,7 @@ freeze(0);
 }
 }*/
 
-void loop()
-{   
+void loop(){   
     double df, dl, dr;
     df = ultrasonicGetDistance(usTrigPins[U_F], usEchoPins[U_F]);
     dl = ultrasonicGetDistance(usTrigPins[U_L], usEchoPins[U_L]);
@@ -313,10 +309,16 @@ void loop()
     //ultrasonictest(1000, df, dl, dr);
 
     //for self-moving
-    /*if(timetogo == true){   //for game start
-        
+    if(timetogo == true){   //for game start
+        if(step == 0 && Dst1PosX != -1){
+            
+            step = 1;
+        }
+        else if(step == 1 && Dst2PosX != -1){
+            
+        }
     }
     else if(timetogo == false){     //for game end
         freeze(0);
-    }*/
+    }
 } 
