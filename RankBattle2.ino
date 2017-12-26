@@ -14,8 +14,8 @@
 static bool timetogo = false; //false for waiting for start, true for can remote
 WiFiClient wifiClient;
 WiFiClient wifiClientPh;
-static char buf[48],bufPh[48],buf_send[32],buf_phsend[32];
-static char client_ID[] = " NightKirie",Team[] = "DWLT";
+static char buf[64],bufPh[64],buf_send[64],buf_phsend[64];
+static char client_ID[] = "NightKirie",Team[] = "DWLT";
 static int messageLen,phmessageLen;
 static int MyPosX, MyPosY, DstPosX, DstPosY, TempPosX, TempPosY, treasure[4][2] = {0};
 static char *recv_ID, *recv_buf, *recv_mod, *recv_name;
@@ -126,12 +126,12 @@ void askPos( void * parameter )
             int i = 0;
             do{
                 buf[i++] = wifiClient.read();
-            }while(i<32 && buf[i-1]!='\r'); 
+            }while(i<64 && buf[i-1]!='\r'); 
             buf[i-1] = '\0';
-            recv_ID = strtok(buf,"|\0");
+            recv_ID = strtok(buf,"|");
             //Serial.print(recv_ID);
             //Serial.print(":");
-            recv_buf = strtok(NULL,"|\0");
+            recv_buf = strtok(NULL,"|");
             //Serial.println(recv_buf);
             if(!strcmp(recv_ID, "Master")){     //From Master
                 if(!strcmp(recv_buf, "Start")){     //Start
@@ -142,15 +142,26 @@ void askPos( void * parameter )
                     timetogo = false;
                 }
                 else{ //Something else
-                    recv_mod = strtok(recv_buf,":\0");
+                    recv_mod = strtok(recv_buf,":");
                     if(!strcmp(recv_mod, "Treasure")){  //get treasure position
-                        recv_mod = strtok(NULL, ":\0");
-                        sscanf(recv_mod, "(%d, %d)", &treasure[0][0], &treasure[0][1]);
-                        sscanf(recv_mod, "(%d, %d)(%d, %d)", &treasure[0][0], &treasure[0][1], &treasure[1][0], &treasure[1][1]);
-                        sscanf(recv_mod, "(%d, %d)(%d, %d)(%d, %d)", &treasure[0][0], &treasure[0][1], &treasure[1][0], &treasure[1][1], &treasure[2][0], &treasure[2][1]);
+                        recv_mod = strtok(NULL, ":");
                         sscanf(recv_mod, "(%d, %d)(%d, %d)(%d, %d)(%d, %d)", &treasure[0][0], &treasure[0][1], &treasure[1][0], &treasure[1][1], &treasure[2][0], &treasure[2][1], &treasure[3][0], &treasure[3][1]);
-                        TempPosX = treasure[0][0];
-                        TempPosY = treasure[0][1];
+                        if(MyPosX >= 192 && MyPosX <= 256 && MyPosY <=192){
+                            TempPosX = treasure[0][0];
+                            TempPosY = treasure[0][1];
+                        }
+                        else if(MyPosX >= 256 && MyPosY >= 192 && MyPosY <= 256){
+                            TempPosX = treasure[1][0];
+                            TempPosY = treasure[1][1];
+                        }
+                        else if(MyPosX >= 192 && MyPosX <= 256 && MyPosY >= 256){
+                            TempPosX = treasure[2][0];
+                            TempPosY = treasure[2][1];
+                        }
+                        else if(MyPosX <= 192 && MyPosY >= 192 && MyPosY <= 256){
+                            TempPosX = treasure[3][0];
+                            TempPosY = treasure[3][1];
+                        }
                     }
                     else if(!strcmp(recv_mod, "False")){    //get false
                         recv_mod = strtok(NULL, ":\0");
@@ -171,13 +182,16 @@ void askPos( void * parameter )
                     }
                 }
             }
-            else{   //get my treasure position
+            /*else{   //get my treasure position
                sscanf(recv_buf, "(%d, %d)", &DstPosX, &DstPosY); 
                
                //for stop to go to real position
                TempPosX = -1;
                TempPosY = -1;
-            }
+            }*/
+            Serial.println(recv_ID);
+            Serial.println(recv_buf);
+            Serial.println(recv_mod);
             Serial.println(TempPosX);
             Serial.println(TempPosY);
             //send_phone(MyPosX,MyPosY); 
