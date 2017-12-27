@@ -208,8 +208,6 @@ void askPos( void * parameter ){
     
             //send_phone(MyPosX,MyPosY); 
             send_mes("Position","");
-            while(treasure[0][0] == 0 && treasure[0][1] == 0)
-                send_mes("Treasure","");
         }
     }
 
