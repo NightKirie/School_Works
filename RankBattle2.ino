@@ -150,7 +150,7 @@ void askPos( void * parameter ){
                     else if(MyPosX <= 192 && MyPosY >= 192 && MyPosY <= 256){
                         InitPoint = 3;
                     }
-                    freeze(InitPoint * 20 + 20);
+                    delay(InitPoint * 50 + 50);
                     send_mes("Treasure","");
                 }
                 else if(!strcmp(recv_buf, "Done")){     //End
@@ -362,7 +362,7 @@ void loop(){
                 check = 1;
             }
             else if(check == 1){
-                if(abs(MyPosX - Dst1PosX) <= 32 && abs(MyPosY - Dst1PosY) <= 32 && (!strcmp(recv_mod, "False") || timetogo == false)){	//if get to the Dst1
+                if(abs(MyPosX - Dst1PosX) <= 32 && abs(MyPosY - Dst1PosY) <= 32 && (recv_name != NULL || timetogo == false)){	//if get to the Dst1
                     step = 1;
                     check = 0;
                     Dst1PosX = -1;
