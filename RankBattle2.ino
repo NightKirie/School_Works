@@ -21,7 +21,7 @@ static int MyPosX, MyPosY, Dst1PosX = -1, Dst1PosY = -1, Dst2PosX = -1, Dst2PosY
 //Dst1 for first destination(may not be my treasure), Dst2 for my treasure, step for Dst1 to Dst2, check for things in step
 static char *recv_ID, *recv_buf, *recv_mod, *recv_name;
 
-xTaskHandle xaskPos;
+//xTaskHandle xaskPos;
 
 enum MotorPinID {
     L_F = 0,
@@ -86,7 +86,7 @@ void setup(){
                     10000,            /* Stack size in words. */
                     NULL,             /* Parameter passed as input of the task */
                     1,                /* Priority of the task. */
-                    &xaskPos);            /* Task handle. */
+                    NULL);            /* Task handle. */
 }
 
 /*double ultrasonicGetDistance(uint8_t trig, uint8_t echo){
@@ -139,19 +139,19 @@ void askPos( void * parameter ){
                     timetogo = true;
                     step = 0;
                     if(MyPosX >= 192 && MyPosX <= 256 && MyPosY <=192){
-							InitPoint = 0;
-                        }
-                        else if(MyPosX >= 256 && MyPosY >= 192 && MyPosY <= 256){
-							InitPoint = 1;
-                        }
-                        else if(MyPosX >= 192 && MyPosX <= 256 && MyPosY >= 256){
-							InitPoint = 2;
-                        }
-                        else if(MyPosX <= 192 && MyPosY >= 192 && MyPosY <= 256){
-							InitPoint = 3;
-                        }
-                        freeze(InitPoint * 10);
-                        send_mes("Treasure","");
+                        InitPoint = 0;
+                    }
+                    else if(MyPosX >= 256 && MyPosY >= 192 && MyPosY <= 256){
+                        InitPoint = 1;
+                    }
+                    else if(MyPosX >= 192 && MyPosX <= 256 && MyPosY >= 256){
+                        InitPoint = 2;
+                    }
+                    else if(MyPosX <= 192 && MyPosY >= 192 && MyPosY <= 256){
+                        InitPoint = 3;
+                    }
+                    freeze(InitPoint * 10);
+                    send_mes("Treasure","");
                 }
                 else if(!strcmp(recv_buf, "Done")){     //End
                     timetogo = false;
@@ -198,18 +198,21 @@ void askPos( void * parameter ){
                 }
             }
             else{   //get my treasure position
-               sscanf(recv_buf, "(%d, %d)", &Dst2PosX, &Dst2PosY); 
+                sscanf(recv_buf, "(%d, %d)", &Dst2PosX, &Dst2PosY); 
             }
-            Serial.println(recv_ID);
-            Serial.println(recv_buf);
-            Serial.println(recv_mod);
-            Serial.println(Dst1PosX);
-            Serial.println(Dst1PosY);
+            //Serial.println(recv_ID);
+            //Serial.println(recv_buf);
+            //Serial.println(recv_mod);
+            //Serial.println(Dst1PosX);
+            //Serial.println(Dst1PosY);
+    
             //send_phone(MyPosX,MyPosY); 
             send_mes("Position","");
+            while(treasure[0][0] == 0 && treasure[0][1] == 0)
+                send_mes("Treasure","");
         }
     }
-   
+
     //Serial.println("Ending task 1");
     vTaskDelete( NULL );
 }
@@ -273,34 +276,6 @@ void ultrasonictest(int t, double df, double dl, double dr){
     delay(t);
 }
 
-void directioncheck(int InitPoint){
-    double degree;
-    int NewPosX, NewPosY;
-    switch(InitPoint){
-        case 0:
-            NewPosX = -(Dst1PosY - MyPosY);
-            NewPosY = Dst1PosX - MyPosX;
-            break;
-        case 1:
-            NewPosX = Dst1PosX - MyPosX;
-            NewPosY = Dst1PosY - MyPosY;
-            break;
-        case 2:
-            NewPosX = Dst1PosY - MyPosY;
-            NewPosY = -(Dst1PosX - MyPosX);
-            break;
-        case 3:
-            NewPosX = -(Dst1PosX - MyPosX);
-            NewPosY = -(Dst1PosY - MyPosY);
-            break;
-    }
-    degree = atan2(NewPosY, NewPosX);
-    if(degree >= 0) //turn 90 degree
-        right(200);
-    else
-        left(200);
-}
-
 //for remote
 /*void remoteCommand()
   {
@@ -354,69 +329,95 @@ void loop(){
     if(step != 2){   //for game start
         if(digitalRead(buttonPins) == HIGH){	//for bump into things
 			backward(100);
-			left(200);
+			left(250);
 			forward(100);
 		}
-		else if(step == 0 && Dst1PosX != -1){	//for go to first point(may not be the treasure)
-			if(check == 0){
-		        directioncheck(InitPoint);
-				check = 1;
-			}
-			else if(check == 1){
-				if(abs(MyPosX - Dst1PosX) <= 32 && abs(MyPosY - Dst1PosY) <= 32 && (!strcmp(recv_mod, "False") || timetogo == false)){	//if get to the Dst1
-					step = 1;
-					check = 0;
-					Dst1PosX = -1;
-					Dst1PosY = -1;
-					freeze(0);
-				}
-				int PrevPosX = MyPosX;
-				int PrevPosY = MyPosY;
+        else if(step == 0 && Dst1PosX != -1){	//for go to first point(may not be the treasure)
+            Serial.println("Go to first");
+            if(check == 0){
+                double degree;
+                int NewPosX, NewPosY;
+                switch(InitPoint){
+                    case 0:
+                        NewPosX = -(Dst1PosY - MyPosY);
+                        NewPosY = Dst1PosX - MyPosX;
+                        break;
+                    case 1:
+                        NewPosX = Dst1PosX - MyPosX;
+                        NewPosY = Dst1PosY - MyPosY;
+                        break;
+                    case 2:
+                        NewPosX = Dst1PosY - MyPosY;
+                        NewPosY = -(Dst1PosX - MyPosX);
+                        break;
+                    case 3:
+                        NewPosX = -(Dst1PosX - MyPosX);
+                        NewPosY = -(Dst1PosY - MyPosY);
+                        break;
+                }
+                degree = atan2(NewPosY, NewPosX);
+                if(degree >= 0) //turn 90 degree
+                    right(300);
+                else
+                    left(300);
+
+                check = 1;
+            }
+            else if(check == 1){
+                if(abs(MyPosX - Dst1PosX) <= 32 && abs(MyPosY - Dst1PosY) <= 32 && (!strcmp(recv_mod, "False") || timetogo == false)){	//if get to the Dst1
+                    step = 1;
+                    check = 0;
+                    Dst1PosX = -1;
+                    Dst1PosY = -1;
+                    freeze(0);
+                }
+                int PrevPosX = MyPosX;
+                int PrevPosY = MyPosY;
                 forward(50);
                 double Dst1Dir = atan2(Dst1PosY - PrevPosY, Dst1PosX - PrevPosX);
                 double MyDir = atan2(MyPosY - PrevPosY, MyPosX - PrevPosX);
                 if(MyDir - Dst1Dir < 0 || MyDir - Dst1Dir > PI)
-                    slightly_right(50);
+                    slightly_right(75);
                 else if(MyDir - Dst1Dir > 0)
-                    slightly_left(50);
-			}
-		}
-		else if(step == 1 && Dst2PosX != -1){	//for go to the real treasure
-			if(check == 0){
-                int PrevPosX = MyPosX;
-                int PrevPosY = MyPosY;
-                forward(50);
-                freeze(0);
-                double Dst2Dir = atan2(Dst2PosY - PrevPosY, Dst2PosX - PrevPosX);
-                double MyDir = atan2(MyPosY - PrevPosY, MyPosX - PrevPosX);
-                if(MyDir - Dst2Dir < 0 || MyDir - Dst2Dir > PI)
-                    right(250);
-                else if(MyDir - Dst2Dir > 0)
-                    left(250);
-                check = 1;
-            }
-		    else if(check == 1){
-                int PrevPosX = MyPosX;
-                int PrevPosY = MyPosY;
-                forward(50);
-                freeze(0);
-                double Dst2Dir = atan2(Dst2PosY - PrevPosY, Dst2PosX - PrevPosX);
-                double MyDir = atan2(MyPosY - PrevPosY, MyPosX - PrevPosX);
-                if(MyDir - Dst2Dir < 0 || MyDir - Dst2Dir > PI)
-                    slightly_right(50);
-                else if(MyDir - Dst2Dir > 0)
-                    slightly_left(50);
+                    slightly_left(75);
             }
         }
-		else{	//all other condition
-			freeze(0);
-		}
-	}
-	else if(timetogo == false && step != 0){     //for game end
-		step = 2;
-		check = 0;
-		Dst2PosX = -1;
-		Dst2PosY = -1;
-		freeze(0);
-	}
+        else if(step == 1 && Dst2PosX != -1){	//for go to the real treasure
+            if(check == 0){
+                int PrevPosX = MyPosX;
+                int PrevPosY = MyPosY;
+                forward(50);
+                freeze(0);
+                double Dst2Dir = atan2(Dst2PosY - PrevPosY, Dst2PosX - PrevPosX);
+                double MyDir = atan2(MyPosY - PrevPosY, MyPosX - PrevPosX);
+                if(MyDir - Dst2Dir < 0 || MyDir - Dst2Dir > PI)
+                    right(300);
+                else if(MyDir - Dst2Dir > 0)
+                    left(300);
+                check = 1;
+            }
+            else if(check == 1){
+                int PrevPosX = MyPosX;
+                int PrevPosY = MyPosY;
+                forward(50);
+                freeze(0);
+                double Dst2Dir = atan2(Dst2PosY - PrevPosY, Dst2PosX - PrevPosX);
+                double MyDir = atan2(MyPosY - PrevPosY, MyPosX - PrevPosX);
+                if(MyDir - Dst2Dir < 0 || MyDir - Dst2Dir > PI)
+                    slightly_right(75);
+                else if(MyDir - Dst2Dir > 0)
+                    slightly_left(75);
+            }
+        }
+        else{	//all other condition
+            freeze(0);
+        }
+    }
+    else if(timetogo == false && step != 0){     //for game end
+        step = 2;
+        check = 0;
+        Dst2PosX = -1;
+        Dst2PosY = -1;
+        freeze(0);
+    }
 } 
