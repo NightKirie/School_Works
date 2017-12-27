@@ -19,7 +19,7 @@ static char client_ID[] = "NightKirie",Team[] = "DWLT";
 static int messageLen,phmessageLen;
 static int MyPosX, MyPosY, Dst1PosX = -1, Dst1PosY = -1, Dst2PosX = -1, Dst2PosY = -1, treasure[4][2] = {0}, InitPoint, step = 0, check = 0;
 //Dst1 for first destination(may not be my treasure), Dst2 for my treasure, step for Dst1 to Dst2, check for things in step
-static char *recv_ID, *recv_buf, *recv_mod, *recv_name;
+static char *recv_ID, *recv_buf, *recv_mod, *recv_name, *name = NULL;
 
 //xTaskHandle xaskPos;
 
@@ -181,14 +181,7 @@ void askPos( void * parameter ){
                     else if(!strcmp(recv_mod, "False")){    //get false
                         recv_mod = strtok(NULL, ":");
                         sscanf(recv_mod, "%c", recv_name);
-                        char *name = "(";
-                        char *dst1posx, *dst1posy;
-                        sprintf(dst1posx, "%d", Dst1PosX);
-                        sprintf(dst1posy, "%d", Dst1PosY);
-                        strcat(name, dst1posx);
-                        strcat(name, ", ");
-                        strcat(name, dst1posy);
-                        strcat(name, ")");
+                        sprintf(name, "(%d, %d)", Dst1PosX, Dst1PosY);
                         send_mes(recv_name, name);
                     }
                     else if(!strcmp(recv_mod, "POS")){
@@ -202,7 +195,9 @@ void askPos( void * parameter ){
             }
             //Serial.println(recv_ID);
             //Serial.println(recv_buf);
-            //Serial.println(recv_mod);
+            Serial.println(recv_mod);
+            Serial.println(recv_name);
+            Serial.println(name);
             //Serial.println(Dst1PosX);
             //Serial.println(Dst1PosY);
     
@@ -331,7 +326,6 @@ void loop(){
 			forward(100);
 		}
         else if(step == 0 && Dst1PosX != -1){	//for go to first point(may not be the treasure)
-            Serial.println("Go to first");
             if(check == 0){
                 double degree;
                 int NewPosX, NewPosY;
@@ -362,7 +356,7 @@ void loop(){
                 check = 1;
             }
             else if(check == 1){
-                if(abs(MyPosX - Dst1PosX) <= 32 && abs(MyPosY - Dst1PosY) <= 32 && (recv_name != NULL || timetogo == false)){	//if get to the Dst1
+                if(abs(MyPosX - Dst1PosX) <= 50 && abs(MyPosY - Dst1PosY) <= 50 && (name != NULL || timetogo == false)){	//if get to the Dst1
                     step = 1;
                     check = 0;
                     Dst1PosX = -1;
