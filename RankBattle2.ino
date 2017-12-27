@@ -150,7 +150,7 @@ void askPos( void * parameter ){
                     else if(MyPosX <= 192 && MyPosY >= 192 && MyPosY <= 256){
                         InitPoint = 3;
                     }
-                    freeze(InitPoint * 10);
+                    freeze(InitPoint * 20 + 20);
                     send_mes("Treasure","");
                 }
                 else if(!strcmp(recv_buf, "Done")){     //End
