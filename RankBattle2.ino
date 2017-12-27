@@ -17,8 +17,8 @@ WiFiClient wifiClientPh;
 static char buf[64],bufPh[64],buf_send[64],buf_phsend[64];
 static char client_ID[] = "NightKirie",Team[] = "DWLT";
 static int messageLen,phmessageLen;
-static int MyPosX, MyPosY, Dst1PosX = -1, Dst1PosY = -1, Dst2PosX = -1, Dst2PosY = -1, treasure[4][2] = {0}, step = 0;
-//Dst1 for first destination(may not be my treasure), Dst2 for my treasure
+static int MyPosX, MyPosY, Dst1PosX = -1, Dst1PosY = -1, Dst2PosX = -1, Dst2PosY = -1, treasure[4][2] = {0}, InitPoint, step = 0, check = 0;
+//Dst1 for first destination(may not be my treasure), Dst2 for my treasure, step for Dst1 to Dst2, check for things in step
 static char *recv_ID, *recv_buf, *recv_mod, *recv_name;
 
 xTaskHandle xaskPos;
@@ -30,17 +30,18 @@ enum MotorPinID {
     R_B,
     NUM_OF_MOTOR_PIN
 };
-enum UltrasonicPinID {
+/*enum UltrasonicPinID {
     U_F = 0,
     U_L,
     U_R,
     NUM_OF_ULTRASONIC_PIN
-};
+};*/
 
 /* Pin assignment */
-static const uint8_t usTrigPins[NUM_OF_ULTRASONIC_PIN] = {2, 4, 6};  // F, L, R
-static const uint8_t usEchoPins[NUM_OF_ULTRASONIC_PIN] = {3, 5, 7};  // F, L, R
+//static const uint8_t usTrigPins[NUM_OF_ULTRASONIC_PIN] = {2, 4, 6};  // F, L, R
+//static const uint8_t usEchoPins[NUM_OF_ULTRASONIC_PIN] = {3, 5, 7};  // F, L, R
 static const uint8_t motorPins[NUM_OF_MOTOR_PIN] = {14, 15, 16, 17};  //  L_F, L_B, R_F, R_B
+static const uint8_t buttonPins = 2;
 
 void setup(){
     int motorpins = 0;
@@ -48,6 +49,7 @@ void setup(){
         pinMode(motorPins[motorpins],OUTPUT);
         motorpins++;
     }
+	pinMode(buttonPins, INPUT);
     int status = WL_IDLE_STATUS;
     Serial.begin(115200);
     while (!Serial)
@@ -85,8 +87,9 @@ void setup(){
                     NULL,             /* Parameter passed as input of the task */
                     1,                /* Priority of the task. */
                     &xaskPos);            /* Task handle. */
-}  
-double ultrasonicGetDistance(uint8_t trig, uint8_t echo){
+}
+
+/*double ultrasonicGetDistance(uint8_t trig, uint8_t echo){
     double duration;
     vTaskSuspend(xaskPos);
     pinMode(trig, OUTPUT);
@@ -97,7 +100,8 @@ double ultrasonicGetDistance(uint8_t trig, uint8_t echo){
     duration = pulseIn(echo, HIGH, 20000L);
     vTaskResume(xaskPos);
     return duration / 29 / 2;
-}
+}*/
+
 void reg_ID(){
     strcpy(buf,"Register|");
     strcat(buf,client_ID);
@@ -146,22 +150,26 @@ void askPos( void * parameter ){
                         if(MyPosX >= 192 && MyPosX <= 256 && MyPosY <=192){
                             Dst1PosX = treasure[0][0];
                             Dst1PosY = treasure[0][1];
+							InitPoint = 0;
                         }
                         else if(MyPosX >= 256 && MyPosY >= 192 && MyPosY <= 256){
                             Dst1PosX = treasure[1][0];
                             Dst1PosY = treasure[1][1];
+							InitPoint = 1;
                         }
                         else if(MyPosX >= 192 && MyPosX <= 256 && MyPosY >= 256){
                             Dst1PosX = treasure[2][0];
                             Dst1PosY = treasure[2][1];
+							InitPoint = 2;
                         }
                         else if(MyPosX <= 192 && MyPosY >= 192 && MyPosY <= 256){
                             Dst1PosX = treasure[3][0];
                             Dst1PosY = treasure[3][1];
+							InitPoint = 3;
                         }
                     }
                     else if(!strcmp(recv_mod, "False")){    //get false
-                        recv_mod = strtok(NULL, ":\0");
+                        recv_mod = strtok(NULL, ":");
                         sscanf(recv_mod, "%c", recv_name);
                         char *name = "(";
                         char *dst1posx, *dst1posy;
@@ -174,17 +182,13 @@ void askPos( void * parameter ){
                         send_mes(recv_name, name);
                     }
                     else if(!strcmp(recv_mod, "POS")){
-                        recv_mod = strtok(NULL, ":\0");
+                        recv_mod = strtok(NULL, ":");
                         sscanf(recv_mod, "(%d,%d)", &MyPosX, &MyPosY);
                     }
                 }
             }
             else{   //get my treasure position
                sscanf(recv_buf, "(%d, %d)", &Dst2PosX, &Dst2PosY); 
-               
-               //for stop to go to real position
-               Dst1PosX = -1;
-               Dst1PosY = -1;
             }
             Serial.println(recv_ID);
             Serial.println(recv_buf);
@@ -294,10 +298,10 @@ freeze(0);
 }*/
 
 void loop(){   
-    double df, dl, dr;
-    df = ultrasonicGetDistance(usTrigPins[U_F], usEchoPins[U_F]);
-    dl = ultrasonicGetDistance(usTrigPins[U_L], usEchoPins[U_L]);
-    dr = ultrasonicGetDistance(usTrigPins[U_R], usEchoPins[U_R]);
+    //double df, dl, dr;
+    //df = ultrasonicGetDistance(usTrigPins[U_F], usEchoPins[U_F]);
+    //dl = ultrasonicGetDistance(usTrigPins[U_L], usEchoPins[U_L]);
+    //dr = ultrasonicGetDistance(usTrigPins[U_R], usEchoPins[U_R]);
     //for remote
     /*if ((phmessageLen = wifiClientPh.available()) > 0) {
       bufPh[0] = wifiClientPh.read();
@@ -310,15 +314,54 @@ void loop(){
 
     //for self-moving
     if(timetogo == true){   //for game start
-        if(step == 0 && Dst1PosX != -1){
-            
-            step = 1;
-        }
-        else if(step == 1 && Dst2PosX != -1){
-            
-        }
-    }
-    else if(timetogo == false){     //for game end
-        freeze(0);
-    }
+        if(digitalRead(buttonPins) == HIGH){	//for bump into things
+			backward(100);
+			left(200);
+			forward(100);
+		}
+		else if(step == 0 && Dst1PosX != -1){	//for go to first point(may not be the treasure)
+			if(check == 0){
+				switch(InitPoint){
+					case 0:
+						
+						break;
+					case 1:
+						
+						break;
+					case 2:
+						
+						break;
+					case 3:
+						
+						break;
+				}
+				check = 1;
+			}
+			else if(check == 1){
+				if(MyPosX == Dst1PosX && MyPosY == Dst1PosY){	//if get to the Dst1
+					step = 1;
+					check = 0;
+					Dst1PosX = -1;
+					Dst1PosY = -1;
+					freeze(0);
+				}
+				int PrevPosX = MyPosX;
+				int PrevPosy = MyPosY;
+			}
+		}
+		else if(step == 1 && Dst2PosX != -1){	//for go to the real treasure
+			int PrevPosX = MyPosX;
+			int PrevPosY = MyPosY;
+		}
+		else{	//all other condition
+			freeze(0);
+		}
+	}
+	else if(timetogo == false){     //for game end
+		step = 0;
+		check = 0;
+		Dst2PosX = -1;
+		Dst2PosY = -1;
+		freeze(0);
+	}
 } 
