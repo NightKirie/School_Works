@@ -17,9 +17,9 @@ WiFiClient wifiClientPh;
 static char buf[64],bufPh[64],buf_send[64],buf_phsend[64];
 static char client_ID[] = "NightKirie",Team[] = "DWLT";
 static int messageLen,phmessageLen;
-static int MyPosX, MyPosY, Dst1PosX = -1, Dst1PosY = -1, Dst2PosX = -1, Dst2PosY = -1, treasure[4][2] = {0}, InitPoint, step = 0, check = 0;
+static int MyPosX, MyPosY, Dst1PosX = -1, Dst1PosY = -1, Dst2PosX = -1, Dst2PosY = -1, TellPosX, TellPosY, treasure[4][2] = {0}, InitPoint, step = 0, check = 0;
 //Dst1 for first destination(may not be my treasure), Dst2 for my treasure, step for Dst1 to Dst2, check for things in step
-static char *recv_ID, *recv_buf, *recv_mod, *recv_name, *name = NULL;
+static char *recv_ID, *recv_buf, *recv_mod, name[32];
 
 //xTaskHandle xaskPos;
 
@@ -177,12 +177,13 @@ void askPos( void * parameter ){
                             Dst1PosX = treasure[3][0];
                             Dst1PosY = treasure[3][1];
                         }
+                        TellPosX = Dst1PosX;
+                        TellPosY = Dst1PosY;
                     }
                     else if(!strcmp(recv_mod, "False")){    //get false
                         recv_mod = strtok(NULL, ":");
-                        sscanf(recv_mod, "%c", recv_name);
-                        sprintf(name, "(%d, %d)", Dst1PosX, Dst1PosY);
-                        send_mes(recv_name, name);
+                        sprintf(name, "(%d, %d)", TellPosX, TellPosY);
+                        send_mes(recv_mod, name);
                     }
                     else if(!strcmp(recv_mod, "POS")){
                         recv_mod = strtok(NULL, ":");
@@ -195,9 +196,8 @@ void askPos( void * parameter ){
             }
             //Serial.println(recv_ID);
             //Serial.println(recv_buf);
-            Serial.println(recv_mod);
-            Serial.println(recv_name);
-            Serial.println(name);
+            //Serial.println(recv_mod);
+            //Serial.println(name);
             //Serial.println(Dst1PosX);
             //Serial.println(Dst1PosY);
     
