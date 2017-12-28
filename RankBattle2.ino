@@ -321,7 +321,7 @@ void loop(){
     //ultrasonictest(1000, df, dl, dr);
 
     //for self-moving
-    if(step != 2){   //for game start
+    if(step != 2 && timetogo == true){   //for game start
         if(digitalRead(buttonPins) == HIGH){	//for bump into things
 			backward(100);
 			left(250);
@@ -413,5 +413,6 @@ void loop(){
         Dst2PosX = -1;
         Dst2PosY = -1;
         freeze(0);
+        falsetrue = false;
     }
 } 
