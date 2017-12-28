@@ -18,6 +18,7 @@ static char buf[64],bufPh[64],buf_send[64],buf_phsend[64];
 static char client_ID[] = "NightKirie",Team[] = "DWLT";
 static int messageLen,phmessageLen;
 static int MyPosX, MyPosY, Dst1PosX = -1, Dst1PosY = -1, Dst2PosX = -1, Dst2PosY = -1, TellPosX, TellPosY, treasure[4][2] = {0}, InitPoint, step = 0, check = 0;
+bool falsetrue = false;
 //Dst1 for first destination(may not be my treasure), Dst2 for my treasure, step for Dst1 to Dst2, check for things in step
 static char *recv_ID, *recv_buf, *recv_mod, name[32];
 
@@ -184,6 +185,7 @@ void askPos( void * parameter ){
                         recv_mod = strtok(NULL, ":");
                         sprintf(name, "(%d, %d)", TellPosX, TellPosY);
                         send_mes(recv_mod, name);
+                        falsetrue = true;
                     }
                     else if(!strcmp(recv_mod, "POS")){
                         recv_mod = strtok(NULL, ":");
@@ -197,7 +199,7 @@ void askPos( void * parameter ){
             //Serial.println(recv_ID);
             //Serial.println(recv_buf);
             //Serial.println(recv_mod);
-            //Serial.println(name);
+            //R.aR.Serial.println(name);
             //Serial.println(Dst1PosX);
             //Serial.println(Dst1PosY);
     
@@ -356,7 +358,7 @@ void loop(){
                 check = 1;
             }
             else if(check == 1){
-                if(abs(MyPosX - Dst1PosX) <= 50 && abs(MyPosY - Dst1PosY) <= 50 && (name != NULL || timetogo == false)){	//if get to the Dst1
+                if(abs(MyPosX - Dst1PosX) <= 50 && abs(MyPosY - Dst1PosY) <= 50 && (falsetrue || timetogo == false)){	//if get to the Dst1
                     step = 1;
                     check = 0;
                     Dst1PosX = -1;
