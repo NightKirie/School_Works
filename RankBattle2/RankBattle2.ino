@@ -12,20 +12,27 @@
 #define TCP_PORT 5000   
 
 static bool timetogo = false; //false for waiting for start, true for can remote
+
+//wificlient connect between car and wifiserver
 WiFiClient wifiClient;
+static char buf[64],buf_send[64];
+
+//wificlient connect between car and phone
+/*
 WiFiClient wifiClientPh;
-static char buf[64],bufPh[64],buf_send[64],buf_phsend[64];
-static char client_ID[] = "NightKirie",Team[] = "DWLT";
-static int messageLen,phmessageLen;
-static int MyPosX, MyPosY, Dst1PosX = -1, Dst1PosY = -1, Dst2PosX = -1, Dst2PosY = -1, TellPosX, TellPosY, treasure[4][2] = {0};
+static char bufPh[64],buf_phsend[64];
+*/
+
+static char client_ID[] = "NightKirie";
+static int treasure[4][2] = {0};
 static int index,step=0,check=0;
 bool falsetrue = false;
-//Dst1 for first destination(may not be my treasure), Dst2 for my treasure, step for Dst1 to Dst2, check for things in step
+
+//step for Dst1 to Dst2, check for things in step
 static char *recv_ID, *recv_buf, *recv_mod, name[32];
 
-//xTaskHandle xaskPos;
-
-enum MotorPinID {
+enum MotorPinID
+{
     L_F = 0,
     L_B,
     R_F,
@@ -35,8 +42,19 @@ enum MotorPinID {
 class point
 {
     public:
+    point(int x=-1,int y=-1);
     int x,y;
 };
+point::point(int x,int y)
+{
+    this->x=x;
+    this->y=y;
+}
+//Dst1 for first destination(may not be my treasure)
+point Dst1Pos,MyPos;
+
+//xTaskHandle xaskPos;
+
 /*enum UltrasonicPinID {
     U_F = 0,
     U_L,
@@ -114,23 +132,26 @@ void setup(){
 }*/
 
 void askPos( void * parameter ){
+    //get message from server
+    //format: Master|Words
+    //or like: Master|(1,2)(3,4)
+    //so we need to escape | and some characters
     while(1){
         //read message from server
-        if ((messageLen = wifiClient.available()) > 0) {
-            int i = 0;
-            do{
-                buf[i++] = wifiClient.read();
-            }while(i<64 && buf[i-1]!='\r'); 
-            buf[i-1] = '\0';
+        if (wifiClient.available())
+        {
+            for(int i=0;i<64&&buf[i]!='\r';i++)
+            {
+                buf[i]=wifiClient.read();
+            }
             recv_ID = strtok(buf,"|");
             recv_buf = strtok(NULL,"|");
-            //Serial.println(recv_buf);
             if(!strcmp(recv_ID, "Master")){     //From Master
                 if(!strcmp(recv_buf, "Start"))
                 {     //Start
                     timetogo = true;
                     step = 0;
-                    index=setIndex(MyPosX,MyPosY);
+                    index=setIndex(MyPos.x,MyPos.y);
                     delay((index+1)*50);
                     send_mes("Treasure","");
                 }
@@ -143,31 +164,27 @@ void askPos( void * parameter ){
                     if(!strcmp(recv_mod, "Treasure")){  //get treasure position
                         recv_mod = strtok(NULL, ":");
                         sscanf(recv_mod, "(%d, %d)(%d, %d)(%d, %d)(%d, %d)", &treasure[0][0], &treasure[0][1], &treasure[1][0], &treasure[1][1], &treasure[2][0], &treasure[2][1], &treasure[3][0], &treasure[3][1]);
-                        Dst1PosX = treasure[index][0];
-                        Dst1PosY = treasure[index][1];
-                        TellPosX = Dst1PosX;
-                        TellPosY = Dst1PosY;
+                        Dst1Pos.x = treasure[index][0];
+                        Dst1Pos.y = treasure[index][1];
                     }
                     else if(!strcmp(recv_mod, "False")){    //get false
                         recv_mod = strtok(NULL, ":");
-                        sprintf(name, "(%d, %d)", TellPosX, TellPosY);
+                        sprintf(name, "(%d, %d)",treasure[index][0],treasure[index][1]);
                         send_mes(recv_mod, name);
                         falsetrue = true;
                     }
                     else if(!strcmp(recv_mod, "POS")){
                         recv_mod = strtok(NULL, ":");
-                        sscanf(recv_mod, "(%d,%d)", &MyPosX, &MyPosY);
+                        sscanf(recv_mod, "(%d,%d)", &MyPos.x, &MyPos.y);
                     }
                 }
             }
             else{   //get my treasure position
-                sscanf(recv_buf, "(%d, %d)", &Dst2PosX, &Dst2PosY); 
+                sscanf(recv_buf, "(%d, %d)", &Dst1Pos.x, &Dst1Pos.y); 
             }
-            //send_phone(MyPosX,MyPosY); 
             send_mes("Position","");
         }
     }
-    //Serial.println("Ending task 1");
     vTaskDelete(NULL);
 }
 
@@ -223,78 +240,82 @@ void slightly_right(int t){
 
 
 //for remote
-/*void remoteCommand()
-  {
-  if(timetogo == true){
-// Stop moving
-if (bufPh[1] == 'E') {
-freeze(0);
+/*
+void remoteCommand()
+{
+    if(timetogo == true)
+    {
+        // Stop moving
+        if (bufPh[1] == 'E')
+        {
+            freeze(0);
+        }
+        else
+        {
+            switch (bufPh[0])
+            {
+                case 'F':   // Forward
+                    forward(0);
+                    break;
+                case 'B':   // Backward
+                    backward(0);
+                    break;
+                case 'L':   // Turn left
+                    left(0);
+                    break;
+                case 'R':   // Turn right
+                    right(0);
+                    break;
+                case 'Z':   // Special stuff
+                    break;
+            }
+        }
+    }
+    else if(timetogo == false)
+    {
+        freeze(0);
+    }
 }
-else{
-switch (bufPh[0]) {
-case 'F':   // Forward
-forward(0);
-break;
-case 'B':   // Backward
-backward(0);
-break;
-case 'L':   // Turn left
-left(0);
-break;
-case 'R':   // Turn right
-right(0);
-break;
-case 'Z':   // Report ultrasonic distance and color
-//    reportUltrasonic();
-//reportColorSensor();
-break;
-}
-}
-}
-else if(timetogo == false){
-freeze(0);
-}
-}*/
+*/
 
-void loop(){   
-    //double df, dl, dr;
-    //df = ultrasonicGetDistance(usTrigPins[U_F], usEchoPins[U_F]);
-    //dl = ultrasonicGetDistance(usTrigPins[U_L], usEchoPins[U_L]);
-    //dr = ultrasonicGetDistance(usTrigPins[U_R], usEchoPins[U_R]);
+void loop()
+{   
     //for remote
-    /*if ((phmessageLen = wifiClientPh.available()) > 0) {
+    /*
+    if (wifiClientPh.available())
+    {
         bufPh[0] = wifiClientPh.read();
         bufPh[1] = wifiClientPh.read();
         remoteCommand();
-        }
+    }
     */
 
     //for self-moving
     if(step != 2){   //for game start
         pushButton();
-        if(step == 0 && Dst1PosX != -1){	//for go to first point(may not be the treasure)
+        if(step == 0 && Dst1Pos.x != -1){	//for go to first point(may not be the treasure)
             if(check == 0){
                 double degree;
-                int NewPosX, NewPosY;
+                point NewPos;
                 switch(index){
                     case 0:
-                        NewPosX = -(Dst1PosY - MyPosY);
-                        NewPosY = Dst1PosX - MyPosX;
+                        NewPos.x = -(Dst1Pos.y - MyPos.y);
+                        NewPos.y = Dst1Pos.x - MyPos.x;
                         break;
                     case 1:
-                        NewPosX = Dst1PosX - MyPosX;
-                        NewPosY = Dst1PosY - MyPosY;
+                        NewPos.x = Dst1Pos.x - MyPos.x;
+                        NewPos.y = Dst1Pos.y - MyPos.y;
                         break;
                     case 2:
-                        NewPosX = Dst1PosY - MyPosY;
-                        NewPosY = -(Dst1PosX - MyPosX);
+                        NewPos.x = Dst1Pos.y - MyPos.y;
+                        NewPos.y = -(Dst1Pos.x - MyPos.x);
                         break;
                     case 3:
-                        NewPosX = -(Dst1PosX - MyPosX);
-                        NewPosY = -(Dst1PosY - MyPosY);
+                        NewPos.x = -(Dst1Pos.x - MyPos.x);
+                        NewPos.y = -(Dst1Pos.y - MyPos.y);
                         break;
                 }
-                degree = atan2(NewPosY, NewPosX);
+                degree = atan2(NewPos.y, NewPos.x);
                 if(degree >= 0) //turn 90 degree
                     right(300);
                 else
@@ -302,32 +323,32 @@ void loop(){
                 check = 1;
             }
             else if(check == 1){
-                if(abs(MyPosX - Dst1PosX) <= 50 && abs(MyPosY - Dst1PosY) <= 50 && (falsetrue || timetogo == false)){	//if get to the Dst1
+                if(abs(MyPos.x - Dst1Pos.x) <= 50 && abs(MyPos.y - Dst1Pos.y) <= 50 && (falsetrue || timetogo == false)){	//if get to the Dst1
                     step = 1;
                     check = 0;
-                    Dst1PosX = -1;
-                    Dst1PosY = -1;
+                    Dst1Pos.x = -1;
+                    Dst1Pos.y = -1;
                     freeze(0);
                 }
-                int PrevPosX = MyPosX;
-                int PrevPosY = MyPosY;
+                point PrevPos;
+
                 forward(50);
-                double Dst1Dir = atan2(Dst1PosY - PrevPosY, Dst1PosX - PrevPosX);
-                double MyDir = atan2(MyPosY - PrevPosY, MyPosX - PrevPosX);
+                double Dst1Dir = atan2(Dst1Pos.y - PrevPos.y, Dst1Pos.x - PrevPos.x);
+                double MyDir = atan2(MyPos.y - PrevPos.y, MyPos.x - PrevPos.x);
                 if(MyDir - Dst1Dir < 0 || MyDir - Dst1Dir > PI)
                     slightly_right(75);
                 else if(MyDir - Dst1Dir > 0)
                     slightly_left(75);
             }
         }
-        else if(step == 1 && Dst2PosX != -1){	//for go to the real treasure
+        else if(step == 1 && Dst1Pos.x != -1){	//for go to the real treasure
             if(check == 0){
-                int PrevPosX = MyPosX;
-                int PrevPosY = MyPosY;
+                int PrevPosX = MyPos.x;
+                int PrevPosY = MyPos.y;
                 forward(50);
                 freeze(0);
-                double Dst2Dir = atan2(Dst2PosY - PrevPosY, Dst2PosX - PrevPosX);
-                double MyDir = atan2(MyPosY - PrevPosY, MyPosX - PrevPosX);
+                double Dst2Dir = atan2(Dst1Pos.y - PrevPosY, Dst1Pos.x - PrevPosX);
+                double MyDir = atan2(MyPos.y - PrevPosY, MyPos.x - PrevPosX);
                 if(MyDir - Dst2Dir < 0 || MyDir - Dst2Dir > PI)
                     right(300);
                 else if(MyDir - Dst2Dir > 0)
@@ -335,12 +356,12 @@ void loop(){
                 check = 1;
             }
             else if(check == 1){
-                int PrevPosX = MyPosX;
-                int PrevPosY = MyPosY;
+                int PrevPosX = MyPos.x;
+                int PrevPosY = MyPos.y;
                 forward(50);
                 freeze(0);
-                double Dst2Dir = atan2(Dst2PosY - PrevPosY, Dst2PosX - PrevPosX);
-                double MyDir = atan2(MyPosY - PrevPosY, MyPosX - PrevPosX);
+                double Dst2Dir = atan2(Dst1Pos.y - PrevPosY, Dst1Pos.x - PrevPosX);
+                double MyDir = atan2(MyPos.y - PrevPosY, MyPos.x - PrevPosX);
                 if(MyDir - Dst2Dir < 0 || MyDir - Dst2Dir > PI)
                     slightly_right(75);
                 else if(MyDir - Dst2Dir > 0)
@@ -356,8 +377,8 @@ void loop(){
     {     
         step = 2;
         check = 0;
-        Dst2PosX = -1;
-        Dst2PosY = -1;
+        Dst1Pos.x = -1;
+        Dst1Pos.y = -1;
         freeze(0);
         falsetrue = false;
     }
@@ -374,23 +395,23 @@ void pushButton()
     }
 }
 //setup treasure index
-int setIndex(int MyPosX,int MyPosY)
+int setIndex(int x,int y)
 {
     //position is at up or down
-    if(MyPosX>=192&&MyPosX<=256)
+    if(x>=192&&x<=256)
     {
         //position at up
-        if(MyPosY<=192) index=0;
+        if(y<=192) index=0;
         //position at down
-        else if(MyPosY>=256) index=2;
+        else if(y>=256) index=2;
     }
     //position is at left or right
-    else if(MyPosY>=192&&MyPosY<=256)
+    else if(y>=192&&y<=256)
     {
         //position at left
-        if(MyPosX<=192) index=3;
+        if(x<=192) index=3;
         //position at right
-        else if(MyPosX>=256) index=1;
+        else if(x>=256) index=1;
     }
 }
 
@@ -405,13 +426,4 @@ void send_mes(char ID[],char mes[]){
     sprintf(buf,"%s|%s",ID,mes);
     wifiClient.write(buf, strlen(buf));
     wifiClient.flush();
-}
-
-void ultrasonictest(double df, double dl, double dr){
-    Serial.print("front: ");
-    Serial.println(df);
-    Serial.print("left: ");
-    Serial.println(dl);
-    Serial.print("right: ");
-    Serial.println(dr);
 }
