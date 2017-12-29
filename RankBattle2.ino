@@ -17,7 +17,8 @@ WiFiClient wifiClientPh;
 static char buf[64],bufPh[64],buf_send[64],buf_phsend[64];
 static char client_ID[] = "NightKirie",Team[] = "DWLT";
 static int messageLen,phmessageLen;
-static int MyPosX, MyPosY, Dst1PosX = -1, Dst1PosY = -1, Dst2PosX = -1, Dst2PosY = -1, TellPosX, TellPosY, treasure[4][2] = {0}, InitPoint, step = 0, check = 0;
+static int MyPosX, MyPosY, Dst1PosX = -1, Dst1PosY = -1, Dst2PosX = -1, Dst2PosY = -1, TellPosX, TellPosY, treasure[4][2] = {0};
+static int index,step=0,check=0;
 bool falsetrue = false;
 //Dst1 for first destination(may not be my treasure), Dst2 for my treasure, step for Dst1 to Dst2, check for things in step
 static char *recv_ID, *recv_buf, *recv_mod, name[32];
@@ -31,6 +32,11 @@ enum MotorPinID {
     R_B,
     NUM_OF_MOTOR_PIN
 };
+class point
+{
+    public:
+    int x,y;
+};
 /*enum UltrasonicPinID {
     U_F = 0,
     U_L,
@@ -38,7 +44,7 @@ enum MotorPinID {
     NUM_OF_ULTRASONIC_PIN
 };*/
 
-/* Pin assignment */
+// Pin assignment
 //static const uint8_t usTrigPins[NUM_OF_ULTRASONIC_PIN] = {2, 4, 6};  // F, L, R
 //static const uint8_t usEchoPins[NUM_OF_ULTRASONIC_PIN] = {3, 5, 7};  // F, L, R
 static const uint8_t motorPins[NUM_OF_MOTOR_PIN] = {14, 15, 16, 17};  //  L_F, L_B, R_F, R_B
@@ -46,12 +52,12 @@ static const uint8_t buttonPins = 2;
 
 void setup(){
     int motorpins = 0;
+    int status = WL_IDLE_STATUS;
     while(motorpins < NUM_OF_MOTOR_PIN){
         pinMode(motorPins[motorpins],OUTPUT);
         motorpins++;
     }
 	pinMode(buttonPins, INPUT);
-    int status = WL_IDLE_STATUS;
     Serial.begin(115200);
     while (!Serial)
         ;       
@@ -62,15 +68,14 @@ void setup(){
     // the board is retrying.
         delay(500);
         WiFi.begin(SSID, PASSWD);
+        status = WiFi.begin(SSID, PASSWD);
         status =  WiFi.begin(SSID, PASSWD);
         Serial.print("Attempting to connect to SSID: ");
         Serial.println(SSID);
-        Serial.println(status);
     }
     
     // Conenct to AP successfully
     while (!wifiClient.connect(TCP_IP, TCP_PORT)){
-    //delay(300);
         Serial.print("Attempting to connect to SERVER: ");
         Serial.println(TCP_IP);
     }
@@ -80,14 +85,13 @@ void setup(){
         Serial.println(TCP_IP_PHONE);
     }*/
     reg_ID();
-    //delay(1000);
     xTaskCreate(
-                    askPos,          /* Task function. */
-                    "askPos",        /* String with name of task. */
-                    10000,            /* Stack size in words. */
-                    NULL,             /* Parameter passed as input of the task */
-                    1,                /* Priority of the task. */
-                    NULL);            /* Task handle. */
+        askPos,          /* Task function. */
+        "askPos",        /* String with name of task. */
+        10000,           /* Stack size in words. */
+        NULL,            /* Parameter passed as input of the task */
+        1,               /* Priority of the task. */
+        NULL);           /* Task handle. */
 }
 
 /*double ultrasonicGetDistance(uint8_t trig, uint8_t echo){
@@ -98,17 +102,10 @@ void setup(){
     digitalWrite(trig, HIGH);
     delayMicroseconds(10);
     digitalWrite(trig, LOW);
-    duration = pulseIn(echo, HIGH, 20000L);
+    duration = pulseIn(echo, HIGH, 2000L);
     vTaskResume(xaskPos);
     return duration / 29 / 2;
 }*/
-
-void reg_ID(){
-    strcpy(buf,"Register|");
-    strcat(buf,client_ID);
-    wifiClient.write(buf, strlen(buf));
-    wifiClient.flush();
-}
 
 /*void send_phone(int x,int y){
     sprintf(buf_phsend,"(%d,%d)",x,y);
@@ -116,14 +113,9 @@ void reg_ID(){
     wifiClientPh.flush();
 }*/
 
-void send_mes(char ID[],char mes[]){
-    sprintf(buf,"%s|%s",ID,mes);
-    wifiClient.write(buf, strlen(buf));
-    wifiClient.flush();
-}
-
 void askPos( void * parameter ){
     while(1){
+        //read message from server
         if ((messageLen = wifiClient.available()) > 0) {
             int i = 0;
             do{
@@ -131,30 +123,19 @@ void askPos( void * parameter ){
             }while(i<64 && buf[i-1]!='\r'); 
             buf[i-1] = '\0';
             recv_ID = strtok(buf,"|");
-            //Serial.print(recv_ID);
-            //Serial.print(":");
             recv_buf = strtok(NULL,"|");
             //Serial.println(recv_buf);
             if(!strcmp(recv_ID, "Master")){     //From Master
-                if(!strcmp(recv_buf, "Start")){     //Start
+                if(!strcmp(recv_buf, "Start"))
+                {     //Start
                     timetogo = true;
                     step = 0;
-                    if(MyPosX >= 192 && MyPosX <= 256 && MyPosY <=192){
-                        InitPoint = 0;
-                    }
-                    else if(MyPosX >= 256 && MyPosY >= 192 && MyPosY <= 256){
-                        InitPoint = 1;
-                    }
-                    else if(MyPosX >= 192 && MyPosX <= 256 && MyPosY >= 256){
-                        InitPoint = 2;
-                    }
-                    else if(MyPosX <= 192 && MyPosY >= 192 && MyPosY <= 256){
-                        InitPoint = 3;
-                    }
-                    delay(InitPoint * 50 + 50);
+                    index=setIndex(MyPosX,MyPosY);
+                    delay((index+1)*50);
                     send_mes("Treasure","");
                 }
-                else if(!strcmp(recv_buf, "Done")){     //End
+                else if(!strcmp(recv_buf, "Done"))
+                {     //End
                     timetogo = false;
                 }
                 else{ //Something else
@@ -162,22 +143,8 @@ void askPos( void * parameter ){
                     if(!strcmp(recv_mod, "Treasure")){  //get treasure position
                         recv_mod = strtok(NULL, ":");
                         sscanf(recv_mod, "(%d, %d)(%d, %d)(%d, %d)(%d, %d)", &treasure[0][0], &treasure[0][1], &treasure[1][0], &treasure[1][1], &treasure[2][0], &treasure[2][1], &treasure[3][0], &treasure[3][1]);
-                        if(MyPosX >= 192 && MyPosX <= 256 && MyPosY <=192){
-                            Dst1PosX = treasure[0][0];
-                            Dst1PosY = treasure[0][1];
-                        }
-                        else if(MyPosX >= 256 && MyPosY >= 192 && MyPosY <= 256){
-                            Dst1PosX = treasure[1][0];
-                            Dst1PosY = treasure[1][1];
-                        }
-                        else if(MyPosX >= 192 && MyPosX <= 256 && MyPosY >= 256){
-                            Dst1PosX = treasure[2][0];
-                            Dst1PosY = treasure[2][1];
-                        }
-                        else if(MyPosX <= 192 && MyPosY >= 192 && MyPosY <= 256){
-                            Dst1PosX = treasure[3][0];
-                            Dst1PosY = treasure[3][1];
-                        }
+                        Dst1PosX = treasure[index][0];
+                        Dst1PosY = treasure[index][1];
                         TellPosX = Dst1PosX;
                         TellPosY = Dst1PosY;
                     }
@@ -196,20 +163,12 @@ void askPos( void * parameter ){
             else{   //get my treasure position
                 sscanf(recv_buf, "(%d, %d)", &Dst2PosX, &Dst2PosY); 
             }
-            //Serial.println(recv_ID);
-            //Serial.println(recv_buf);
-            //Serial.println(recv_mod);
-            //R.aR.Serial.println(name);
-            //Serial.println(Dst1PosX);
-            //Serial.println(Dst1PosY);
-    
             //send_phone(MyPosX,MyPosY); 
             send_mes("Position","");
         }
     }
-
     //Serial.println("Ending task 1");
-    vTaskDelete( NULL );
+    vTaskDelete(NULL);
 }
 
 void freeze(int t){
@@ -261,15 +220,7 @@ void slightly_right(int t){
     analogWrite(motorPins[R_B], 0);
     delay(t);
 } 
-void ultrasonictest(int t, double df, double dl, double dr){
-    Serial.print("front: ");
-    Serial.println(df);
-    Serial.print("left: ");
-    Serial.println(dl);
-    Serial.print("right: ");
-    Serial.println(dr);
-    delay(t);
-}
+
 
 //for remote
 /*void remoteCommand()
@@ -312,26 +263,20 @@ void loop(){
     //dr = ultrasonicGetDistance(usTrigPins[U_R], usEchoPins[U_R]);
     //for remote
     /*if ((phmessageLen = wifiClientPh.available()) > 0) {
-      bufPh[0] = wifiClientPh.read();
-      bufPh[1] = wifiClientPh.read();
-      remoteCommand();
-      }*/
-
-    //ultrasonic testing
-    //ultrasonictest(1000, df, dl, dr);
+        bufPh[0] = wifiClientPh.read();
+        bufPh[1] = wifiClientPh.read();
+        remoteCommand();
+        }
+    */
 
     //for self-moving
     if(step != 2){   //for game start
-        if(digitalRead(buttonPins) == HIGH){	//for bump into things
-			backward(100);
-			left(250);
-			forward(100);
-		}
-        else if(step == 0 && Dst1PosX != -1){	//for go to first point(may not be the treasure)
+        pushButton();
+        if(step == 0 && Dst1PosX != -1){	//for go to first point(may not be the treasure)
             if(check == 0){
                 double degree;
                 int NewPosX, NewPosY;
-                switch(InitPoint){
+                switch(index){
                     case 0:
                         NewPosX = -(Dst1PosY - MyPosY);
                         NewPosY = Dst1PosX - MyPosX;
@@ -354,7 +299,6 @@ void loop(){
                     right(300);
                 else
                     left(300);
-
                 check = 1;
             }
             else if(check == 1){
@@ -407,7 +351,9 @@ void loop(){
             freeze(0);
         }
     }
-    if(timetogo == false && step != 0){     //for game end
+    //for game end
+    if(timetogo == false && step != 0)
+    {     
         step = 2;
         check = 0;
         Dst2PosX = -1;
@@ -415,4 +361,57 @@ void loop(){
         freeze(0);
         falsetrue = false;
     }
-} 
+}
+
+//detect button is triggered or not
+void pushButton()
+{
+    if(digitalRead(buttonPins) == HIGH)
+    {
+        backward(100);
+        left(250);
+        forward(100);
+    }
+}
+//setup treasure index
+int setIndex(int MyPosX,int MyPosY)
+{
+    //position is at up or down
+    if(MyPosX>=192&&MyPosX<=256)
+    {
+        //position at up
+        if(MyPosY<=192) index=0;
+        //position at down
+        else if(MyPosY>=256) index=2;
+    }
+    //position is at left or right
+    else if(MyPosY>=192&&MyPosY<=256)
+    {
+        //position at left
+        if(MyPosX<=192) index=3;
+        //position at right
+        else if(MyPosX>=256) index=1;
+    }
+}
+
+void reg_ID(){
+    strcpy(buf,"Register|");
+    strcat(buf,client_ID);
+    wifiClient.write(buf,strlen(buf));
+    wifiClient.flush();
+}
+
+void send_mes(char ID[],char mes[]){
+    sprintf(buf,"%s|%s",ID,mes);
+    wifiClient.write(buf, strlen(buf));
+    wifiClient.flush();
+}
+
+void ultrasonictest(double df, double dl, double dr){
+    Serial.print("front: ");
+    Serial.println(df);
+    Serial.print("left: ");
+    Serial.println(dl);
+    Serial.print("right: ");
+    Serial.println(dr);
+}
