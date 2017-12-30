@@ -156,8 +156,8 @@ void askPos( void * parameter ){
                     delay((index+1)*50);
                     send_mes("Treasure","");
                 }
-                else if(!strcmp(recv_buf, "Done"))
-                {     //End
+                else if(!strcmp(recv_buf, "Done"))  //game End
+                {
                     timetogo = false;
                 }
                 else{ //Something else
@@ -327,7 +327,6 @@ void loop()
                     freeze(0);
                 }
                 point PrevPos=point(MyPos.x,MyPos.y);
-
                 forward(50);
                 double Dst1Dir = atan2(Dst1Pos.y - PrevPos.y, Dst1Pos.x - PrevPos.x);
                 double MyDir = atan2(MyPos.y - PrevPos.y, MyPos.x - PrevPos.x);
@@ -339,22 +338,20 @@ void loop()
         }
         else if(step == 1 && Dst2Pos.x != -1){	//for go to the real treasure
             point PrevPos=point(MyPos.x,MyPos.y);
-            if(check == 0){
-                forward(50);
-                freeze(0);
-                double Dst2Dir = atan2(Dst2Pos.y - PrevPos.y, Dst2Pos.x - PrevPos.x);
-                double MyDir = atan2(MyPos.y - PrevPos.y, MyPos.x - PrevPos.x);
+            forward(50);
+            freeze(0);
+            double Dst2Dir = atan2(Dst2Pos.y - PrevPos.y, Dst2Pos.x - PrevPos.x);
+            double MyDir = atan2(MyPos.y - PrevPos.y, MyPos.x - PrevPos.x);
+            if(check == 0)
+            {
                 if(MyDir - Dst2Dir < 0 || MyDir - Dst2Dir > PI)
                     right(300);
                 else if(MyDir - Dst2Dir > 0)
                     left(300);
                 check = 1;
             }
-            else if(check == 1){
-                forward(50);
-                freeze(0);
-                double Dst2Dir = atan2(Dst2Pos.y - PrevPos.y, Dst2Pos.x - PrevPos.x);
-                double MyDir = atan2(MyPos.y - PrevPos.y, MyPos.x - PrevPos.x);
+            else if(check == 1)
+            {
                 if(MyDir - Dst2Dir < 0 || MyDir - Dst2Dir > PI)
                     slightly_right(75);
                 else if(MyDir - Dst2Dir > 0)
