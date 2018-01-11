@@ -8,7 +8,7 @@ syms y;
 f = @(x,y)(x^2 + y^2);
 a(1) = 1;
 for i = 1:num-1
-    a(i+1) = a(i) + h*subs(f,[x,y], [1+h*(i-1), a(i)]);
+    a(i+1) = a(i) + h*subs(f,[x,y], [xn(i), a(i)]);
 end
 result = [xn' a']
 
