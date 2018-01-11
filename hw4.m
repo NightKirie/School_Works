@@ -13,7 +13,21 @@ end
 result = [xn' a']
 
 %% Section 1(b)
+h = 0.1;
+xn = 0:h:0.5;
+num = numel(xn);
+yn = zeros(1,num);
+yyn = zeros(1,num);
+yn(1) = -2;
+yyn(1) = 1;
+syms x;
+syms y;
+syms yy;
+f = 4*yy - 4*y;
+for i = 1:num-1
+    yn(i+1) = yn(i) + h*yyn(i);
+    yyn(i+1) = yyn(i) + h*subs(f,[yy, y], [yyn(i), yn(i)]);
+end
+result = [xn' yn']
 
 %% Section 2(a)
-
-%% Section 2(b)
