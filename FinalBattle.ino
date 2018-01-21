@@ -5,9 +5,9 @@
 #include <FreeRTOS.h>
 
 
-#define SSID "1scream2.4G"
+#define SSID "2scream"
 #define PASSWD "2017scream"
-#define TCP_IP "192.168.0.50"
+#define TCP_IP "192.168.0.101"
 #define TCP_PORT 5000
 
 static bool timetogo = false; //false for waiting for start, true for can remote
@@ -16,12 +16,8 @@ static bool timetogo = false; //false for waiting for start, true for can remote
 WiFiClient wifiClient;
 static char buf[128], buf_send[128];
 static char client_ID[] = "NightKirie", Team[] = "A", BaseA = 'C', BaseB = 'C';
-static int treasure[4][2] = {0};
 static int index, step = 0, check = 0, hp = 0;
-bool falsetrue = false;
-
-//step for Dst1 to Dst2, check for things in step
-static char *recv_ID, *recv_buf, *recv_mod, name[32];
+static char *recv_ID, *recv_buf, *recv_mod;
 
 enum MotorPinID
 {
@@ -42,9 +38,6 @@ class point
         int x, y;
 };
 
-int dot(point A, point B){
-    return A.x*B.x + A.y*B.y;  
-}
 //Dst1 for first destination(may not be my treasure)
 point DstPos, MyPos, lighthouse[3], MyDir, LastPos;
 const point TeamAPos(96, 96), TeamBPos(480, 480);
@@ -85,7 +78,6 @@ void setup() {
         delay(500);
         WiFi.begin(SSID, PASSWD);
         status = WiFi.begin(SSID, PASSWD);
-        status =  WiFi.begin(SSID, PASSWD);
         Serial.print("Attempting to connect to SSID: ");
         Serial.println(SSID);
     }
@@ -107,10 +99,6 @@ void setup() {
 
 
 void askPos( void * parameter ) {
-    //get message from server
-    //format: Master|Words
-    //or like: Master|(1,2)(3,4)
-    //so we need to escape | and some characters
     while (1) {
         //read message from server
         if (wifiClient.available())
@@ -120,14 +108,10 @@ void askPos( void * parameter ) {
                 buf[i] = wifiClient.read();
             }
             recv_ID = strtok(buf, "|");
-            Serial.println(recv_ID);
-            Serial.println("####################");
             recv_buf= strtok(NULL,"|");
-            Serial.println(recv_buf);
             if (!strcmp(recv_ID, "Master")) {   //From Master
                 if (!strncmp(recv_buf, "Start",5))
                 { //Start
-                    Serial.println("Start!!");
                     timetogo = true;
                     step = 0;
                 }
@@ -141,22 +125,7 @@ void askPos( void * parameter ) {
                         recv_mod = strtok(NULL, ":");
                         sscanf(recv_mod, "(%d, %d)BaseA:%cBaseB:%cTowers:(%d, %d)(%d, %d)(%d, %d)Blood:%d", &MyPos.x, &MyPos.y, &BaseA, &BaseB, &lighthouse[0].x, &lighthouse[0].y, &lighthouse[1].x, &lighthouse[1].y, &lighthouse[2].x, &lighthouse[2].y, &hp);
                     }
-                    //Serial.println(recv_buf);
-                    //Serial.println(MyPos.x);
-                    //Serial.println(MyPos.y);
-                    //float dist[3];
-                    //dist[0]=(lighthouse[0].x-MyPos.x)*(lighthouse[0].x-MyPos.x)+(lighthouse[0].y-MyPos.y)*(lighthouse[0].y-MyPos.y);
-                    //dist[1]=(lighthouse[1].x-MyPos.x)*(lighthouse[1].x-MyPos.x)+(lighthouse[1].y-MyPos.y)*(lighthouse[1].y-MyPos.y);
-                    //dist[2]=(lighthouse[2].x-MyPos.x)*(lighthouse[2].x-MyPos.x)+(lighthouse[2].y-MyPos.y)*(lighthouse[2].y-MyPos.y);
-                    //int shortest=0,shortestPath=dist[0];
-                    //for(int i=1;i<3;++i){
-                    //    if(dist[i]<shortestPath){
-                    //        shortest=i;
-                    //        shortestPath=dist[i];
-                    //    }
-                    //}
-                    DstPos = lighthouse[0];
-                    //set direction
+                    DstPos = TeamAPos;
                 }
             }
             if(timetogo == true)
@@ -174,18 +143,18 @@ void freeze(int t) {
     analogWrite(motorPins[R_B], 0);
     delay(t);
 }
-void forward(int t, int power) {
-    analogWrite(motorPins[L_F], power);
+void forward(int t) {
+    analogWrite(motorPins[L_F], 255);
     analogWrite(motorPins[L_B], 0);
-    analogWrite(motorPins[R_F], power);
+    analogWrite(motorPins[R_F], 255);
     analogWrite(motorPins[R_B], 0);
     delay(t);
 }
-void backward(int t, int power) {
+void backward(int t) {
     analogWrite(motorPins[L_F], 0);
-    analogWrite(motorPins[L_B], power);
+    analogWrite(motorPins[L_B], 255);
     analogWrite(motorPins[R_F], 0);
-    analogWrite(motorPins[R_B], power);
+    analogWrite(motorPins[R_B], 255);
     delay(t);
 }
 void left(int t) {
@@ -222,7 +191,7 @@ void loop()
     //it can't decide which destination to go
     if(timetogo){
         point LastPos(MyPos.x, MyPos.y);
-        forward(50, 255);
+        forward(50);
         double DstDegree = atan2(DstPos.x - MyPos.x, DstPos.y - MyPos.y);
         double MyDegree = atan2(MyPos.x - LastPos.x, MyPos.y - LastPos.y);
         double Degree = MyDegree - DstDegree;
@@ -238,26 +207,5 @@ void loop()
             else
                 slightly_left(75, (400*Degree/PI > 255)?255 : 400*Degree/PI);
         }
-    }
-}
-
-//setup treasure index
-int setIndex(int x, int y)
-{
-    //position is at up or down
-    if (x >= 192 && x <= 256)
-    {
-        //position at up
-        if (y <= 192) index = 0;
-        //position at down
-        else if (y >= 256) index = 2;
-    }
-    //position is at left or right
-    else if (y >= 192 && y <= 256)
-    {
-        //position at left
-        if (x <= 192) index = 3;
-        //position at right
-        else if (x >= 256) index = 1;
     }
 }
