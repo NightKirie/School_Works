@@ -11,7 +11,8 @@
 //#define TCP_IP_PHONE "192.168.0.31"
 #define TCP_PORT 5000   
 
-static bool timetogo = false; //false for waiting for start, true for can remote
+//false for waiting for start, true for game finished
+static bool timetogo = false; 
 
 //wificlient connect between car and wifiserver
 WiFiClient wifiClient;
@@ -51,7 +52,7 @@ point::point(int x,int y)
     this->y=y;
 }
 //Dst1 for first destination(may not be my treasure)
-point Dst1Pos,MyPos;
+point Dst1Pos,MyPos,Dst2Pos;
 
 //xTaskHandle xaskPos;
 
@@ -155,8 +156,8 @@ void askPos( void * parameter ){
                     delay((index+1)*50);
                     send_mes("Treasure","");
                 }
-                else if(!strcmp(recv_buf, "Done"))
-                {     //End
+                else if(!strcmp(recv_buf, "Done"))  //game End
+                {
                     timetogo = false;
                 }
                 else{ //Something else
@@ -164,8 +165,7 @@ void askPos( void * parameter ){
                     if(!strcmp(recv_mod, "Treasure")){  //get treasure position
                         recv_mod = strtok(NULL, ":");
                         sscanf(recv_mod, "(%d, %d)(%d, %d)(%d, %d)(%d, %d)", &treasure[0][0], &treasure[0][1], &treasure[1][0], &treasure[1][1], &treasure[2][0], &treasure[2][1], &treasure[3][0], &treasure[3][1]);
-                        Dst1Pos.x = treasure[index][0];
-                        Dst1Pos.y = treasure[index][1];
+                        Dst1Pos=point(treasure[index][0],treasure[index][1]);
                     }
                     else if(!strcmp(recv_mod, "False")){    //get false
                         recv_mod = strtok(NULL, ":");
@@ -179,8 +179,9 @@ void askPos( void * parameter ){
                     }
                 }
             }
-            else{   //get my treasure position
-                sscanf(recv_buf, "(%d, %d)", &Dst1Pos.x, &Dst1Pos.y); 
+            else
+            {   //get my treasure position
+                sscanf(recv_buf, "(%d, %d)", &Dst2Pos.x, &Dst2Pos.y); 
             }
             send_mes("Position","");
         }
@@ -299,20 +300,16 @@ void loop()
                 point NewPos;
                 switch(index){
                     case 0:
-                        NewPos.x = -(Dst1Pos.y - MyPos.y);
-                        NewPos.y = Dst1Pos.x - MyPos.x;
+                        NewPos=point(-(Dst1Pos.y - MyPos.y),Dst1Pos.x - MyPos.x);
                         break;
                     case 1:
-                        NewPos.x = Dst1Pos.x - MyPos.x;
-                        NewPos.y = Dst1Pos.y - MyPos.y;
+                        NewPos=point(Dst1Pos.x - MyPos.x,Dst1Pos.y - MyPos.y);
                         break;
                     case 2:
-                        NewPos.x = Dst1Pos.y - MyPos.y;
-                        NewPos.y = -(Dst1Pos.x - MyPos.x);
+                        NewPos=point(Dst1Pos.y - MyPos.y,-(Dst1Pos.x - MyPos.x));
                         break;
                     case 3:
-                        NewPos.x = -(Dst1Pos.x - MyPos.x);
-                        NewPos.y = -(Dst1Pos.y - MyPos.y);
+                        NewPos=point(-(Dst1Pos.x - MyPos.x),-(Dst1Pos.y - MyPos.y));
                         break;
                 }
                 degree = atan2(NewPos.y, NewPos.x);
@@ -326,12 +323,10 @@ void loop()
                 if(abs(MyPos.x - Dst1Pos.x) <= 50 && abs(MyPos.y - Dst1Pos.y) <= 50 && (falsetrue || timetogo == false)){	//if get to the Dst1
                     step = 1;
                     check = 0;
-                    Dst1Pos.x = -1;
-                    Dst1Pos.y = -1;
+                    Dst1Pos=point(-1,-1);
                     freeze(0);
                 }
-                point PrevPos;
-
+                point PrevPos=point(MyPos.x,MyPos.y);
                 forward(50);
                 double Dst1Dir = atan2(Dst1Pos.y - PrevPos.y, Dst1Pos.x - PrevPos.x);
                 double MyDir = atan2(MyPos.y - PrevPos.y, MyPos.x - PrevPos.x);
@@ -341,27 +336,22 @@ void loop()
                     slightly_left(75);
             }
         }
-        else if(step == 1 && Dst1Pos.x != -1){	//for go to the real treasure
-            if(check == 0){
-                int PrevPosX = MyPos.x;
-                int PrevPosY = MyPos.y;
-                forward(50);
-                freeze(0);
-                double Dst2Dir = atan2(Dst1Pos.y - PrevPosY, Dst1Pos.x - PrevPosX);
-                double MyDir = atan2(MyPos.y - PrevPosY, MyPos.x - PrevPosX);
+        else if(step == 1 && Dst2Pos.x != -1){	//for go to the real treasure
+            point PrevPos=point(MyPos.x,MyPos.y);
+            forward(50);
+            freeze(0);
+            double Dst2Dir = atan2(Dst2Pos.y - PrevPos.y, Dst2Pos.x - PrevPos.x);
+            double MyDir = atan2(MyPos.y - PrevPos.y, MyPos.x - PrevPos.x);
+            if(check == 0)
+            {
                 if(MyDir - Dst2Dir < 0 || MyDir - Dst2Dir > PI)
                     right(300);
                 else if(MyDir - Dst2Dir > 0)
                     left(300);
                 check = 1;
             }
-            else if(check == 1){
-                int PrevPosX = MyPos.x;
-                int PrevPosY = MyPos.y;
-                forward(50);
-                freeze(0);
-                double Dst2Dir = atan2(Dst1Pos.y - PrevPosY, Dst1Pos.x - PrevPosX);
-                double MyDir = atan2(MyPos.y - PrevPosY, MyPos.x - PrevPosX);
+            else if(check == 1)
+            {
                 if(MyDir - Dst2Dir < 0 || MyDir - Dst2Dir > PI)
                     slightly_right(75);
                 else if(MyDir - Dst2Dir > 0)
@@ -377,8 +367,7 @@ void loop()
     {     
         step = 2;
         check = 0;
-        Dst1Pos.x = -1;
-        Dst1Pos.y = -1;
+        Dst2Pos=point(-1,-1);
         freeze(0);
         falsetrue = false;
     }
