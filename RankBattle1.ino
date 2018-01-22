@@ -222,7 +222,7 @@ void loop()
         } 
         else if (BaseA == 'O') {
             if (abs(MyPos.x - PosA.x) <= 25 && abs(MyPos.y - PosA.y) <= 25) { //if get to the Dst1
-                freeze(3500);
+                freeze(0);
                 return;
             }
             forward(100);
@@ -232,7 +232,7 @@ void loop()
         } 
         else if (BaseB == 'O') {
             if (abs(MyPos.x - PosB.x) <= 25 && abs(MyPos.y - PosB.y) <= 25) { //if get to the Dst1
-                freeze(3500);
+                freeze(0);
                 return;
             }
             forward(100);
@@ -246,7 +246,7 @@ void loop()
             if (Degree < -PI / 2 || Degree > -PI * 3 / 2){
                 right(150);
                 PrevPos = MyPos;
-                forward(100);
+                forward(150);
             }
             else
                 slightly_right(75, 75);
@@ -255,7 +255,7 @@ void loop()
             if (Degree > PI / 2){
                 left(150);
                 PrevPos = MyPos;
-                forward(100);
+                forward(150);
             }    
             else
                 slightly_left(75, 75);
