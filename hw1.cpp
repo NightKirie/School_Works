@@ -1,24 +1,26 @@
-//compile: g++ -o hw1 hw1.cpp
-//execute: ./hw1
-//you can input from 1 ~ 9
 #include <iostream>
 using namespace std;
 
 #define DOTS 10	//for using 1 ~ 9 nodes
- 
-int CalculatePaths(bool visited[DOTS], int passby[DOTS][DOTS], int thisNode, int nodesToGo){
-    if (nodesToGo <= 0)
-        return (nodesToGo == 0)? 1 : 0;
-    int path = 0;
-    visited[thisNode] = true;	//Currently set this node is visited
-    for(int i = 1; i < DOTS; i++){
-       if(!visited[i] && (!passby[thisNode][i] || visited[passby[thisNode][i]]))	//if node i is unvisited, and no node between node i and this node, or the node between node i and this node is visited, go to node i
-         	path += CalculatePaths(visited, passby, i, nodesToGo-1);
-    }
-    visited[thisNode] = false;	//after recursive, this node will be reseted to unvisited for next loop
-    return path;
+
+int PathsOfConnection(int, int);
+int CalculatePaths(bool[DOTS], int[DOTS][DOTS], int, int);
+
+int main(){
+    int minNode, maxNode;
+	
+	cout << "Please input the minimum number of nodes you want to connect: ";
+	cin >> minNode;
+	cout << endl;
+	
+	cout << "Please input the maximum number of nodes you want to connect: ";
+	cin >> maxNode;
+	cout << endl;
+    
+	cout << "\nThere\'s " << PathsOfConnection(minNode, maxNode) << " kind of path patterns for " << minNode << " to " << maxNode << " nodes connected" << endl;
+    return 0;
 }
- 
+
 int PathsOfConnection(int minNode, int maxNode){	//for 
     int passby[DOTS][DOTS] = {0};	//for the node that pass by
 	bool visited[DOTS] = {false};	//for node that have been visited
@@ -57,19 +59,16 @@ int PathsOfConnection(int minNode, int maxNode){	//for
     }
     return path;
 }
- 
-//  Driver code to test above method
-int main(){
-    int minNode, maxNode;
-	
-	cout << "Please input the minimum number of nodes you want to connect: ";
-	cin >> minNode;
-	cout << endl;
-	
-	cout << "Please input the maximum number of nodes you want to connect: ";
-	cin >> maxNode;
-	cout << endl;
-    
-	cout << "\nThere\'s " << PathsOfConnection(minNode, maxNode) << " kind of path patterns for " << minNode << " to " << maxNode << " nodes connected" << endl;
-    return 0;
+
+int CalculatePaths(bool visited[DOTS], int passby[DOTS][DOTS], int thisNode, int nodesToGo){
+    if (nodesToGo <= 0)
+        return (nodesToGo == 0)? 1 : 0;
+    int path = 0;
+    visited[thisNode] = true;	//Currently set this node is visited
+    for(int i = 1; i < DOTS; i++){
+       if(!visited[i] && (!passby[thisNode][i] || visited[passby[thisNode][i]]))	//if node i is unvisited, and no node between node i and this node, or the node between node i and this node is visited, go to node i
+         	path += CalculatePaths(visited, passby, i, nodesToGo-1);
+    }
+    visited[thisNode] = false;	//after recursive, this node will be reseted to unvisited for next loop
+    return path;
 }
