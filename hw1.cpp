@@ -1,3 +1,6 @@
+//compile: g++ -o hw1 hw1.cpp
+//execute: ./hw1
+//you can input from 1 ~ 9
 #include <iostream>
 using namespace std;
 
