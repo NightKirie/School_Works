@@ -27,67 +27,67 @@ class TocMachine(GraphMachine):
     def is_going_to_by_nation(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['國家', 'nation', '重新選擇國家'])
+            return any(x in text.lower() for x in ['國家', 'nation', '重新選擇國家', 'reselect nation'])
         return False
 
     def is_going_to_usa(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['美國', 'usa', 'america', '重新選擇車種'])
+            return any(x in text.lower() for x in ['美國', 'usa', 'america', '重新選擇車種', 'reselect type'])
         return False
 
     def is_going_to_germany(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['德國', '得意志', '納粹', 'germany', 'nazi', '重新選擇車種'])
+            return any(x in text.lower() for x in ['德國', '得意志', '納粹', 'germany', 'nazi', '重新選擇車種', 'reselect type'])
         return False
 
     def is_going_to_ussr(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['蘇聯', '俄羅斯', 'ussr', 'russia', 'cccp', '重新選擇車種'])
+            return any(x in text.lower() for x in ['蘇聯', '俄羅斯', 'ussr', 'russia', 'cccp', '重新選擇車種', 'reselect type'])
         return False
 
     def is_going_to_british(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['英國', '大英帝國', 'british', 'england', 'uk', '重新選擇車種'])
+            return any(x in text.lower() for x in ['英國', '大英帝國', 'british', 'england', 'uk', '重新選擇車種', 'reselect type'])
         return False
 
     def is_going_to_by_type(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['車種', 'type', '重新選擇車種'])
+            return any(x in text.lower() for x in ['車種', 'type', '重新選擇車種', 'reselect type'])
         return False
 
     def is_going_to_LT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['輕型戰車', '輕型坦克', '輕坦', '輕戰', '輕型', 'light tank', 'light', 'lt', '重新選擇國家'])
+            return any(x in text.lower() for x in ['輕型戰車', '輕型坦克', '輕坦', '輕戰', '輕型', 'light tank', 'light', 'lt', '重新選擇國家', 'reselect nation'])
         return False
 
     def is_going_to_MT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['中型戰車', '中型坦克', '中坦', '中戰', '中型', 'medium tank', 'medium', 'mt', '重新選擇國家'])
+            return any(x in text.lower() for x in ['中型戰車', '中型坦克', '中坦', '中戰', '中型', 'medium tank', 'medium', 'mt', '重新選擇國家', 'reselect nation'])
         return False
 
     def is_going_to_HT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['重型戰車', '重型坦克', '重坦', '重戰', '重型', 'heavy tank', 'heavy', 'ht', '重新選擇國家'])
+            return any(x in text.lower() for x in ['重型戰車', '重型坦克', '重坦', '重戰', '重型', 'heavy tank', 'heavy', 'ht', '重新選擇國家', 'reselect nation'])
         return False
 
     def is_going_to_TD(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['驅逐戰車', '驅逐坦克', '驅逐', 'tank destroyer', 'destroyer', 'td', '重新選擇國家'])
+            return any(x in text.lower() for x in ['驅逐戰車', '驅逐坦克', '驅逐', 'tank destroyer', 'destroyer', 'td', '重新選擇國家', 'reselect nation'])
         return False
 
     def is_going_to_usa_LT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['美國', 'usa', 'america', '輕型戰車', '輕型坦克', '輕坦', '輕戰', '輕型', 'light tank', 'light', 'lt', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['美國', 'usa', 'america', '輕型戰車', '輕型坦克', '輕坦', '輕戰', '輕型', 'light tank', 'light', 'lt', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_M2_LT(self, event):
@@ -117,7 +117,7 @@ class TocMachine(GraphMachine):
     def is_going_to_usa_MT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['美國', 'usa', 'america', '中型戰車', '中型坦克', '中坦', '中戰', '中型', 'medium tank', 'medium', 'mt', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['美國', 'usa', 'america', '中型戰車', '中型坦克', '中坦', '中戰', '中型', 'medium tank', 'medium', 'mt', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
     
     def is_going_to_M2_MT(self, event):
@@ -141,7 +141,7 @@ class TocMachine(GraphMachine):
     def is_going_to_usa_HT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['美國', 'usa', 'america', '重型戰車', '重型坦克', '重坦', '重戰', '重型', 'heavy tank', 'heavy', 'ht', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['美國', 'usa', 'america', '重型戰車', '重型坦克', '重坦', '重戰', '重型', 'heavy tank', 'heavy', 'ht', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_M26(self, event):
@@ -153,7 +153,7 @@ class TocMachine(GraphMachine):
     def is_going_to_usa_TD(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['美國', 'usa', 'america', '驅逐戰車', '驅逐坦克', '驅逐', 'tank destroyer', 'destroyer', 'td', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['美國', 'usa', 'america', '驅逐戰車', '驅逐坦克', '驅逐', 'tank destroyer', 'destroyer', 'td', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
     
     def is_going_to_M10(self, event):
@@ -177,7 +177,7 @@ class TocMachine(GraphMachine):
     def is_going_to_germany_LT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['德國', '得意志', '納粹', 'germany', 'nazi', '輕型戰車', '輕型坦克', '輕坦', '輕戰', '輕型', 'light tank', 'light', 'lt', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['德國', '得意志', '納粹', 'germany', 'nazi', '輕型戰車', '輕型坦克', '輕坦', '輕戰', '輕型', 'light tank', 'light', 'lt', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
     
     def is_going_to_PZ1(self, event):
@@ -207,7 +207,7 @@ class TocMachine(GraphMachine):
     def is_going_to_germany_MT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['德國', '得意志', '納粹', 'germany', 'nazi', '中型戰車', '中型坦克', '中坦', '中戰', '中型', 'medium tank', 'medium', 'mt', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['德國', '得意志', '納粹', 'germany', 'nazi', '中型戰車', '中型坦克', '中坦', '中戰', '中型', 'medium tank', 'medium', 'mt', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_PZ3(self, event):
@@ -231,7 +231,7 @@ class TocMachine(GraphMachine):
     def is_going_to_germany_HT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['德國', '得意志', '納粹', 'germany', 'nazi', '重型戰車', '重型坦克', '重坦', '重戰', '重型', 'heavy tank', 'heavy', 'ht', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['德國', '得意志', '納粹', 'germany', 'nazi', '重型戰車', '重型坦克', '重坦', '重戰', '重型', 'heavy tank', 'heavy', 'ht', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_Tiger(self, event):
@@ -255,7 +255,7 @@ class TocMachine(GraphMachine):
     def is_going_to_germany_TD(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['德國', '得意志', '納粹', 'germany', 'nazi', '驅逐戰車', '驅逐坦克', '驅逐', 'tank destroyer', 'destroyer', 'td', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['德國', '得意志', '納粹', 'germany', 'nazi', '驅逐戰車', '驅逐坦克', '驅逐', 'tank destroyer', 'destroyer', 'td', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_PzJg1(self, event):
@@ -321,7 +321,7 @@ class TocMachine(GraphMachine):
     def is_going_to_ussr_LT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['蘇聯', 'ussr', 'russia', 'cccp', '輕型戰車', '輕型坦克', '輕坦', '輕戰', '輕型', 'light tank', 'light', 'lt', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['蘇聯', 'ussr', 'russia', 'cccp', '輕型戰車', '輕型坦克', '輕坦', '輕戰', '輕型', 'light tank', 'light', 'lt', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_BT7(self, event):
@@ -357,7 +357,7 @@ class TocMachine(GraphMachine):
     def is_going_to_ussr_MT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['蘇聯', 'ussr', 'russia', 'cccp', '中型戰車', '中型坦克', '中坦', '中戰', '中型', 'medium tank', 'medium', 'mt', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['蘇聯', 'ussr', 'russia', 'cccp', '中型戰車', '中型坦克', '中坦', '中戰', '中型', 'medium tank', 'medium', 'mt', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_T28(self, event):
@@ -381,7 +381,7 @@ class TocMachine(GraphMachine):
     def is_going_to_ussr_HT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['蘇聯', 'ussr', 'russia', 'cccp', '重型戰車', '重型坦克', '重坦', '重戰', '重型', 'heavy tank', 'heavy', 'ht', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['蘇聯', 'ussr', 'russia', 'cccp', '重型戰車', '重型坦克', '重坦', '重戰', '重型', 'heavy tank', 'heavy', 'ht', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_KV1(self, event):
@@ -423,7 +423,7 @@ class TocMachine(GraphMachine):
     def is_going_to_ussr_TD(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['蘇聯', 'ussr', 'russia', 'cccp', '驅逐戰車', '驅逐坦克', '驅逐', 'tank destroyer', 'destroyer', 'td', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['蘇聯', 'ussr', 'russia', 'cccp', '驅逐戰車', '驅逐坦克', '驅逐', 'tank destroyer', 'destroyer', 'td', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
     
     def is_going_to_Zis30(self, event):
@@ -477,7 +477,7 @@ class TocMachine(GraphMachine):
     def is_going_to_british_LT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['英國', '大英帝國', 'british', 'uk', 'england', '輕型戰車', '輕型坦克', '輕坦', '輕戰', '輕型', 'light tank', 'light', 'lt', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['英國', '大英帝國', 'british', 'uk', 'england', '輕型戰車', '輕型坦克', '輕坦', '輕戰', '輕型', 'light tank', 'light', 'lt', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_MkVI(self, event):
@@ -495,7 +495,7 @@ class TocMachine(GraphMachine):
     def is_going_to_british_MT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['英國', '大英帝國', 'british', 'uk', 'england', '中型戰車', '中型坦克', '中坦', '中戰', '中型', 'medium tank', 'medium', 'mt', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['英國', '大英帝國', 'british', 'uk', 'england', '中型戰車', '中型坦克', '中坦', '中戰', '中型', 'medium tank', 'medium', 'mt', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_Crusader(self, event):
@@ -525,7 +525,7 @@ class TocMachine(GraphMachine):
     def is_going_to_british_HT(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['英國', '大英帝國', 'british', 'uk', 'england', '重型戰車', '重型坦克', '重坦', '重戰', '重型', 'heavy tank', 'heavy', 'ht', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['英國', '大英帝國', 'british', 'uk', 'england', '重型戰車', '重型坦克', '重坦', '重戰', '重型', 'heavy tank', 'heavy', 'ht', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_Matilda(self, event):
@@ -549,7 +549,7 @@ class TocMachine(GraphMachine):
     def is_going_to_british_TD(self, event):
         if event.get("message"):
             text = event['message']['text']
-            return any(x in text.lower() for x in ['英國', '大英帝國', 'british', 'uk', 'england', '驅逐戰車', '驅逐坦克', '驅逐', 'tank destroyer', 'destroyer', 'td', '重新選擇坦克', '重新選擇戰車'])
+            return any(x in text.lower() for x in ['英國', '大英帝國', 'british', 'uk', 'england', '驅逐戰車', '驅逐坦克', '驅逐', 'tank destroyer', 'destroyer', 'td', '重新選擇坦克', '重新選擇戰車', 'reselect tank'])
         return False
 
     def is_going_to_Archer(self, event):
