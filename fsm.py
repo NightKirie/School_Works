@@ -618,7 +618,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('m2 light tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_M5(self, event):
         sender_id = event['sender']['id']
@@ -626,7 +626,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('m3 stuart tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_M22(self, event):
         sender_id = event['sender']['id']
@@ -634,7 +634,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('m22 locust tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_M24(self, event):
         sender_id = event['sender']['id']
@@ -642,7 +642,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('m24 chaffee tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_usa_MT(self, event):
         sender_id = event['sender']['id']
@@ -654,7 +654,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('m2 medium tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_M3(self, event):
         sender_id = event['sender']['id']
@@ -662,7 +662,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('m3 lee tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_M4(self, event):
         sender_id = event['sender']['id']
@@ -670,7 +670,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('m4 sherman tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_usa_HT(self, event):
         sender_id = event['sender']['id']
@@ -682,7 +682,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('M26 Pershing tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_usa_TD(self, event):
         sender_id = event['sender']['id']
@@ -694,7 +694,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('M10 tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_M18(self, event):
         sender_id = event['sender']['id']
@@ -702,7 +702,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('M18 tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_M36(self, event):
         sender_id = event['sender']['id']
@@ -710,7 +710,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('M36 tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_germany_LT(self, event):
         sender_id = event['sender']['id']
@@ -722,7 +722,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('pz i light tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_PZ2(self, event):
         sender_id = event['sender']['id']
@@ -730,7 +730,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('pz ii light tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_LT35(self, event):
         sender_id = event['sender']['id']        
@@ -738,7 +738,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('LT-35 light tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_LT38(self, event):
         sender_id = event['sender']['id']
@@ -746,7 +746,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('LT-38 light tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_germany_MT(self, event):
         sender_id = event['sender']['id']
@@ -758,7 +758,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('pz iii medium tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_PZ4(self, event):
         sender_id = event['sender']['id']
@@ -766,7 +766,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('pz iv medium tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Panther(self, event):
         sender_id = event['sender']['id']
@@ -774,7 +774,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('panther medium tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_germany_HT(self, event):
         sender_id = event['sender']['id']
@@ -786,7 +786,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('tiger i heavy tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Tiger2(self, event):
         sender_id = event['sender']['id']
@@ -794,7 +794,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('tiger ii heavy tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Maus(self, event):
         sender_id = event['sender']['id']
@@ -802,7 +802,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('maus heavy tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_germany_TD(self, event):
         sender_id = event['sender']['id']
@@ -814,7 +814,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('pzjg i tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Marder3(self, event):
         sender_id = event['sender']['id']
@@ -822,7 +822,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('marder iii tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Hetzer(self, event):
         sender_id = event['sender']['id']
@@ -830,7 +830,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('hetzer tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Stug3(self, event):
         sender_id = event['sender']['id']
@@ -838,7 +838,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('stug iii tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_JgPz4(self, event):
         sender_id = event['sender']['id']
@@ -846,7 +846,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('jgpz iv tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Nashorn(self, event):
         sender_id = event['sender']['id']
@@ -854,7 +854,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('nashorn tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_JgPanther(self, event):
         sender_id = event['sender']['id']
@@ -862,7 +862,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('jgpanther tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_SturmTiger(self, event):
         sender_id = event['sender']['id']
@@ -870,7 +870,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('sturmtiger tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_JgTiger(self, event):
         sender_id = event['sender']['id']
@@ -878,7 +878,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('jgtiger tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Ferdinand(self, event):
         sender_id = event['sender']['id']
@@ -886,7 +886,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('ferdinand tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_ussr_LT(self, event):
         sender_id = event['sender']['id']
@@ -898,7 +898,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('bt-7 light tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_T26(self, event):
         sender_id = event['sender']['id']
@@ -906,7 +906,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('t-26 light tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_T50(self, event):
         sender_id = event['sender']['id']
@@ -914,7 +914,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('t-50 light tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_T60(self, event):
         sender_id = event['sender']['id']
@@ -922,7 +922,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('t-60 light tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_T70(self, event):
         sender_id = event['sender']['id']
@@ -930,7 +930,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('t-70 light tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_ussr_MT(self, event):
         sender_id = event['sender']['id']
@@ -942,7 +942,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('t-28 medium tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_T34(self, event):
         sender_id = event['sender']['id']
@@ -950,7 +950,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('t-34 medium tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_T44(self, event):
         sender_id = event['sender']['id']
@@ -958,7 +958,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('t-44 medium tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_ussr_HT(self, event):
         sender_id = event['sender']['id']
@@ -970,7 +970,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('kv-1 heavy tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_KV1S(self, event):
         sender_id = event['sender']['id']
@@ -978,7 +978,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('kv-1s heavy tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_KV2(self, event):
         sender_id = event['sender']['id']
@@ -986,7 +986,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('kv-2 heavy tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_KV85(self, event):
         sender_id = event['sender']['id']
@@ -994,7 +994,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('kv-85 heavy tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_IS2(self, event):
         sender_id = event['sender']['id']
@@ -1002,7 +1002,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('is-2 heavy tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_IS3(self, event):
         sender_id = event['sender']['id']
@@ -1010,7 +1010,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('is-3 heavy tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_ussr_TD(self, event):
         sender_id = event['sender']['id']
@@ -1022,7 +1022,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('ZiS-30 tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
 
     def on_enter_SU76(self, event):
@@ -1031,7 +1031,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('SU-76 tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
 
     def on_enter_SU85(self, event):
@@ -1040,7 +1040,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('SU-85 tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_SU100(self, event):
         sender_id = event['sender']['id']
@@ -1048,7 +1048,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('SU-100 tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_SU122(self, event):
         sender_id = event['sender']['id']
@@ -1056,7 +1056,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('SU-122 tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_SU152(self, event):
         sender_id = event['sender']['id']
@@ -1064,7 +1064,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('SU-152 tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_ISU122(self, event):
         sender_id = event['sender']['id']
@@ -1072,7 +1072,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('ISU-122 tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_ISU152(self, event):
         sender_id = event['sender']['id']
@@ -1080,7 +1080,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('ISU-152 tank destroyer ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_british_LT(self, event):
         sender_id = event['sender']['id']
@@ -1092,7 +1092,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('mk.vi tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Tetrarch(self, event):
         sender_id = event['sender']['id']
@@ -1100,7 +1100,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('tetrarch tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_british_MT(self, event):
         sender_id = event['sender']['id']
@@ -1112,7 +1112,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('crusader tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
 
     def on_enter_Cromwell(self, event):
@@ -1121,7 +1121,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('cromwell tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
 
     def on_enter_Firefly(self, event):
@@ -1130,7 +1130,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('firefly tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Comet(self, event):
         sender_id = event['sender']['id']
@@ -1138,7 +1138,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('comet tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_british_HT(self, event):
         sender_id = event['sender']['id']
@@ -1150,7 +1150,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('matilda tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Valetine(self, event):
         sender_id = event['sender']['id']
@@ -1158,7 +1158,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('valentine tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_Churchill(self, event):
         sender_id = event['sender']['id']
@@ -1166,7 +1166,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('churchill tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     def on_enter_british_TD(self, event):
         sender_id = event['sender']['id']
@@ -1178,7 +1178,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('archer tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
     
     def on_enter_Achilles(self, event):
         sender_id = event['sender']['id']
@@ -1186,7 +1186,7 @@ class TocMachine(GraphMachine):
         page = wptools.page(title, lang='zh-tw').get_query()
         send_image_message(sender_id,page.images()[0]['url'])
         send_text_message(sender_id,get_youtube_link('achilles tank ww2'))
-        send_text_message(sender_id,wikipedia.summary(title, sentences=5))
+        send_text_message(sender_id,wikipedia.summary(title, sentences=10))
 
     
         
