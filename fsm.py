@@ -566,7 +566,7 @@ class TocMachine(GraphMachine):
 
     def on_enter_help(self, event):
         sender_id = event['sender']['id']
-        send_text_message(sender_id,'您好，\n這是一個可以簡易查詢二戰坦克的TOCproject專業，\n目前提供美德蘇英四個國家的知名坦克查詢，\n同時提供四種戰車，輕型、中型、重型、驅逐的車種類別\n欲開始查詢，請輸入"國家"或"車種"')
+        send_text_message(sender_id,'您好，\n這是一個可以簡易查詢二戰坦克的TOCproject專頁，\n目前提供美德蘇英四個國家的知名坦克查詢，\n同時提供四種戰車，輕型、中型、重型、驅逐的車種類別\n欲開始查詢，請輸入"國家"或"車種"')
 
     def on_enter_by_nation(self, event):
         sender_id = event['sender']['id']
