@@ -1,5 +1,4 @@
-import requests
-import wikipedia
+import requests, os
 
 
 GRAPH_URL = "https://graph.facebook.com/v2.6"
