@@ -1,63 +1,36 @@
-# TOC Project 2019
+# TOC Project 2018
+這是一個可以搜尋二戰部份國家的著名坦克的facebook bot
+可以根據不同條件來搜索特定坦克
+只要照著步驟走即可
+資料來源利用wikipedia爬蟲(wptools, wikipedia)
+還有youtube爬蟲
+給使用者相關坦克知識與影片
+以及會給使用者一些各國坦克的一些小常識
 
-Template Code for TOC Project 2019
-
-A Facebook messenger bot based on a finite state machine
-
-More details in the [Slides](https://hackmd.io/p/SkpBR-Yam#/)
-
-## Setup
-
-### Prerequisite
-* Python 3
-* Facebook Page and App
-* HTTPS Server
-
-#### Install Dependency
-```sh
-pip install -r requirements.txt
-```
-
-* pygraphviz (For visualizing Finite State Machine)
-    * [Setup pygraphviz on Ubuntu](http://www.jianshu.com/p/a3da7ecc5303)
-
-#### Secret Data
-
-`VERIFY_TOKEN` and `ACCESS_TOKEN` **MUST** be set to proper values.
-Otherwise, you might not be able to run your code.
-
-#### Run Locally
-You can either setup https server or using `ngrok` as a proxy.
-
-**`ngrok` would be used in the following instruction**
-
-```sh
-./ngrok http 5000
-```
-
-After that, `ngrok` would generate a https URL.
-
-#### Run the sever
-
-```sh
-python3 app.py
-```
 
 ## Finite State Machine
-![fsm](./img/show-fsm.png)
+![fsm](./fsm.png)
 
 ## Usage
-The initial state is set to `user`.
+簡易輸入
+1. 首先輸入```國家```或者```車種```來選擇下一條路
 
-Every time `user` state is triggered to `advance` to another state, it will `go_back` to `user` state after the bot replies corresponding message.
+    1. 選擇國家，會給你4個國家```美國``` ```德國``` ```蘇聯``` ```英國```，可輸入以上來進入某國家的車種選擇
+    
+        - 各國有四種車種，```輕型坦克``` ```中型坦克``` ```重型坦克``` ```驅逐坦克```，可輸入以上來進入某國某車種的車名選擇
 
-* user
-	* Input: "go to state1"
-		* Reply: "I'm entering state1"
+            - 最終會依照國家+車種，給你可以查詢的車名，輸入特定車名來獲得知識
+    2. 選擇車種，會給你4個車種```輕型坦克``` ```中型坦克``` ```重型坦克``` ```驅逐坦克```，可輸入以上來進入某車種的國家選擇
 
-	* Input: "go to state2"
-		* Reply: "I'm entering state2"
+        - 各車種有四種國家，```美國``` ```德國``` ```蘇聯``` ```英國```，可輸入以上來進入某國某車種的車名選擇
+    
+            - 最終會依照國家+車種，給你可以查詢的車名，輸入特定車名來獲得知識
 
+以上若要向上一層，可依據上一層可能為何，來輸入，
+```重新選擇車種```、```重新選擇國家```、```重新選擇坦克```來向上一層，以利使用者重新輸入資料
 
-## Reference
-[TOC-Project-2017](https://github.com/Lee-W/TOC-Project-2017) ❤️ [@Lee-W](https://github.com/Lee-W)
+若要獲得協助，可以打```help```或者```幫助```
+
+以上輸入支援中英文以及部份簡寫
+如果輸入無反應 表示不支援
+    
