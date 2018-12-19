@@ -1,5 +1,5 @@
 from bottle import route, run, request, abort, static_file
-import wikipedia
+import os
 from fsm import TocMachine
 
 VERIFY_TOKEN = os.environ['VERIFY_TOKEN']
