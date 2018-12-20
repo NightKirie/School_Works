@@ -300,7 +300,7 @@ class TocMachine(GraphMachine):
             return 'jgpanther' == text.lower() 
         return False
 
-    def is_going_to_SturmTigers(self, event):
+    def is_going_to_SturmTiger(self, event):
         if event.get("message"):
             text = event['message']['text']
             return 'sturmtiger' == text.lower() 
