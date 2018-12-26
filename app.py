@@ -212,6 +212,11 @@ machine = TocMachine(
             'dest': 'helphelp',
             'conditions': 'is_going_to_helphelp'
         },
+		{
+            'trigger': 'go_back',
+            'source': 'helphelp',
+            'dest': 'help'
+        },
         {
             'trigger': 'advance',
             'source': [
