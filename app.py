@@ -210,7 +210,7 @@ machine = TocMachine(
             'trigger': 'advance',
             'source': 'help',
             'dest': 'helphelp',
-            'conditions': 'is_going_to_by_helphelp'
+            'conditions': 'is_going_to_helphelp'
         },
         {
             'trigger': 'advance',
