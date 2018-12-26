@@ -573,7 +573,7 @@ class TocMachine(GraphMachine):
     def on_enter_helphelp(self, event):
         sender_id = event['sender']['id']
         send_text_message(sender_id,'Hello World\n')
-        on_enter_help()
+        self.go_back()
         
     def on_enter_help(self, event):
         sender_id = event['sender']['id']
