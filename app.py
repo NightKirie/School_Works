@@ -9,6 +9,7 @@ machine = TocMachine(
     states=[
         'user',
         'help',
+        'helphelp',
         'by_nation',
             'usa',
             'germany',
@@ -204,6 +205,12 @@ machine = TocMachine(
             ],
             'dest': 'help',
             'conditions': 'is_going_to_help'
+        },
+        {
+            'trigger': 'advance',
+            'source': 'help',
+            'dest': 'helphelp',
+            'conditions': 'is_going_to_by_helphelp'
         },
         {
             'trigger': 'advance',
