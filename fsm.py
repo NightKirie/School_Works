@@ -570,7 +570,7 @@ class TocMachine(GraphMachine):
             return 'achilles' == text.lower() 
         return False
 	
-	def on_exit_state1(self):
+	def on_exit_helphelp(self):
 		print('lol')
 		
     def on_enter_helphelp(self, event):
