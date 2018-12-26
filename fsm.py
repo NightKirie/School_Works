@@ -23,6 +23,7 @@ class TocMachine(GraphMachine):
             text = event['message']['text']
             return any(x in text.lower() for x in ['help', '幫助'])
         return False
+		
     def is_going_to_helphelp(self, event):
         if event.get("message"):
             text = event['message']['text']
@@ -572,7 +573,7 @@ class TocMachine(GraphMachine):
     def on_enter_helphelp(self, event):
         sender_id = event['sender']['id']
         send_text_message(sender_id,'Hello World\n')
-        state = self.helphelp
+        on_enter_help()
         
     def on_enter_help(self, event):
         sender_id = event['sender']['id']
