@@ -112,6 +112,7 @@ machine = TocMachine(
             'source': [
                 'user',
                 'help',
+				'helphelp',
                 'by_nation',
                     'usa',
                     'germany',
@@ -211,11 +212,6 @@ machine = TocMachine(
             'source': 'help',
             'dest': 'helphelp',
             'conditions': 'is_going_to_helphelp'
-        },
-		{
-            'trigger': 'go_back',
-            'source': 'helphelp',
-            'dest': 'help'
         },
         {
             'trigger': 'advance',

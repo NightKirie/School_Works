@@ -570,13 +570,11 @@ class TocMachine(GraphMachine):
             return 'achilles' == text.lower() 
         return False
 	
-	def on_exit_helphelp(self):
-		print('lol')
-		
+	
+
     def on_enter_helphelp(self, event):
         sender_id = event['sender']['id']
         send_text_message(sender_id,'Hello World\n')
-        self.go_back()
         
     def on_enter_help(self, event):
         sender_id = event['sender']['id']
