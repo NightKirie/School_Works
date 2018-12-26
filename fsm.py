@@ -23,6 +23,11 @@ class TocMachine(GraphMachine):
             text = event['message']['text']
             return any(x in text.lower() for x in ['help', '幫助'])
         return False
+    def is_going_to_helphelp(self, event):
+        if event.get("message"):
+            text = event['message']['text']
+            return any(x in text.lower() for x in ['hello'])
+        return False
 
     def is_going_to_by_nation(self, event):
         if event.get("message"):
@@ -564,6 +569,11 @@ class TocMachine(GraphMachine):
             return 'achilles' == text.lower() 
         return False
 
+    def on_enter_helphelp(self, event):
+        sender_id = event['sender']['id']
+        send_text_message(sender_id,'Hello World\n')
+        state = self.helphelp
+        
     def on_enter_help(self, event):
         sender_id = event['sender']['id']
         send_text_message(sender_id,'您好，\n這是一個可以簡易查詢二戰坦克的TOCproject專頁，\n目前提供美德蘇英四個國家的知名坦克查詢，\n同時提供四種戰車，輕型、中型、重型、驅逐的車種類別\n欲開始查詢，請輸入"國家"或"車種"')
