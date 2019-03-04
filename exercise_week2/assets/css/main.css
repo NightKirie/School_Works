@@ -148,11 +148,11 @@ a:hover, a:active {
     font-size: 12vw;
     color: #ffffff;
     cursor: pointer;
-    transition: font-size 500ms linear;
+    transition: transform 500ms linear;
 }
 
 .article.full #nake_tag {
-    font-size: 15vw;
+    transform: translate(-50%, -50%) scale(1.25);
 }
 
 #top_img {
