@@ -145,14 +145,14 @@ a:hover, a:active {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 1200%;
+    font-size: 12vw;
     color: #ffffff;
     cursor: pointer;
     transition: font-size 500ms linear;
 }
 
 .article.full #nake_tag {
-    font-size: 1500%;
+    font-size: 15vw;
 }
 
 #top_img {
