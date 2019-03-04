@@ -1,0 +1,180 @@
+html, body {
+    background-color: #d79371;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width:100%;
+}
+
+.main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+}
+
+
+#asidebutton {
+    position: relative;
+    float: right;
+    margin-top: 1em;
+    margin-right: 1em;    
+    z-index: 2;
+}
+
+#asidebutton img{
+    height: 3em;
+    width: 3em;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.nav {
+    padding-bottom: 30%;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+}
+
+#gallery, #wiki, #twitter {
+    text-align: center;
+    margin-top: 5em;
+    margin-bottom: 5em;
+}
+
+a:link, a:visited {
+    font-size: 150%;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+a:hover, a:active {
+    font-size: 150%;
+    color: #ff0000;
+    text-decoration: none;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0%;
+    width: 100%;
+    pointer-events: none;
+}
+
+#spinning_image{
+    position: relative;
+    width: 20%;
+    height: auto;
+    bottom: 5em;
+    left: 5em;
+    margin-top: 20em;
+    -webkit-animation: rotation 2s infinite linear;
+}
+
+@-webkit-keyframes rotation {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(359deg);
+    }
+}
+
+#contact_author {    
+    position: relative;
+    left: 2em;
+    bottom: 1em;
+    z-index: 2;
+    pointer-events: all;
+}
+
+#instagram {
+    position: relative;
+    float: right;
+    right: 2em;
+    bottom: 1em;
+    z-index: 2;
+    pointer-events: all;
+}
+
+.article {
+    position: absolute;
+    background-color: #000000;
+    bottom: 0;
+    right: 0;
+    min-width: 80%;
+    min-height: 80%;
+    z-index: 1;
+    transition: min-width 500ms linear, min-height 500ms linear;
+}
+.article.full {
+    min-width:100%;
+    min-height:100%;
+}
+
+#left_img {
+    position: absolute;
+    left: 5%;
+    bottom: 20%;
+    width: 20%;
+    height: auto;
+}
+
+#right_img {
+    position: absolute;
+    right: 5%;
+    bottom: 10%;
+    width: 30%;
+    height: auto;
+    transition: all 50ms linear;
+}
+
+#right_img:hover {
+    transform: scale(1.1,1.1);
+    cursor: pointer;
+}
+
+#right_img img {
+    width:100%;
+}
+
+#nake_tag {
+    position: absolute;
+    margin: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1200%;
+    color: #ffffff;
+    cursor: pointer;
+    transition: font-size 500ms linear;
+}
+
+.article.full #nake_tag {
+    font-size: 1500%;
+}
+
+#top_img {
+    position: absolute;
+    top: 2%;
+    right: 40%;
+    width: 20%;
+    height: auto;
+}
+
+#bottom_img {
+    position: absolute;
+    bottom: 0;
+    left: 30%;
+    width: 20%;
+    height: auto;
+}
+
+#title_img {
+    position: absolute;
+    left: 5%;
+    bottom: 60%;
+    width: 35%;
+    height: auto;
+}
