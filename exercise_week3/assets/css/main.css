@@ -10,109 +10,156 @@ html, body {
     width: 100%;
     margin: 0;
     padding: 0;
-    display: flex;
 }  
+    nav {
+        position: absolute;
+        width: 70%;
+        height: 50%;
+        overflow: hidden;
+        bottom: 0;
+        display: none;
+        transition: hidden;
+    }
+    nav.welcome_page {
+        transition: height 2000ms ease-out, width 2000ms ease-out;
+    }
+    nav.expand {
+        position: absolute;
+        width: 100%;
+        height: 100%;   
+        bottom: 0;
+    }
+        #main_table {
+            position: absolute;
+            width: 120%;
+            height: auto;
+            margin: 0;
+            padding: 0;
+            bottom: -25vw;
+            left: -20vw;
+        }
+        #main_table.welcome_page {
+            transition: width 2000ms ease-out, bottom 2000ms ease-out, left 2000ms ease-out;
+        }
+        #main_table.expand {
+            width: 100%;
+            bottom: -10vw;
+            left: 0%;
+        }
+        #chair_1 {
+            position: absolute;
+            width: 15%;
+            height: auto;
+            bottom: 35%;
+            left: 0;
+            transition: width 2000ms ease-out, bottom 2000ms ease-out;
+        }
+        #chair_1:hover {
+            transform: scale(1.1,1.1);
+            cursor: pointer;
+        }
+        #chair_1.welcome_page {
+            transition: width 2000ms ease-out, bottom 2000ms ease-out;
+        }
+        #chair_1.expand {
+            width: 12%;
+            bottom: 40%;
+        }
+        #chair_2 {
+            position: absolute;
+            width: 15%;
+            height: auto;
+            bottom: 45%;
+            left: 20%;
+            transition: width 2000ms ease-out, bottom 2000ms ease-out;
+        }
+        #chair_2:hover {
+            transform: scale(1.1,1.1);
+            cursor: pointer;
+        }
+        #chair_2.welcome_page {
+            transition: width 2000ms ease-out, bottom 2000ms ease-out;
+        }
+        #chair_2.expand {
+            width: 12%;
+            bottom: 60%;
+        }
+        #chair_3 {
+            position: absolute;
+            width: 15%;
+            height: auto;
+            bottom: 42%;
+            left: 40%;
+            cursor: pointer;
+            transition: width 2000ms ease-out, bottom 2000ms ease-out, left 2000ms ease-out;
+        }
+        #chair_3:hover {
+            transform: scale(1.1,1.1);
+            cursor: pointer;
+        }
+        #chair_3.welcome_page {
+            transition: width 2000ms ease-out, bottom 2000ms ease-out, left 2000ms ease-out;
+        }
+        #chair_3.expand {
+            width: 12%;
+            bottom: 68%;
+            left: 43%;
+        }
+        #chair_4 {
+            position: absolute;
+            width: 15%;
+            height: auto;
+            bottom: 30%;
+            left: 58%;
+            transition: width 2000ms ease-out, bottom 2000ms ease-out, left 2000ms ease-out;
+        }
+        #chair_4:hover {
+            transform: scale(1.1,1.1);
+            cursor: pointer;
+        }
+        #chair_4.welcome_page {
+            transition: width 2000ms ease-out, bottom 2000ms ease-out, left 2000ms ease-out;
+        }
+        #chair_4.expand {
+            width: 12%;
+            bottom: 60%;
+            left: 66%;
+        }
+        #chair_5 {
+            position: absolute;
+            width: 15%;
+            height: auto;
+            bottom: 5%;
+            left: 75%;
+        }
+        #chair_5:hover {
+            transform: scale(1.1,1.1);
+            cursor: pointer;
+        }
+        #chair_5.welcome_page {
+            transition: width 2000ms ease-out, bottom 2000ms ease-out, left 2000ms ease-out;
+        }
+        #chair_5.expand {
+            width: 12%;
+            bottom: 40%;
+            left: 88%;
+        }
     article {
         position: absolute;
         width: 70%;
         min-height: 50%;  
         margin: 0;
         padding: 0;
-        opacity: 1;
-        -webkit-transition: opacity 1000ms linear;
-        transition: opacity 1000ms linear;
-        z-index: 0;
+        display: none;
+        transition: hidden;
     }  
-    article.invisible {
-        opacity: 0;
-        position: absolute;
-    } 
         article div {
             padding: 5% 0 0 20%;
             text-align: left;
             font-size: 2.3vh;
+            line-height: 2.5vh;
             font-family: "wt071";
             color: #ffdb82;
-        }
-    nav {
-        position: absolute;
-        width: 70%;
-        height: 50%;
-        overflow: hidden;
-        align-self: flex-end;
-        transition: height 1000ms linear, width 1000ms linear;
-    }
-    nav.expand{
-        position: absolute;
-        width: 100%;
-        height: 100%;   
-        bottom: 0;
-        z-index: 10;
-    }
-        #main_table {
-            position: absolute;
-            width: 140%;
-            height: auto;
-            margin: 0;
-            padding: 0;
-            top: 0;
-            right: 0;
-        }
-        #chair_1 {
-            position: absolute;
-            width: 15%;
-            height: auto;
-            top: 10%;
-            left: 0;
-        }
-        #chair_1:hover {
-            transform: scale(1.1,1.1);
-            cursor: pointer;
-        }
-        #chair_2 {
-            position: absolute;
-            width: 15%;
-            height: auto;
-            top: 0;
-            left: 20%;
-        }
-        #chair_2:hover {
-            transform: scale(1.1,1.1);
-            cursor: pointer;
-        }
-        #chair_3 {
-            position: absolute;
-            width: 15%;
-            height: auto;
-            top: 5%;
-            left: 40%;
-            cursor: pointer;
-        }
-        #chair_3:hover {
-            transform: scale(1.1,1.1);
-            cursor: pointer;
-        }
-        #chair_4 {
-            position: absolute;
-            width: 15%;
-            height: auto;
-            top: 20%;
-            left: 58%;
-        }
-        #chair_4:hover {
-            transform: scale(1.1,1.1);
-            cursor: pointer;
-        }
-        #chair_5 {
-            position: absolute;
-            width: 15%;
-            height: auto;
-            top: 45%;
-            left: 75%;
-        }
-        #chair_5:hover {
-            transform: scale(1.1,1.1);
-            cursor: pointer;
         }
     header {
         position: absolute;
@@ -120,18 +167,136 @@ html, body {
         height: 100%;
         top: 0;
         right: 0;
-        opacity: 1;
-        -webkit-transition: opacity 1000ms linear;
-        transition: opacity 1000ms linear;
+        display: none;
+        transition: hidden;
     } 
-    header.invisible {
-        opacity: 0;
-        /* display: none; */
-    }
         #title {
             padding-top: 10%;
             width: 70%;
             max-height: auto;
         }    
-    
+    .menu {
+        position: absolute;
+        width: 60%;
+        height: 50%;
+        top: 50%;
+        left: 20%;
+        z-index: 10;
+        display: none;
+        transition: hidden;
+    }
+        .choose_meal_btn {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            bottom: 0;
+        }
+            #left_btn {
+                position: absolute;
+                float: left;
+                width: 15%;
+                height: auto;
+                bottom: 5%;
+                left: 10%;
+            }
+            #left_btn:hover {
+                transform: scale(1.1,1.1);
+                cursor: pointer;
+            }
+            #right_btn {
+                position: absolute;
+                float: right;
+                width: 15%;
+                height: auto;
+                bottom: 5%;
+                right: 10%;
+            }
+            #right_btn:hover {
+                transform: scale(1.1,1.1);
+                cursor: pointer;
+            }
+        .meal {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            width: 50%;
+            height: 100%;
+            left: 25%;
+            bottom: 10%;
+        }
+            #meal_btn{
+                align-self: flex-end;
+                width: 80%;              
+            }
+            #meal_btn:hover {
+                transform: scale(1.1,1.1);
+                cursor: pointer;
+            }
+
+    .detail {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: none;
+        transition: hidden;
+        z-index: 10;
+    }
+        .detail .left {
+            width: 50%;
+            height: 100%;
+            float: left;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+            #meal_image {
+                width: 50%;
+                height: auto;
+            }
+            #detail_back_btn {
+                position: absolute;
+                left: 5%;
+                bottom: 5%;
+                font-size: 8vh;
+                font-family: "wt071";
+                color: #ffdb82;
+            }
+            #detail_back_btn:hover {
+                transform: scale(1.1,1.1);
+                cursor: pointer;
+            }
+        .detail .right {
+            width: 50%;
+            height: 100%;
+            float: right;
+        }
+            #meal_title {
+                position: relative;
+                font-size: 10vh;
+                top: 25%;
+                left: 0%;
+                font-family: "wt071";
+                color: #ffdb82;
+            }
+            #meal_intro {
+                position: relative;
+                font-size: 3vh;
+                top: 15%;
+                left: 0%;
+                font-family: "wt071";
+                color: #ffdb82;
+            }
+            #detail_order_btn {
+                position: absolute;
+                right: 5%;
+                bottom: 5%;
+                font-size: 8vh;
+                font-family: "wt071";
+                color: #ffdb82;
+            }
+            #detail_order_btn:hover {
+                transform: scale(1.1,1.1);
+                cursor: pointer;
+            }
         
