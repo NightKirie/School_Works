@@ -12,9 +12,9 @@ let meal_intro_list = ["正統的東坡肉，油而不膩，入口即化，一�
 let meal_num = 0;
 
 $(document).ready(() => { 
-    $('header').transition('fade down', 0, ()=>{
-        $('article').transition('fade down', 0, () => {
-            $('nav').transition('fade up', 0)
+    $('header').transition('fade down', 2000, ()=>{
+        $('article').transition('fade down', 2000, () => {
+            $('nav').transition('scale', 2000)
         });
     });
 });
