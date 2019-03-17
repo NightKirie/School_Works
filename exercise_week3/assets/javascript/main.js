@@ -40,17 +40,37 @@ $('.main_chair').click(() => {
 });
 
 $('#left_btn').click(() => {
-    --meal_num;
-    if(meal_num < 0)
-        meal_num = meal_btn_list.length-1;
-    $('#meal_btn').attr('src', meal_btn_list[meal_num]);
+    $('.meal').addClass('rotate_left');
+    $('#meal_btn').addClass('rotate_left');
+    setTimeout(() => {
+        --meal_num;
+        if(meal_num < 0)
+            meal_num = meal_btn_list.length-1;
+        $('#meal_btn').attr('src', meal_btn_list[meal_num]);
+    }, 1000);
+    $('.meal').on("webkitAnimationEnd oanimationend msAnimationEnd animationend", () => {
+        $('.meal').removeClass("rotate_left");
+    });
+    $('#meal_btn').on("webkitAnimationEnd oanimationend msAnimationEnd animationend", () => {
+        $('#meal_btn').removeClass("rotate_left");
+    });
 });
 
 $('#right_btn').click(() => {
-    ++meal_num;
-    if(meal_num >= meal_btn_list.length)
-        meal_num = 0;
-    $('#meal_btn').attr('src', meal_btn_list[meal_num]);
+    $('.meal').addClass('rotate_right');
+    $('#meal_btn').addClass('rotate_right');
+    setTimeout(() => {
+        ++meal_num;
+        if(meal_num >= meal_btn_list.length)
+            meal_num = 0;
+        $('#meal_btn').attr('src', meal_btn_list[meal_num]);
+    }, 1000);
+    $('.meal').on("webkitAnimationEnd oanimationend msAnimationEnd animationend", () => {
+        $('.meal').removeClass("rotate_right");
+    });
+    $('#meal_btn').on("webkitAnimationEnd oanimationend msAnimationEnd animationend", () => {
+        $('#meal_btn').removeClass("rotate_right");
+    });
 });
 
 $('#meal_btn').click(() => {
