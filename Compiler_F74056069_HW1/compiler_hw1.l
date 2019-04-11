@@ -21,7 +21,7 @@ cpp_comment ("//").*
 /* Rules section */
 %%
 
-"+" 			{ printf("%s \t ADD\n", yytext); }
+"+"				{ printf("%s \t ADD\n", yytext); }
 "-"				{ printf("%s \t SUB\n", yytext); }
 "*"				{ printf("%s \t MUL\n", yytext); }
 "/"				{ printf("%s \t DIV\n", yytext); }
@@ -52,8 +52,8 @@ cpp_comment ("//").*
 ","				{ printf("%s \t COMMA\n", yytext); }
 ";"				{ printf("%s \t SEMICOLON\n", yytext); }
 "\""			{ printf("%s \t QUOTA\n", yytext); BEGIN STR_CONST;}
-<STR_CONST>[^"\""]+	{ printf("%s \t STR_CONST\n", yytext); }
-<STR_CONST>"\""	{ printf("%s \t QUOTA\n", yytext); BEGIN INITIAL;}
+<STR_CONST>([^\"]|"\\\"")+	{ printf("%s \t STR_CONST\n", yytext); }
+<STR_CONST>\"	{ printf("%s \t QUOTA\n", yytext); BEGIN INITIAL;}
 "print"			{ printf("%s \t PRINT\n", yytext); }
 "if"			{ printf("%s \t IF\n", yytext); }
 "else"			{ printf("%s \t ELSE\n", yytext); }
