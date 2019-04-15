@@ -1,0 +1,148 @@
+body {
+	overflow-x: hidden;
+	overflow-y: auto;
+	background-color: #ececec;
+	margin: 0px;
+}
+
+nav {
+	background-color: #353535;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+	nav img{
+		width: 40%;
+		height: auto;
+		margin: 1%;
+	}
+
+main{
+	display: -webkit-flex;
+	display: flex;
+	height: 40%;
+	margin: 3%;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+	main img{
+		width: 65%;
+		height: auto;
+	}
+
+section {
+	display: -webkit-flex;
+	display: flex;
+	height: 10%;
+	margin: 5%;
+	-webkit-align-items: center;
+	align-items: center;
+}
+	.section_bar {
+		-webkit-flex: 1;
+		flex: 1;
+		margin-top: 0%;
+	}
+	#our_team{
+		-webkit-flex: initial;
+		flex: initial;
+		margin: 1%;
+		width: 15%;
+		height: 10%;
+	}
+
+article{
+	display: -webkit-flex;
+	display: flex;
+	height: 8%;
+	margin: 5%;
+	-webkit-align-items: center;
+	align-items: center;
+}
+	article div{
+		position: relative;
+		-webkit-flex: 1;
+		flex: 1;
+		margin: 1%;
+	}
+		.member_pic{
+			width: 100%;
+			height: auto;
+		}
+		.member_overlay {
+			position: absolute;
+			z-index: 10;
+			margin: 0;
+			top: 0;
+			right: 0;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			height: 100%;
+			background-color: #000000;
+			-webkit-transition: opacity 0.5s;
+			transition: opacity 0.5s;	
+			opacity: 0;	
+		}
+		.member_overlay img{
+			position: absolute;
+			margin: 0;
+			top: 0;
+			right: 0;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			height: 100%;
+		}
+		#member_pic_1:hover > .member_overlay,
+		#member_pic_2:hover > .member_overlay,
+		#member_pic_3:hover > .member_overlay,
+		#member_pic_4:hover > .member_overlay,
+		#member_pic_5:hover > .member_overlay{
+			opacity: 0.7;
+			cursor: pointer;
+		}
+
+
+footer {
+	background-position: bottom;
+	width: 100%;
+	height: 10vw;
+	background-color: #353535;
+}
+
+#intro {
+	position: fixed;
+	z-index: 100;
+	margin: 0;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+	background-color:rgba(0, 0, 0, 0.8);
+	display: none;
+}
+	#intro_img {
+		width: 50%;
+		height: auto;
+		margin: 7.5% 25% 10% 25%;
+		display: none;
+	}
+	#close_btn {
+		position: absolute;
+		z-index: 1000;
+		top: 1%;
+		right: 1%;
+		width: 3%;
+		height: auto;
+	}
+	#close_btn:hover {
+		cursor: pointer;
+	}
