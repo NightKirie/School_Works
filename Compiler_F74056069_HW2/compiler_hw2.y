@@ -61,14 +61,8 @@ program
 primary_expression
 	: ID
 	| constant
-	| STR_CONST
 	| LB expression RB
 	;
-
-constant
-	: I_CONST		/* includes character_constant */
-	| F_CONST
-    ;
 
 postfix_expression
 	: primary_expression
@@ -118,7 +112,7 @@ additive_expression
 	;
 
 relational_expression
-	: shift_expression
+	: additive_expression
 	| relational_expression MT additive_expression
 	| relational_expression LT additive_expression
 	| relational_expression MTE additive_expression
@@ -148,11 +142,11 @@ assignment_expression
 
 assignment_operator
 	: ASGN
-	| ADDASGN
-	| SUBASGN
 	| MULASGN
 	| DIVASGN
 	| MODASGN
+	| ADDASGN
+	| SUBASGN
 	;
 
 expression
@@ -165,171 +159,42 @@ declaration
 	| declaration_specifiers init_declarator_list SEMICOLON
 	;
 
-DSFAASJDHKLFLASDFGHLKASGHDFJHAGSFLJHASDLFASDF
-ASDF
-ASDFSF
-ASDFAS
-DEFAULTASDF
-ASDFASDFADS
-
-
 declaration_specifiers
-	: storage_class_specifier declaration_specifiers
-	| storage_class_specifier
 	| type_specifier declaration_specifiers
 	| type_specifier
-	| type_qualifier declaration_specifiers
-	| type_qualifier
-	| function_specifier declaration_specifiers
-	| function_specifier
-	| alignment_specifier declaration_specifiers
-	| alignment_specifier
 	;
 
 init_declarator_list
 	: init_declarator
-	| init_declarator_list ',' init_declarator
+	| init_declarator_list COMMA init_declarator
 	;
 
 init_declarator
-	: declarator '=' initializer
+	: declarator EQ initializer
 	| declarator
-	;
-
-storage_class_specifier
-	: TYPEDEF	/* identifiers must be flagged as TYPEDEF_NAME */
-	| EXTERN
-	| STATIC
-	| THREAD_LOCAL
-	| AUTO
-	| REGISTER
 	;
 
 type_specifier
 	: VOID
 	| CHAR
-	| SHORT
 	| INT
-	| LONG
 	| FLOAT
-	| DOUBLE
-	| SIGNED
-	| UNSIGNED
 	| BOOL
-	| COMPLEX
-	| IMAGINARY	  	/* non-mandated extension */
-	| atomic_type_specifier
-	| struct_or_union_specifier
-	| enum_specifier
-	| TYPEDEF_NAME		/* after it has been defined as such */
-	;
-
-struct_or_union_specifier
-	: struct_or_union '{' struct_declaration_list '}'
-	| struct_or_union IDENTIFIER '{' struct_declaration_list '}'
-	| struct_or_union IDENTIFIER
-	;
-
-struct_or_union
-	: STRUCT
-	| UNION
-	;
-
-struct_declaration_list
-	: struct_declaration
-	| struct_declaration_list struct_declaration
-	;
-
-struct_declaration
-	: specifier_qualifier_list ';'	/* for anonymous struct/union */
-	| specifier_qualifier_list struct_declarator_list ';'
-	| static_assert_declaration
 	;
 
 specifier_qualifier_list
 	: type_specifier specifier_qualifier_list
 	| type_specifier
-	| type_qualifier specifier_qualifier_list
-	| type_qualifier
-	;
-
-struct_declarator_list
-	: struct_declarator
-	| struct_declarator_list ',' struct_declarator
-	;
-
-struct_declarator
-	: ':' constant_expression
-	| declarator ':' constant_expression
-	| declarator
-	;
-
-enum_specifier
-	: ENUM '{' enumerator_list '}'
-	| ENUM '{' enumerator_list ',' '}'
-	| ENUM IDENTIFIER '{' enumerator_list '}'
-	| ENUM IDENTIFIER '{' enumerator_list ',' '}'
-	| ENUM IDENTIFIER
-	;
-
-enumerator_list
-	: enumerator
-	| enumerator_list ',' enumerator
-	;
-
-enumerator	/* identifiers must be flagged as ENUMERATION_CONSTANT */
-	: enumeration_constant '=' constant_expression
-	| enumeration_constant
-	;
-
-atomic_type_specifier
-	: ATOMIC '(' type_name ')'
-	;
-
-type_qualifier
-	: CONST
-	| RESTRICT
-	| VOLATILE
-	| ATOMIC
-	;
-
-function_specifier
-	: INLINE
-	| NORETURN
-	;
-
-alignment_specifier
-	: ALIGNAS '(' type_name ')'
-	| ALIGNAS '(' constant_expression ')'
 	;
 
 declarator
-	: pointer direct_declarator
-	| direct_declarator
-	;
-
-direct_declarator
-	: IDENTIFIER
-	| '(' declarator ')'
-	| direct_declarator '[' ']'
-	| direct_declarator '[' '*' ']'
-	| direct_declarator '[' STATIC type_qualifier_list assignment_expression ']'
-	| direct_declarator '[' STATIC assignment_expression ']'
-	| direct_declarator '[' type_qualifier_list '*' ']'
-	| direct_declarator '[' type_qualifier_list STATIC assignment_expression ']'
-	| direct_declarator '[' type_qualifier_list assignment_expression ']'
-	| direct_declarator '[' type_qualifier_list ']'
-	| direct_declarator '[' assignment_expression ']'
-	| direct_declarator '(' parameter_type_list ')'
-	| direct_declarator '(' ')'
-	| direct_declarator '(' identifier_list ')'
-	;
-
-pointer
-	: '*' type_qualifier_list pointer
-	| '*' type_qualifier_list
-	| '*' pointer
-	| '*'
+	: ID
+	| LB declarator RB
+	| declarator LSB RSB
+	| declarator LSB assignment_expression RSB
+	| declarator LB parameter_list RB
+	| declarator LB RB
+	| declarator LB identifier_list RB
 	;
 
 type_qualifier_list
@@ -337,15 +202,9 @@ type_qualifier_list
 	| type_qualifier_list type_qualifier
 	;
 
-
-parameter_type_list
-	: parameter_list ',' ELLIPSIS
-	| parameter_list
-	;
-
 parameter_list
 	: parameter_declaration
-	| parameter_list ',' parameter_declaration
+	| parameter_list COMMA parameter_declaration
 	;
 
 parameter_declaration
@@ -355,74 +214,23 @@ parameter_declaration
 	;
 
 identifier_list
-	: IDENTIFIER
-	| identifier_list ',' IDENTIFIER
+	: ID
+	| identifier_list COMMA ID
 	;
 
 type_name
-	: specifier_qualifier_list abstract_declarator
-	| specifier_qualifier_list
-	;
-
-abstract_declarator
-	: pointer direct_abstract_declarator
-	| pointer
-	| direct_abstract_declarator
-	;
-
-direct_abstract_declarator
-	: '(' abstract_declarator ')'
-	| '[' ']'
-	| '[' '*' ']'
-	| '[' STATIC type_qualifier_list assignment_expression ']'
-	| '[' STATIC assignment_expression ']'
-	| '[' type_qualifier_list STATIC assignment_expression ']'
-	| '[' type_qualifier_list assignment_expression ']'
-	| '[' type_qualifier_list ']'
-	| '[' assignment_expression ']'
-	| direct_abstract_declarator '[' ']'
-	| direct_abstract_declarator '[' '*' ']'
-	| direct_abstract_declarator '[' STATIC type_qualifier_list assignment_expression ']'
-	| direct_abstract_declarator '[' STATIC assignment_expression ']'
-	| direct_abstract_declarator '[' type_qualifier_list assignment_expression ']'
-	| direct_abstract_declarator '[' type_qualifier_list STATIC assignment_expression ']'
-	| direct_abstract_declarator '[' type_qualifier_list ']'
-	| direct_abstract_declarator '[' assignment_expression ']'
-	| '(' ')'
-	| '(' parameter_type_list ')'
-	| direct_abstract_declarator '(' ')'
-	| direct_abstract_declarator '(' parameter_type_list ')'
+	: specifier_qualifier_list
 	;
 
 initializer
-	: '{' initializer_list '}'
-	| '{' initializer_list ',' '}'
+	: LCB initializer_list RCB
+	| LCB initializer_list COMMA RCB
 	| assignment_expression
 	;
 
 initializer_list
-	: designation initializer
-	| initializer
-	| initializer_list ',' designation initializer
-	| initializer_list ',' initializer
-	;
-
-designation
-	: designator_list '='
-	;
-
-designator_list
-	: designator
-	| designator_list designator
-	;
-
-designator
-	: '[' constant_expression ']'
-	| '.' IDENTIFIER
-	;
-
-static_assert_declaration
-	: STATIC_ASSERT '(' constant_expression ',' STR_CONST ')' ';'
+	: initializer
+	| initializer_list COMMA initializer
 	;
 
 statement
@@ -434,15 +242,9 @@ statement
 	| jump_statement
 	;
 
-labeled_statement
-	: IDENTIFIER ':' statement
-	| CASE constant_expression ':' statement
-	| DEFAULT ':' statement
-	;
-
 compound_statement
-	: '{' '}'
-	| '{'  block_item_list '}'
+	: LCB RCB
+	| LCB block_item_list RCB
 	;
 
 block_item_list
@@ -456,34 +258,27 @@ block_item
 	;
 
 expression_statement
-	: ';'
-	| expression ';'
+	: SEMICOLON
+	| expression SEMICOLON
 	;
 
 selection_statement
-	: IF '(' expression ')' statement ELSE statement
-	| IF '(' expression ')' statement
-	| SWITCH '(' expression ')' statement
+	: IF LB expression RB statement ELSE statement
+	| IF LB expression RB statement
 	;
 
 iteration_statement
-	: WHILE '(' expression ')' statement
-	| DO statement WHILE '(' expression ')' ';'
-	| FOR '(' expression_statement expression_statement ')' statement
-	| FOR '(' expression_statement expression_statement expression ')' statement
-	| FOR '(' declaration expression_statement ')' statement
-	| FOR '(' declaration expression_statement expression ')' statement
+	: WHILE LB expression RB statement
+	| FOR LB expression_statement expression_statement RB statement
+	| FOR LB expression_statement expression_statement expression RB statement
+	| FOR LB declaration expression_statement RB statement
+	| FOR LB declaration expression_statement expression RB statement
 	;
 
 jump_statement
-	: GOTO IDENTIFIER ';'
-	| CONTINUE ';'
-	| BREAK ';'
-	| RETURN ';'
-	| RETURN expression ';'
+	: RETURN COMMA
+	| RETURN expression COMMA
 	;
-
-
 
 external_declaration
 	: function_definition
@@ -510,7 +305,7 @@ type
     | VOID { $<v_val>$ = $1; }
 ;
 
-initializer
+constant
     : I_CONST { $<i_val>$ = $1; }
     | F_CONST { $<f_val>$ = $1; }
     | STR_CONST { $<str_val>$ = $1; }
