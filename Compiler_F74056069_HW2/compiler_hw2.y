@@ -11,6 +11,8 @@ void create_symbol();
 void insert_symbol();
 void dump_symbol();
 
+int 
+
 %}
 
 /* Use variable or self-defined structure to represent
@@ -54,30 +56,11 @@ void dump_symbol();
 %%
 
 program
-    : program stat
-    |
+    : external_declaration
+    | program external_declaration
 ;
 
-stat
-    : declaration
-    | compound_stat
-    | expression_stat
-    | print_func
-;
 
-declaration
-    : type ID '=' initializer SEMICOLON
-    | type ID SEMICOLON
-;
-
-/* actions can be taken when meet the token or rule */
-type
-    : INT { $$ = $1; }
-    | FLOAT { $$ = $1; }
-    | BOOL  { $$ = $1; }
-    | STRING { $$ = $1; }
-    | VOID { $$ = $1; }
-;
 
 
 %%

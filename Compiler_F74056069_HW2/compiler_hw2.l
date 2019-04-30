@@ -87,12 +87,8 @@ id			{letter}+({letter}|{digit})*
 "return"    { return RET; }
 
  /* String Constant */
-\"				        { 
-    BEGIN STRING_STATE; 
-    return COMMA; }
-<STRING_STATE>\"		{ 
-    BEGIN INITIAL;
-    return COMMA; }
+\"  { BEGIN STRING_STATE; }
+<STRING_STATE>\"		{ BEGIN INITIAL; }
 <STRING_STATE>[^"]*		{ 
     strcpy(yylval.string, yytext);
     return STR_CONST; }
@@ -110,10 +106,10 @@ id			{letter}+({letter}|{digit})*
 <COMMENT>[^*\n]+	{  }
 <COMMENT>\n			{ ++yylineno; }
 <COMMENT>"*"		{  }
-<COMMENT>"*/"		{ BEGIN INITIAL; }
+<COMMENT>"*/"		{ BEGIN INITIAL; return COMMENT; }
 
  /* C++ type Comment */
-\/\/.*	{  }
+\/\/.*	{ return COMMENT; }
 
  /* Variable ID */
  {id}       { return ID; }
@@ -121,10 +117,10 @@ id			{letter}+({letter}|{digit})*
  /* others */
 
 [;]         { return SEMICOLON; }
-[\n]        { ++yylineno; }
+[\n]        { ++yylineno; return NEWLINE;}
 [ \t]		{  } /* Ignore */
-[^ \t\n] 	{ ++yylineno; } /* Ignore other charactor sets */
-<<EOF>>     { }
+[^ \t\n] 	{  } /* Ignore other charactor sets */
+<<EOF>>     { return 0; }
 
 %%
 
