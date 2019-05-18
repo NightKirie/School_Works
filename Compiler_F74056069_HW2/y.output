@@ -1,0 +1,353 @@
+Nonterminals useless in grammar
+
+   stat
+   function_declaration
+
+
+Terminals unused in grammar
+
+   ADD
+   SUB
+   MUL
+   DIV
+   MOD
+   INC
+   DEC
+   MT
+   LT
+   MTE
+   LTE
+   EQ
+   NE
+   ADDASGN
+   SUBASGN
+   MULASGN
+   DIVASGN
+   MODASGN
+   AND
+   OR
+   NOT
+   LB
+   RB
+   LCB
+   RCB
+   LSB
+   RSB
+   COMMA
+   PRINT
+   IF
+   ELSE
+   FOR
+   WHILE
+   TRUE
+   FALSE
+   RET
+   STR_COMMENT
+
+
+Rules useless in grammar
+
+   18 stat: declaration
+
+
+State 0 conflicts: 5 shift/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: external_declaration
+    2        | program external_declaration
+    3        | %empty
+
+    4 external_declaration: declaration
+
+    5 declaration: type ID ASGN val SEMICOLON
+    6            | type ID SEMICOLON
+
+    7 val: term
+
+    8 term: initializer
+
+    9 initializer: I_CONST
+   10            | F_CONST
+   11            | STR_CONST
+   12            | ID
+
+   13 type: INT
+   14     | FLOAT
+   15     | STRING
+   16     | VOID
+   17     | BOOL
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+ADD (258)
+SUB (259)
+MUL (260)
+DIV (261)
+MOD (262)
+INC (263)
+DEC (264)
+MT (265)
+LT (266)
+MTE (267)
+LTE (268)
+EQ (269)
+NE (270)
+ASGN (271) 5
+ADDASGN (272)
+SUBASGN (273)
+MULASGN (274)
+DIVASGN (275)
+MODASGN (276)
+AND (277)
+OR (278)
+NOT (279)
+LB (280)
+RB (281)
+LCB (282)
+RCB (283)
+LSB (284)
+RSB (285)
+COMMA (286)
+PRINT (287)
+IF (288)
+ELSE (289)
+FOR (290)
+WHILE (291)
+TRUE (292)
+FALSE (293)
+RET (294)
+ID (295) 5 6 12
+SEMICOLON (296) 5 6
+STR_COMMENT (297)
+I_CONST (298) 9
+INT (299) 13
+BOOL (300) 17
+VOID (301) 16
+F_CONST (302) 10
+FLOAT (303) 14
+STR_CONST (304) 11
+STRING (305) 15
+
+
+Nonterminals, with rules where they appear
+
+$accept (51)
+    on left: 0
+program (52)
+    on left: 1 2 3, on right: 0 2
+external_declaration (53)
+    on left: 4, on right: 1 2
+declaration (54)
+    on left: 5 6, on right: 4
+val (55)
+    on left: 7, on right: 5
+term (56)
+    on left: 8, on right: 7
+initializer (57)
+    on left: 9 10 11 12, on right: 8
+type (58)
+    on left: 13 14 15 16 17, on right: 5 6
+
+
+State 0
+
+    0 $accept: . program $end
+
+    INT     shift, and go to state 1
+    BOOL    shift, and go to state 2
+    VOID    shift, and go to state 3
+    FLOAT   shift, and go to state 4
+    STRING  shift, and go to state 5
+
+    INT       [reduce using rule 3 (program)]
+    BOOL      [reduce using rule 3 (program)]
+    VOID      [reduce using rule 3 (program)]
+    FLOAT     [reduce using rule 3 (program)]
+    STRING    [reduce using rule 3 (program)]
+    $default  reduce using rule 3 (program)
+
+    program               go to state 6
+    external_declaration  go to state 7
+    declaration           go to state 8
+    type                  go to state 9
+
+
+State 1
+
+   13 type: INT .
+
+    $default  reduce using rule 13 (type)
+
+
+State 2
+
+   17 type: BOOL .
+
+    $default  reduce using rule 17 (type)
+
+
+State 3
+
+   16 type: VOID .
+
+    $default  reduce using rule 16 (type)
+
+
+State 4
+
+   14 type: FLOAT .
+
+    $default  reduce using rule 14 (type)
+
+
+State 5
+
+   15 type: STRING .
+
+    $default  reduce using rule 15 (type)
+
+
+State 6
+
+    0 $accept: program . $end
+    2 program: program . external_declaration
+
+    $end    shift, and go to state 10
+    INT     shift, and go to state 1
+    BOOL    shift, and go to state 2
+    VOID    shift, and go to state 3
+    FLOAT   shift, and go to state 4
+    STRING  shift, and go to state 5
+
+    external_declaration  go to state 11
+    declaration           go to state 8
+    type                  go to state 9
+
+
+State 7
+
+    1 program: external_declaration .
+
+    $default  reduce using rule 1 (program)
+
+
+State 8
+
+    4 external_declaration: declaration .
+
+    $default  reduce using rule 4 (external_declaration)
+
+
+State 9
+
+    5 declaration: type . ID ASGN val SEMICOLON
+    6            | type . ID SEMICOLON
+
+    ID  shift, and go to state 12
+
+
+State 10
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 11
+
+    2 program: program external_declaration .
+
+    $default  reduce using rule 2 (program)
+
+
+State 12
+
+    5 declaration: type ID . ASGN val SEMICOLON
+    6            | type ID . SEMICOLON
+
+    ASGN       shift, and go to state 13
+    SEMICOLON  shift, and go to state 14
+
+
+State 13
+
+    5 declaration: type ID ASGN . val SEMICOLON
+
+    ID         shift, and go to state 15
+    I_CONST    shift, and go to state 16
+    F_CONST    shift, and go to state 17
+    STR_CONST  shift, and go to state 18
+
+    val          go to state 19
+    term         go to state 20
+    initializer  go to state 21
+
+
+State 14
+
+    6 declaration: type ID SEMICOLON .
+
+    $default  reduce using rule 6 (declaration)
+
+
+State 15
+
+   12 initializer: ID .
+
+    $default  reduce using rule 12 (initializer)
+
+
+State 16
+
+    9 initializer: I_CONST .
+
+    $default  reduce using rule 9 (initializer)
+
+
+State 17
+
+   10 initializer: F_CONST .
+
+    $default  reduce using rule 10 (initializer)
+
+
+State 18
+
+   11 initializer: STR_CONST .
+
+    $default  reduce using rule 11 (initializer)
+
+
+State 19
+
+    5 declaration: type ID ASGN val . SEMICOLON
+
+    SEMICOLON  shift, and go to state 22
+
+
+State 20
+
+    7 val: term .
+
+    $default  reduce using rule 7 (val)
+
+
+State 21
+
+    8 term: initializer .
+
+    $default  reduce using rule 8 (term)
+
+
+State 22
+
+    5 declaration: type ID ASGN val SEMICOLON .
+
+    $default  reduce using rule 5 (declaration)

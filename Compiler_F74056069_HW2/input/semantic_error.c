@@ -25,6 +25,7 @@ int main() {
     } else {
         x = a % 10 + 10 * 7; /* Arithmetic */
     }
+    loop(x, i);
     print("Hello World");
 
     // Redeclare variable
