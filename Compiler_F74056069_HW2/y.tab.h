@@ -79,20 +79,20 @@ extern int yydebug;
     ELSE = 289,
     FOR = 290,
     WHILE = 291,
-    TRUE = 292,
-    FALSE = 293,
-    RET = 294,
-    ID = 295,
-    SEMICOLON = 296,
-    STR_COMMENT = 297,
-    I_CONST = 298,
-    INT = 299,
-    BOOL = 300,
-    VOID = 301,
-    F_CONST = 302,
-    FLOAT = 303,
+    VOID = 292,
+    INT = 293,
+    FLOAT = 294,
+    STRING = 295,
+    BOOL = 296,
+    TRUE = 297,
+    FALSE = 298,
+    RET = 299,
+    SEMICOLON = 300,
+    STR_COMMENT = 301,
+    I_CONST = 302,
+    F_CONST = 303,
     STR_CONST = 304,
-    STRING = 305
+    ID = 305
   };
 #endif
 /* Tokens.  */
@@ -130,20 +130,20 @@ extern int yydebug;
 #define ELSE 289
 #define FOR 290
 #define WHILE 291
-#define TRUE 292
-#define FALSE 293
-#define RET 294
-#define ID 295
-#define SEMICOLON 296
-#define STR_COMMENT 297
-#define I_CONST 298
-#define INT 299
-#define BOOL 300
-#define VOID 301
-#define F_CONST 302
-#define FLOAT 303
+#define VOID 292
+#define INT 293
+#define FLOAT 294
+#define STRING 295
+#define BOOL 296
+#define TRUE 297
+#define FALSE 298
+#define RET 299
+#define SEMICOLON 300
+#define STR_COMMENT 301
+#define I_CONST 302
+#define F_CONST 303
 #define STR_CONST 304
-#define STRING 305
+#define ID 305
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

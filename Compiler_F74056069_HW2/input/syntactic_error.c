@@ -25,7 +25,6 @@ int main() {
         x = a % 10 + 10 * 7; /* Arithmetic */
         print(x);
     }
-    loop(x, i);
     print("Hello World");
 
     return 0; 

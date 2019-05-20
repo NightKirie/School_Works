@@ -8,9 +8,10 @@
 #include <ctype.h>
 extern YYSTYPE yylval; //YYSTYPE
 char buf[BUF_SIZE];
-
+void printLine();
 /* This macro is used to record code line */
 #define CONCAT { strncat(buf, yytext, BUF_SIZE - strlen(buf) - 1); }
+#define FREEBUF { memset(buf, 0, BUF_SIZE); }
 %}
 
 /* Define regular expression label */
@@ -29,204 +30,204 @@ id			{letter}+({letter}|{digit})*
 
  /* Arithmetic */
 "+"     { 
-    printf("%s", yytext); 
+    CONCAT;
     return ADD; }
 "-" 	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return SUB; }
 "*" 	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return MUL; }
 "/" 	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return DIV; }
 "%"     { 
-    printf("%s", yytext); 
+    CONCAT;
     return MOD; }
 "++"    { 
-    printf("%s", yytext); 
+    CONCAT;
     return INC; }
 "--"    { 
-    printf("%s", yytext); 
+    CONCAT;
     return DEC; }
 
  /* Relational */
 ">"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return MT; }
 "<"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return LT; }
 ">="	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return MTE; }
 "<="	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return LTE; }
 "=="	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return EQ; }
 "!="	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return NE; }
 
  /* Assignment */
 "="		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return ASGN; }
 "+="	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return ADDASGN; }
 "-="	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return SUBASGN; }
 "*="	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return MULASGN; }
 "/="	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return DIVASGN; }
 "%="	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return MODASGN; }
 
  /* Logical */
 "&&"	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return AND; }
 "||"	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return OR; }
 "!"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return NOT; }
 
  /* Delimiters */
 "("		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return LB; }
 ")"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return RB; }
 "{"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return LCB; }
 "}"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return RCB; }
 "["		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return LSB; }
 "]"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return RSB; }
 ","		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return COMMA; }
 
  /* Print Keywords */	
 "print"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return PRINT; }
 
  /* Condition and Loop Keywords */
 "if"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return IF; }
 "else"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return ELSE; }
 "for"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return FOR; }
 "while"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return WHILE; }
 
  /* Declaration Keywords */
 "void"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return VOID; }
 "int"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     return INT; }
 "float"  	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return FLOAT; }
 "string"  	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return STRING; }
 "bool"  	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return BOOL; }
 
  /* boolean Keywords */
 "true"      { 
-    printf("%s", yytext); 
+    CONCAT;
     return TRUE; }
 "false"     { 
-    printf("%s", yytext); 
+    CONCAT;
     return FALSE; }
 
 "return"    { 
-    printf("%s", yytext); 
+    CONCAT;
     return RET; }
 
  /* String Constant */
-\"  { BEGIN STRING_STATE; }
+\"  {
+    CONCAT; 
+    BEGIN STRING_STATE; }
 <STRING_STATE>\"		{ 
-    printf("%s", yytext); 
+    CONCAT;
     BEGIN INITIAL; }
 <STRING_STATE>[^"]*		{ 
-    printf("%s", yytext); 
-    yylval.str_val = malloc(strlen(yytext));
-    strcpy(yylval.str_val, yytext);
+    CONCAT;
     return STR_CONST; }
 
  /* Number Constant */
 {integer}	{ 
-    printf("%s", yytext); 
-    yylval.i_val = atoi(yytext);
+    CONCAT;
     return I_CONST; }
 {float}	    { 
-    printf("%s", yytext); 
-    yylval.f_val = atof(yytext);
+    CONCAT;
     return F_CONST; }
 
  /* C type Comment */
 "/*"				{ 
-    printf("%s", yytext); 
-    BEGIN STR_COMMENT; }
-<COMMENT>[^*\n]+	{ printf("%s", yytext); }
+    CONCAT;
+    BEGIN COMMENT; }
+<COMMENT>[^*\n]+	{ CONCAT; }
 <COMMENT>\n			{ 
-    printf("%s", yytext); 
-    ++yylineno; }
-<COMMENT>"*"		{ printf("%s", yytext); }
+    CONCAT;
+    printLine(); }
+<COMMENT>"*"		{ CONCAT; }
 <COMMENT>"*/"		{ 
-    printf("%s", yytext); 
+    CONCAT; 
     BEGIN INITIAL; 
     return STR_COMMENT; }
 
  /* C++ type Comment */
 \/\/.*	{ 
-    printf("%s", yytext); 
+    CONCAT;
     return STR_COMMENT; }
 
  /* Variable ID */
  {id}       { 
-     printf("%s", yytext); 
-     yylval.str_val = malloc(strlen(yytext));
+     CONCAT; 
+     yylval.str_val = (char *)malloc(strlen(yytext) + 1);
      strcpy(yylval.str_val, yytext);
      return ID; }
 
  /* others */
 
 [;]         { 
-    printf("%s", yytext); 
+    CONCAT; 
     return SEMICOLON; }
-[\n]        { printf("%s", yytext); }
-[ \t]		{ printf("%s", yytext);  } /* Ignore */
-[^ \t\n] 	{ printf("%s", yytext);  } /* Ignore other charactor sets */
+[\n]        { 
+    CONCAT;
+    printLine(); }
+[ \t]		{ CONCAT; } /* Ignore */
+[^ \t\n] 	{ CONCAT; } /* Ignore other charactor sets */
 <<EOF>>     { return 0; }
 
 %%
@@ -235,3 +236,11 @@ int yywrap()
 {
     return 1;
 }
+
+void printLine() {
+    printf("%d: %s", yylineno, buf);
+    FREEBUF;
+
+}
+
+

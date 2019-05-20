@@ -54,21 +54,18 @@ Symbol_table* symbol_table[MAX_SCOPE];		// Table for dynamic storing symbol, sta
 %token LB RB LCB RCB LSB RSB COMMA
 %token PRINT 
 %token IF ELSE FOR WHILE
+%token VOID INT FLOAT STRING BOOL
 %token TRUE FALSE RET
-%token ID SEMICOLON STR_COMMENT
+%token SEMICOLON STR_COMMENT
 
 /* Token with return, which need to sepcify type */
-%token <i_val> I_CONST INT BOOL VOID
-%token <f_val> F_CONST FLOAT
-%token <str_val> STR_CONST STRING ID
+%token <i_val> I_CONST 
+%token <f_val> F_CONST 
+%token <str_val> STR_CONST 
+%token <str_val> ID
 
 /* Nonterminal with return, which need to sepcify type */
-%type <f_val> stat 
-%type <f_val> external_declaration
-%type <f_val> function_declaration
-%type <f_val> declaration
-%type <f_val> val
-%type <f_val> term
+%type <i_val> type
 
 /* Yacc will start at this nonterminal */
 %start program
@@ -76,30 +73,186 @@ Symbol_table* symbol_table[MAX_SCOPE];		// Table for dynamic storing symbol, sta
 /* Grammar section */
 %%
 
-program
+program 
     : external_declaration 
     | program external_declaration 
 	| 
 	;
 
 external_declaration
-	// : function_declaration
-	: declaration
+	: declaration 
+	| function_definition
+	| STR_COMMENT
 	;
 
-stat 
+function_definition
+	: type declarator declaration_list compound_statement
+	| type declarator compound_statement
+	;
+
+/* stat 
 	: declaration
-	/* | function_stat
+	| function_stat
 	| expression_stat
 	| print_func
 	| if_else_stat
 	| while_stat
-	| COMMENT */
-	;
+	| COMMENT
+	; */
 
 declaration
-	: type ID ASGN val SEMICOLON  
-	| type ID SEMICOLON 
+	: type init_declarator SEMICOLON
+	;
+
+type 
+	: INT       {$$ = 1;}
+    | FLOAT     {$$ = 2;}
+    | BOOL      {$$ = 3;}
+    | STRING    {$$ = 4;}
+    | VOID      {$$ = 5;}
+	;
+
+init_declarator
+	: declarator ASGN initializer
+	| declarator
+	;
+
+declarator
+	: ID
+	| declarator LB parameter_list RB
+	| declarator LB RB
+	| declarator LB identifier_list RB
+	;
+
+initializer
+	: assignment_expression
+	;
+
+assignment_expression
+	: logical_or_expression
+	| unary_expression assignment_operator assignment_expression
+	;
+
+logical_or_expression
+	: logical_and_expression 
+	| logical_or_expression OR logical_and_expression
+	;
+
+logical_and_expression
+	: equality_expression
+	| logical_and_expression AND equality_expression
+	;
+
+equality_expression
+	: relational_expression
+	| equality_expression EQ relational_expression
+	| equality_expression NE relational_expression
+	;
+
+relational_expression
+	: additive_expression
+	| relational_expression MT additive_expression
+	| relational_expression LT additive_expression
+	| relational_expression MTE additive_expression
+	| relational_expression LTE additive_expression
+	;
+
+additive_expression
+	: multiplicative_expression
+	| additive_expression ADD multiplicative_expression
+	| additive_expression SUB multiplicative_expression
+	;
+
+multiplicative_expression
+	: cast_expression
+	| multiplicative_expression MUL cast_expression
+	| multiplicative_expression DIV cast_expression
+	| multiplicative_expression MOD cast_expression
+	;
+
+cast_expression
+	: unary_expression
+	| LB specifier_qualifier_list RB cast_expression
+	;
+
+unary_expression
+	: postfix_expression
+	| INC unary_expression
+	| DEC unary_expression
+	| unary_operator cast_expression
+	;
+
+/* For positive/negative/not variable */
+unary_operator
+	: ADD
+	| SUB
+	| NOT
+	;
+
+postfix_expression
+	: primary_expression
+	| postfix_expression LB RB
+	| postfix_expression LB argument_expression_list RB
+	| postfix_expression INC
+	| postfix_expression DEC
+	| LB specifier_qualifier_list RB LCB initializer_list RCB
+	| LB specifier_qualifier_list RB LCB initializer_list COMMA RCB
+	;
+
+primary_expression
+	: ID
+	| constant
+	| STR_CONST
+	| LB expression RB
+	;
+
+constant
+	: I_CONST
+	| F_CONST
+	;
+
+parameter_list
+	: parameter_declaration
+	| parameter_list COMMA parameter_declaration
+	;
+
+parameter_declaration
+	: type declarator
+	| type
+	;
+
+identifier_list
+	: ID
+	| identifier_list COMMA ID
+	;
+
+assignment_operator
+	: ASGN
+	| MULASGN
+	| DIVASGN
+	| MODASGN
+	| ADDASGN
+	| SUBASGN
+	;
+
+specifier_qualifier_list
+	: type specifier_qualifier_list
+	| type
+	;
+
+argument_expression_list
+	: assignment_expression
+	| argument_expression_list COMMA assignment_expression
+	;
+
+initializer_list
+	: initializer
+	| initializer_list COMMA initializer
+	;
+
+expression
+	: assignment_expression
+	| expression COMMA assignment_expression
 	;
 
 /* function_stat 
@@ -147,17 +300,17 @@ expression_stat
 	| ID DEC SEMICOLON 
 	; */
 
-val 
+/* val 
 	: term
-/* 	| val ADD term
-	| val SUB term */
+	| val ADD term
+	| val SUB term
 	;
 
 term
 	: initializer
-/* 	| term MUL initializer
+	| term MUL initializer
 	| term DIV initializer
-	| term MOD initializer */
+	| term MOD initializer
 	;
 
 initializer
@@ -165,8 +318,8 @@ initializer
 	| F_CONST 
 	| STR_CONST 
  	| ID 
-/*	| group_stat */
-	;
+	| group_stat
+	; */
 
 /* group_stat
 	: LB val RB
@@ -211,13 +364,6 @@ while_stat
 	| WHILE LB compare_stat RB stat
 	; */
 
-type 
-	: INT { $<i_val>$ = $1; }
-	| FLOAT { $<f_val>$ = $1; }
-	| STRING { $<str_val>$ = $1; }
-	| VOID { $<i_val>$ = $1; }
-	| BOOL { $<i_val>$ = $1; }
-	;
 
 
 
