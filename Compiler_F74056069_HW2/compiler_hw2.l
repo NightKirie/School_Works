@@ -30,190 +30,187 @@ id			{letter}+({letter}|{digit})*
 
  /* Arithmetic */
 "+"     { 
-    CONCAT;
+    CONCAT
     return ADD; }
 "-" 	{ 
-    CONCAT;
+    CONCAT
     return SUB; }
 "*" 	{ 
-    CONCAT;
+    CONCAT
     return MUL; }
 "/" 	{ 
-    CONCAT;
+    CONCAT
     return DIV; }
 "%"     { 
-    CONCAT;
+    CONCAT
     return MOD; }
 "++"    { 
-    CONCAT;
+    CONCAT
     return INC; }
 "--"    { 
-    CONCAT;
+    CONCAT
     return DEC; }
 
  /* Relational */
 ">"		{ 
-    CONCAT;
+    CONCAT
     return MT; }
 "<"		{ 
-    CONCAT;
+    CONCAT
     return LT; }
 ">="	{ 
-    CONCAT;
+    CONCAT
     return MTE; }
 "<="	{ 
-    CONCAT;
+    CONCAT
     return LTE; }
 "=="	{ 
-    CONCAT;
+    CONCAT
     return EQ; }
 "!="	{ 
-    CONCAT;
+    CONCAT
     return NE; }
 
  /* Assignment */
 "="		{ 
-    CONCAT;
+    CONCAT
     return ASGN; }
 "+="	{ 
-    CONCAT;
+    CONCAT
     return ADDASGN; }
 "-="	{ 
-    CONCAT;
+    CONCAT
     return SUBASGN; }
 "*="	{ 
-    CONCAT;
+    CONCAT
     return MULASGN; }
 "/="	{ 
-    CONCAT;
+    CONCAT
     return DIVASGN; }
 "%="	{ 
-    CONCAT;
+    CONCAT
     return MODASGN; }
 
  /* Logical */
 "&&"	{ 
-    CONCAT;
+    CONCAT
     return AND; }
 "||"	{ 
-    CONCAT;
+    CONCAT
     return OR; }
 "!"		{ 
-    CONCAT;
+    CONCAT
     return NOT; }
 
  /* Delimiters */
 "("		{ 
-    CONCAT;
+    CONCAT
     return LB; }
 ")"		{ 
-    CONCAT;
+    CONCAT
     return RB; }
 "{"		{ 
-    CONCAT;
+    CONCAT
     return LCB; }
 "}"		{ 
-    CONCAT;
+    CONCAT
     return RCB; }
 "["		{ 
-    CONCAT;
+    CONCAT
     return LSB; }
 "]"		{ 
-    CONCAT;
+    CONCAT
     return RSB; }
 ","		{ 
-    CONCAT;
+    CONCAT
     return COMMA; }
 
  /* Print Keywords */	
 "print"		{ 
-    CONCAT;
+    CONCAT
     return PRINT; }
 
  /* Condition and Loop Keywords */
 "if"		{ 
-    CONCAT;
+    CONCAT
     return IF; }
 "else"		{ 
-    CONCAT;
+    CONCAT
     return ELSE; }
 "for"		{ 
-    CONCAT;
+    CONCAT
     return FOR; }
 "while"		{ 
-    CONCAT;
+    CONCAT
     return WHILE; }
 
  /* Declaration Keywords */
 "void"		{ 
-    CONCAT;
+    CONCAT
     return VOID; }
 "int"		{ 
-    CONCAT;
+    CONCAT
     return INT; }
 "float"  	{ 
-    CONCAT;
+    CONCAT
     return FLOAT; }
 "string"  	{ 
-    CONCAT;
+    CONCAT
     return STRING; }
 "bool"  	{ 
-    CONCAT;
+    CONCAT
     return BOOL; }
 
  /* boolean Keywords */
 "true"      { 
-    CONCAT;
+    CONCAT
     return TRUE; }
 "false"     { 
-    CONCAT;
+    CONCAT
     return FALSE; }
 
 "return"    { 
-    CONCAT;
+    CONCAT
     return RET; }
 
  /* String Constant */
 \"  {
-    CONCAT; 
+    CONCAT 
     BEGIN STRING_STATE; }
 <STRING_STATE>\"		{ 
-    CONCAT;
+    CONCAT
     BEGIN INITIAL; }
 <STRING_STATE>[^"]*		{ 
-    CONCAT;
+    CONCAT
     return STR_CONST; }
 
  /* Number Constant */
 {integer}	{ 
-    CONCAT;
+    CONCAT
     return I_CONST; }
 {float}	    { 
-    CONCAT;
+    CONCAT
     return F_CONST; }
 
  /* C type Comment */
 "/*"				{ 
-    CONCAT;
+    CONCAT
     BEGIN COMMENT; }
-<COMMENT>[^*\n]+	{ CONCAT; }
+<COMMENT>[^*\n]+	{ CONCAT }
 <COMMENT>\n			{ 
-    CONCAT;
+    CONCAT
     printLine(); }
-<COMMENT>"*"		{ CONCAT; }
+<COMMENT>"*"		{ CONCAT }
 <COMMENT>"*/"		{ 
-    CONCAT; 
-    BEGIN INITIAL; 
-    return STR_COMMENT; }
+    CONCAT 
+    BEGIN INITIAL; }
 
  /* C++ type Comment */
-\/\/.*	{ 
-    CONCAT;
-    return STR_COMMENT; }
+\/\/.*	{ CONCAT }
 
  /* Variable ID */
  {id}       { 
-     CONCAT; 
+     CONCAT 
      yylval.str_val = (char *)malloc(strlen(yytext) + 1);
      strcpy(yylval.str_val, yytext);
      return ID; }
@@ -221,13 +218,13 @@ id			{letter}+({letter}|{digit})*
  /* others */
 
 [;]         { 
-    CONCAT; 
+    CONCAT 
     return SEMICOLON; }
 [\n]        { 
-    CONCAT;
+    CONCAT
     printLine(); }
-[ \t]		{ CONCAT; } /* Ignore */
-[^ \t\n] 	{ CONCAT; } /* Ignore other charactor sets */
+[ \t]		{ CONCAT } /* Ignore */
+[^ \t\n] 	{ CONCAT } /* Ignore other charactor sets */
 <<EOF>>     { return 0; }
 
 %%
@@ -239,7 +236,7 @@ int yywrap()
 
 void printLine() {
     printf("%d: %s", yylineno, buf);
-    FREEBUF;
+    FREEBUF
 
 }
 

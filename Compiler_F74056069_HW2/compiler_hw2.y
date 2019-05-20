@@ -34,6 +34,14 @@ typedef struct data {
 } Symbol_table;
 Symbol_table* symbol_table[MAX_SCOPE];		// Table for dynamic storing symbol, static array for each scope
 
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 %}
 
 /* Use variable or self-defined structure to represent
@@ -56,7 +64,7 @@ Symbol_table* symbol_table[MAX_SCOPE];		// Table for dynamic storing symbol, sta
 %token IF ELSE FOR WHILE
 %token VOID INT FLOAT STRING BOOL
 %token TRUE FALSE RET
-%token SEMICOLON STR_COMMENT
+%token SEMICOLON 
 
 /* Token with return, which need to sepcify type */
 %token <i_val> I_CONST 
@@ -82,7 +90,6 @@ program
 external_declaration
 	: declaration 
 	| function_definition
-	| STR_COMMENT
 	;
 
 function_definition
@@ -90,15 +97,65 @@ function_definition
 	| type declarator compound_statement
 	;
 
-/* stat 
+declaration_list
 	: declaration
-	| function_stat
-	| expression_stat
-	| print_func
-	| if_else_stat
-	| while_stat
-	| COMMENT
-	; */
+	| declaration_list declaration
+	;
+
+compound_statement
+	: scope_start scope_end 
+	| scope_start block_item_list scope_end
+	;
+
+scope_start
+	: LCB	{ printf(ANSI_COLOR_GREEN "scope start!!!" ANSI_COLOR_RESET "\n"); }
+	;
+
+scope_end 
+	: RCB	{ printf(ANSI_COLOR_RED "scope end!!!" ANSI_COLOR_RESET "\n"); }
+	;
+
+block_item_list
+	: block_item
+	| block_item_list block_item
+	;
+
+block_item
+	: declaration
+	| statement
+	;
+
+statement
+	: compound_statement
+	| expression_statement
+	| selection_statement
+	| iteration_statement
+	| jump_statement
+	| print_statement
+	;
+
+expression_statement
+	: SEMICOLON
+	| expression SEMICOLON
+	;
+
+selection_statement
+	: IF LB expression RB statement ELSE statement
+	| IF LB expression RB statement
+	;
+
+iteration_statement
+	: WHILE LB expression RB statement
+	;
+
+jump_statement
+	: RET SEMICOLON
+	| RET expression SEMICOLON
+	;
+
+print_statement
+	: PRINT LB expression RB SEMICOLON
+	;
 
 declaration
 	: type init_declarator SEMICOLON
@@ -184,8 +241,8 @@ unary_expression
 
 /* For positive/negative/not variable */
 unary_operator
-	: ADD
-	| SUB
+	: ADD 
+	| SUB 
 	| NOT
 	;
 
@@ -195,20 +252,24 @@ postfix_expression
 	| postfix_expression LB argument_expression_list RB
 	| postfix_expression INC
 	| postfix_expression DEC
-	| LB specifier_qualifier_list RB LCB initializer_list RCB
-	| LB specifier_qualifier_list RB LCB initializer_list COMMA RCB
 	;
 
 primary_expression
 	: ID
 	| constant
-	| STR_CONST
+	| boolean
 	| LB expression RB
 	;
 
 constant
 	: I_CONST
 	| F_CONST
+	| STR_CONST
+	;
+
+boolean
+	: TRUE
+	| FALSE
 	;
 
 parameter_list
@@ -245,128 +306,10 @@ argument_expression_list
 	| argument_expression_list COMMA assignment_expression
 	;
 
-initializer_list
-	: initializer
-	| initializer_list COMMA initializer
-	;
-
 expression
 	: assignment_expression
 	| expression COMMA assignment_expression
 	;
-
-/* function_stat 
-	: type ID LB parameter_stat RB compound_stat  
-	| ID LB argument_stat RB SEMICOLON  
-	;
-
-parameter_stat
-	: parameter_declaration
-	| parameter_stat COMMA parameter_declaration
-	|
-	;
-
-parameter_declaration
-	: type ID ASGN val
-	| type ID
-	;
-
-argument_stat
-	: argument_declaration
-	| argument_stat COMMA argument_declaration
-	;
-
-argument_declaration
-	: ID ASGN val
-	| ID ADDASGN val 
-	| ID SUBASGN val 
-	| ID MULASGN val 
-	| ID DIVASGN val 
-	| ID MODASGN val 
-	| ID INC 
-	| ID DEC 
-	| val
-	;
-
-
-expression_stat
-	: ID ASGN val SEMICOLON  
-	| ID ADDASGN val SEMICOLON  
-	| ID SUBASGN val SEMICOLON  
-	| ID MULASGN val SEMICOLON  
-	| ID DIVASGN val SEMICOLON 
-	| ID MODASGN val SEMICOLON 
-	| ID INC SEMICOLON 
-	| ID DEC SEMICOLON 
-	; */
-
-/* val 
-	: term
-	| val ADD term
-	| val SUB term
-	;
-
-term
-	: initializer
-	| term MUL initializer
-	| term DIV initializer
-	| term MOD initializer
-	;
-
-initializer
-	: I_CONST 
-	| F_CONST 
-	| STR_CONST 
- 	| ID 
-	| group_stat
-	; */
-
-/* group_stat
-	: LB val RB
-	;
-
-print_func
-	: PRINT group SEMICOLON
-	;
-
-compound_stat
-	: LCB
-	| RCB
-	;
-
-if_else_stat
-	: IF LB compare_stat RB LCB
-	| RCB ELSE IF LB compare_stat RB LCB
-	| RCB ELSE LCB 
-    | ELSE IF LB compare_stat RB LCB 
-    | ELSE LCB 
-    | IF compare_stat LCB 
-    | RCB ELSE IF compare_stat LCB 
-    | ELSE IF compare_stat LCB 
-	;
-
-compare_stat
-	: val MT val
-    | val LT val
-    | val MTE val
-    | val LTE val
-    | val EQ val
-    | val NE val
-	| I_CONST
-	| F_CONST
-	| STR_CONST
-	| ID
-	;
-
-while_stat
-	: WHILE LB compare_stat RB LCB 
-	| WHILE LB compare_stat RB SEMICOLON
-	| WHILE LB compare_stat RB stat
-	; */
-
-
-
-
 
 %%
 

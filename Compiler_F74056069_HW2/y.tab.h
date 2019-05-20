@@ -88,11 +88,10 @@ extern int yydebug;
     FALSE = 298,
     RET = 299,
     SEMICOLON = 300,
-    STR_COMMENT = 301,
-    I_CONST = 302,
-    F_CONST = 303,
-    STR_CONST = 304,
-    ID = 305
+    I_CONST = 301,
+    F_CONST = 302,
+    STR_CONST = 303,
+    ID = 304
   };
 #endif
 /* Tokens.  */
@@ -139,24 +138,23 @@ extern int yydebug;
 #define FALSE 298
 #define RET 299
 #define SEMICOLON 300
-#define STR_COMMENT 301
-#define I_CONST 302
-#define F_CONST 303
-#define STR_CONST 304
-#define ID 305
+#define I_CONST 301
+#define F_CONST 302
+#define STR_CONST 303
+#define ID 304
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 42 "compiler_hw2.y" /* yacc.c:1909  */
+#line 50 "compiler_hw2.y" /* yacc.c:1909  */
 
     int i_val;
     double f_val;
     char* str_val;
 
-#line 160 "y.tab.h" /* yacc.c:1909  */
+#line 158 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
