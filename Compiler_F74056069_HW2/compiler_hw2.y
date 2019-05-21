@@ -1,6 +1,5 @@
 /*	Definition section */
 %{
-#define MAX_SCOPE 100
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,17 +11,16 @@ extern char* yytext;   // Get current token from lex
 extern char buf[256];  // Get current code line from lex
 
 /* Symbol table function - you can add new function if needed. */
-int lookup_symbol();
+int lookup_symbol(char*);
 void create_symbol();
-void insert_symbol(int, char*, char*, char*, char*);
+void insert_symbol(char*, char*, char*, char*);
 void dump_symbol();
 
 int assign_flag = 0;
 int error_flag = 0;
 int type_flag = 0;
-int scope_flag = 0;
+int scope_num = -1;
 int id_flag = 0;
-int table_index[MAX_SCOPE];	// For each scope's table index
 
 typedef struct data {
 	int index;
@@ -31,9 +29,14 @@ typedef struct data {
 	char* type;
 	int scope;
 	char* attribute;
+	Symbol_table* next;
+	Symbol_table* prev;
+	
 } Symbol_table;
-Symbol_table* symbol_table[MAX_SCOPE];		// Table for dynamic storing symbol, static array for each scope
+Symbol_table* symbol_table_head;	// Head of linked list for dynamic storing symbols
+Symbol_table* symbol_table_tail;	// Tail of linked list for dynamic storing symbols
 
+/* For debugging colorful text */
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
 #define ANSI_COLOR_YELLOW  "\x1b[33m"
@@ -335,46 +338,78 @@ void yyerror(char *s)
 
 void create_symbol() 
 {
-	// If the symbol table of this scope isn't initialized, append a size of Symbol_table to it
-	// Also initialize the table index of this scope to 0 (first element)
-	if(symbol_table[scope_flag] == NULL) {
-		symbol_table[scope_flag] = malloc(sizeof(Symbol_table));
-		table_index[scope_flag] = 0;
-	}
-	// If the symbol table of this scope exists, append a size of Symbol_table to it
-	// Also increase the table index of this scope by 1 (next element)
-	else {
-		symbol_table[scope_flag]  = realloc(symbol_table[scope_flag] , sizeof(symbol_table[scope_flag]) + sizeof(Symbol_table));
-		++table_index[scope_flag];
-	}
+	/* Initialize a dumb head of symbol table */
+	symbol_table_head = (Symbol_table*)malloc(sizeof(Symbol_table));
+	symbol_table_head->index = -1;
+	symbol_table_head->name = NULL;
+	symbol_table_head->kind = NULL;
+	symbol_table_head->type = NULL;
+	symbol_table_head->scope = -1;
+	symbol_table_head->attribute = NULL;
+	symbol_table_head->next = NULL;
+	symbol_table_head->prev = NULL;
+	symbol_table_tail = symbol_table_head;
 }
 
-void insert_symbol(int index, char* name, char* kind, char* type, char* attribute) 
+void insert_symbol(char* name, char* kind, char* type, char* attribute) 
 {
-	// Always create(append) symbol table before insert a symbol's data
-	create_symbol();
-	Symbol_table* symbol_data = &symbol_table[scope_flag][table_index[scope_flag]];
-	symbol_data->index = table_index[scope_flag];
-	symbol_data->name = malloc(strlen(name)+1);
-	strcpy(symbol_data->name, name);
-	symbol_data->kind = malloc(strlen(kind)+1);
-	strcpy(symbol_data->kind, kind);
-	symbol_data->type = malloc(strlen(type)+1);
-	strcpy(symbol_data->type, type);
-	symbol_data->scope = scope_flag;
-	symbol_data->attribute = malloc(strlen(attribute)+1);
-	strcpy(symbol_data->attribute, attribute);
+	Symbol_table* new_symbol = (Symbol_table*)malloc(sizeof(Symbol_table));
+	/* If the prev symbol's scope isn't the same as the new symbol, reset index to 0 */
+	if(scope_num != symbol_table_tail->scope) 
+		new_symbol->index = 0;
+	/* If the prev symbol's scope is the same as the new symbol, increase the index */
+	else
+		new_symbol->index = symbol_table_tail->index + 1;
+	symbol_table_head->name = (char*)malloc(strlen(name)+1);
+	strcpy(symbol_table_head->name, name);
+	symbol_table_head->kind = (char*)malloc(strlen(kind)+1);
+	strcpy(symbol_table_head->kind, kind);
+	symbol_table_head->type = (char*)malloc(strlen(type)+1);
+	strcpy(symbol_table_head->type, type);
+	symbol_table_head->scope = scope_num;
+	symbol_table_head->attribute = (char*)malloc(strlen(attribute)+1);
+	strcpy(symbol_table_head->attribute, attribute);
+	/* Concat new symbol to the tail of the symbol table, set the new tail to be this new symbol */
+	new_symbol->prev = symbol_table_tail;
+	new_symbol->next = NULL;
+	symbol_table_tail->next = new_symbol;
+	symbol_table_tail = new_symbol;
 }
 
-int lookup_symbol() {}
+int lookup_symbol(char* name) {
+	/* look back from tail to head, for better performance */
+	Symbol_table* lookup = symbol_table_tail;
+	while(lookup != symbol_table_head){
+		/* If we find a variable/function previously defined at the same scope */
+		if(strcmp(lookup->name, name) == 0 && lookup->scope == scope_num)
+			return 2;	// For redeclared, as for undeclared only check if it's true
+		/* If we find a variable/function previously defined at the lower scope */
+		if(strcmp(lookup->name, name) == 0 && lookup->scope > scope_num)
+			return 1;	// For redeclared, as for undeclared only check if it's true
+		lookup = lookup->prev;
+	}
+	return 0;	// For variable/function not found
+}
 
 void dump_symbol() {
-    if(symbol_table[scope_flag] != NULL) {
+	Symbol_table* dump = symbol_table_tail;
+	char* print_out_dump = NULL;	// For storing the dump variable's data, because we dump symbols from tail to head, need to reverse
+	/* Only if the symbol's scope is equal to the scope_num, then we need to dump it */
+	while(dump->scope == scope_num) {
+		
+	}
+	/* If there are some dumped symbols need to print out */
+	if(print_out_dump != NULL) {
 		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n",
 			"Index", "Name", "Kind", "Type", "Scope", "Attribute");
-		while (symbol_table[scope_flag] != NULL) {
+	}
+	
+	/* if(symbol_table[scope_num] != NULL) {
+		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n",
+			"Index", "Name", "Kind", "Type", "Scope", "Attribute");
+		while (symbol_table[scope_num] != NULL) {
 			// Always take first element to print out, then dump it
-			Symbol_table* symbol_dumped = &symbol_table[scope_flag][0];
+			Symbol_table* symbol_dumped = &symbol_table[scope_num][0];
 			printf("\n%-10d%-10s%-12s%-10s%-10d%-10s\n\n", symbol_dumped->index, symbol_dumped->name, 
 														symbol_dumped->kind, symbol_dumped->type, 
 														symbol_dumped->scope, symbol_dumped->attribute);
@@ -384,5 +419,5 @@ void dump_symbol() {
 			free(symbol_dumped->attribute);
 			free(symbol_dumped);
 		}
-	}
+	} */
 }
