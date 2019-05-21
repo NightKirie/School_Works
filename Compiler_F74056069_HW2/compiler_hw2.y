@@ -452,6 +452,7 @@ void dump_symbol() {
 			print_out_dumped = (char*)realloc(print_out_dumped, strlen(temp)+dumped_line_length);
 			strcat(print_out_dumped, temp);
 		}
+		symbol_dumped = symbol_dumped->prev;
 	}
 	/* If there are some dumped symbols need to print out */
 	if(print_out_dumped != NULL) {
