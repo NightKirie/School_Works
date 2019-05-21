@@ -466,7 +466,7 @@ void insert_attribute(int scope, char* type) {
 		insert_symbol(scope, "", "function", "", type);
 	else {
 		Symbol_table* function_symbol = symbol_table_tail;
-		while(symbol_table_tail->scope != scope) {
+		while(function_symbol->scope != scope) {
 			function_symbol = function_symbol->prev;
 			printf("lolllllllllllllllllllllllll\n");
 		}
