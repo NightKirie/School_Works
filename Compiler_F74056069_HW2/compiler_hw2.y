@@ -19,7 +19,7 @@ void dump_symbol();
 int assign_flag = 0;
 int error_flag = 0;
 int type_flag = 0;
-int scope_num = -1;
+int scope_num = 0;
 int id_flag = 0;
 
 typedef struct data {
@@ -29,8 +29,8 @@ typedef struct data {
 	char* type;
 	int scope;
 	char* attribute;
-	Symbol_table* next;
-	Symbol_table* prev;
+	struct data* next;
+	struct data* prev;
 	
 } Symbol_table;
 Symbol_table* symbol_table_head;	// Head of linked list for dynamic storing symbols
@@ -92,12 +92,11 @@ program
 
 external_declaration
 	: declaration 
-	| function_definition
+	| function_definition 
 	;
 
 function_definition
-	: type declarator declaration_list compound_statement
-	| type declarator compound_statement
+	: type declarator compound_statement { printf(ANSI_COLOR_RED "function start!!!!!!!! " ANSI_COLOR_RESET); }
 	;
 
 declaration_list
@@ -111,11 +110,17 @@ compound_statement
 	;
 
 scope_start
-	: LCB	{ printf(ANSI_COLOR_GREEN "scope start!!!" ANSI_COLOR_RESET "\n"); }
+	: LCB	{ 
+		++scope_num;
+		printf(ANSI_COLOR_GREEN "%d scope start!!!" ANSI_COLOR_RESET "\n", scope_num);
+	}
 	;
 
 scope_end 
-	: RCB	{ printf(ANSI_COLOR_RED "scope end!!!" ANSI_COLOR_RESET "\n"); }
+	: RCB	{ 
+		--scope_num;
+		printf(ANSI_COLOR_RED "%d scope end!!!" ANSI_COLOR_RESET "\n", scope_num); 
+	}
 	;
 
 block_item_list
@@ -161,7 +166,7 @@ print_statement
 	;
 
 declaration
-	: type init_declarator SEMICOLON
+	: type init_declarator SEMICOLON { printf(ANSI_COLOR_YELLOW "type: %d " ANSI_COLOR_RESET, $1); }
 	;
 
 type 
@@ -178,8 +183,8 @@ init_declarator
 	;
 
 declarator
-	: ID
-	| declarator LB parameter_list RB
+	: ID 	{ printf(ANSI_COLOR_YELLOW "ID: %s " ANSI_COLOR_RESET, $1); }
+	| declarator LB parameter_list RB 
 	| declarator LB RB
 	| declarator LB identifier_list RB
 	;
@@ -281,7 +286,7 @@ parameter_list
 	;
 
 parameter_declaration
-	: type declarator
+	: type declarator { printf(ANSI_COLOR_YELLOW "type: %d " ANSI_COLOR_RESET, $1); }
 	| type
 	;
 
@@ -320,11 +325,11 @@ expression
 int main(int argc, char** argv)
 {
     yylineno = 0;
-
+	create_symbol();
     yyparse();
 	printf("\nTotal lines: %d \n",yylineno);
 	dump_symbol();
-
+	--scope_num;
     return 0;
 }
 
@@ -378,46 +383,48 @@ void insert_symbol(char* name, char* kind, char* type, char* attribute)
 
 int lookup_symbol(char* name) {
 	/* look back from tail to head, for better performance */
-	Symbol_table* lookup = symbol_table_tail;
-	while(lookup != symbol_table_head){
+	Symbol_table* symbol_lookup = symbol_table_tail;
+	while(symbol_lookup != symbol_table_head){
 		/* If we find a variable/function previously defined at the same scope */
-		if(strcmp(lookup->name, name) == 0 && lookup->scope == scope_num)
+		if(strcmp(symbol_lookup->name, name) == 0 && symbol_lookup->scope == scope_num)
 			return 2;	// For redeclared, as for undeclared only check if it's true
 		/* If we find a variable/function previously defined at the lower scope */
-		if(strcmp(lookup->name, name) == 0 && lookup->scope > scope_num)
+		if(strcmp(symbol_lookup->name, name) == 0 && symbol_lookup->scope > scope_num)
 			return 1;	// For redeclared, as for undeclared only check if it's true
-		lookup = lookup->prev;
+		symbol_lookup = symbol_lookup->prev;
 	}
 	return 0;	// For variable/function not found
 }
 
 void dump_symbol() {
-	Symbol_table* dump = symbol_table_tail;
-	char* print_out_dump = NULL;	// For storing the dump variable's data, because we dump symbols from tail to head, need to reverse
+	Symbol_table* symbol_dumped = symbol_table_tail;
+	char* print_out_dumped = NULL;	// For storing the dump variable's data, because we dump symbols from tail to head, need to reverse
 	/* Only if the symbol's scope is equal to the scope_num, then we need to dump it */
-	while(dump->scope == scope_num) {
-		
-	}
-	/* If there are some dumped symbols need to print out */
-	if(print_out_dump != NULL) {
-		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n",
-			"Index", "Name", "Kind", "Type", "Scope", "Attribute");
-	}
-	
-	/* if(symbol_table[scope_num] != NULL) {
-		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n",
-			"Index", "Name", "Kind", "Type", "Scope", "Attribute");
-		while (symbol_table[scope_num] != NULL) {
-			// Always take first element to print out, then dump it
-			Symbol_table* symbol_dumped = &symbol_table[scope_num][0];
-			printf("\n%-10d%-10s%-12s%-10s%-10d%-10s\n\n", symbol_dumped->index, symbol_dumped->name, 
+	while(symbol_dumped->scope == scope_num && scope_num != -1) { 
+		/* get the length of line of print out this dumped symbol's data */
+		ssize_t dumped_line_length = snprintf(NULL, 0, "%-10d%-10s%-12s%-10s%-10d%-10s\n", symbol_dumped->index, symbol_dumped->name, 
+														symbol_dumped->kind, symbol_dumped->type, 
+														symbol_dumped->scope, symbol_dumped->attribute) + 1;
+		/* Temporary store the line of this dumped symbol */
+		char* dumped_line = (char*)malloc(dumped_line_length);
+		snprintf(dumped_line, dumped_line_length, "%-10d%-10s%-12s%-10s%-10d%-10s\n", symbol_dumped->index, symbol_dumped->name, 
 														symbol_dumped->kind, symbol_dumped->type, 
 														symbol_dumped->scope, symbol_dumped->attribute);
-			free(symbol_dumped->name);
-			free(symbol_dumped->kind);
-			free(symbol_dumped->type);
-			free(symbol_dumped->attribute);
-			free(symbol_dumped);
+		/* For copying first dumped symbol's data */
+		if(print_out_dumped == NULL)
+			print_out_dumped = strdup(dumped_line);
+		/* For copying last dumped symbol, with putting new dumped symbol's data to the front of the string */	
+		else {
+			char* temp = strdup(print_out_dumped);
+			print_out_dumped = (char*)malloc(dumped_line_length);
+			strcpy(print_out_dumped, dumped_line);
+			print_out_dumped = (char*)realloc(print_out_dumped, strlen(temp)+dumped_line_length);
+			strcat(print_out_dumped, temp);
 		}
-	} */
+	}
+	/* If there are some dumped symbols need to print out */
+	if(print_out_dumped != NULL) {
+		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n%s",
+			"Index", "Name", "Kind", "Type", "Scope", "Attribute", print_out_dumped);
+	}
 }
