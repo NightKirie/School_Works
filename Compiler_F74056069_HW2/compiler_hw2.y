@@ -13,14 +13,18 @@ extern char buf[256];  // Get current code line from lex
 /* Symbol table function - you can add new function if needed. */
 int lookup_symbol(char*);
 void create_symbol();
-void insert_symbol(char*, char*, char*, char*);
+void insert_symbol(int, char*, char*, char*, char*);
 void dump_symbol();
+void insert_attribute(int, char*);
+void print_test();
 
 int assign_flag = 0;
 int error_flag = 0;
 int type_flag = 0;
 int scope_num = 0;
 int id_flag = 0;
+int if_insert_attribute = 0;
+int attribute_count = 0;
 
 typedef struct data {
 	int index;
@@ -76,7 +80,8 @@ Symbol_table* symbol_table_tail;	// Tail of linked list for dynamic storing symb
 %token <str_val> ID
 
 /* Nonterminal with return, which need to sepcify type */
-%type <i_val> type
+%type <str_val> type
+%type <str_val> declarator init_declarator
 
 /* Yacc will start at this nonterminal */
 %start program
@@ -96,7 +101,16 @@ external_declaration
 	;
 
 function_definition
-	: type declarator compound_statement { printf(ANSI_COLOR_RED "function start!!!!!!!! " ANSI_COLOR_RESET); }
+	: function_definition_declarator compound_statement 
+	;
+
+function_definition_declarator
+	: type declarator scope_start { 
+		// if(!lookup_symbol($2)) {
+			
+		// }
+		printf(ANSI_COLOR_MAGENTA "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $1, $2, scope_num);
+	}
 	;
 
 declaration_list
@@ -105,21 +119,25 @@ declaration_list
 	;
 
 compound_statement
-	: scope_start scope_end 
-	| scope_start block_item_list scope_end
+	: scope_end 
+	| block_item_list scope_end
 	;
+
 
 scope_start
 	: LCB	{ 
-		++scope_num;
+		 ++scope_num;
 		printf(ANSI_COLOR_GREEN "%d scope start!!!" ANSI_COLOR_RESET "\n", scope_num);
 	}
 	;
 
 scope_end 
 	: RCB	{ 
-		--scope_num;
+		print_test();
+		dump_symbol();
 		printf(ANSI_COLOR_RED "%d scope end!!!" ANSI_COLOR_RESET "\n", scope_num); 
+		
+		--scope_num;
 	}
 	;
 
@@ -134,7 +152,7 @@ block_item
 	;
 
 statement
-	: compound_statement
+	: scope_start compound_statement
 	| expression_statement
 	| selection_statement
 	| iteration_statement
@@ -166,27 +184,29 @@ print_statement
 	;
 
 declaration
-	: type init_declarator SEMICOLON { printf(ANSI_COLOR_YELLOW "type: %d " ANSI_COLOR_RESET, $1); }
+	: type init_declarator SEMICOLON { 
+		printf(ANSI_COLOR_YELLOW "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $1, $2, scope_num); 
+	}
 	;
 
 type 
-	: INT       {$$ = 1;}
-    | FLOAT     {$$ = 2;}
-    | BOOL      {$$ = 3;}
-    | STRING    {$$ = 4;}
-    | VOID      {$$ = 5;}
+	: INT       {$$ = "int";}
+    | FLOAT     {$$ = "float";}
+    | BOOL      {$$ = "bool";}
+    | STRING    {$$ = "string";}
+    | VOID      {$$ = "void";}
 	;
 
 init_declarator
-	: declarator ASGN initializer
-	| declarator
+	: declarator ASGN initializer	{ $$ = $1; }	
+	| declarator	{ $$ = $1; }
 	;
 
 declarator
-	: ID 	{ printf(ANSI_COLOR_YELLOW "ID: %s " ANSI_COLOR_RESET, $1); }
-	| declarator LB parameter_list RB 
-	| declarator LB RB
-	| declarator LB identifier_list RB
+	: ID 
+	| declarator LB parameter_list RB 		{printf("I am function!");}
+	| declarator LB RB						{printf("I am function!");}
+	//| declarator LB identifier_list RB
 	;
 
 initializer
@@ -281,13 +301,20 @@ boolean
 	;
 
 parameter_list
-	: parameter_declaration
-	| parameter_list COMMA parameter_declaration
+	: type declarator { 
+		insert_attribute(scope_num, $1);
+		insert_symbol(scope_num+1, $2, "variable", $1, "");
+		printf(ANSI_COLOR_BLUE "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $1, $2, scope_num+1); 
+	}
+	| parameter_list COMMA type declarator { 
+		insert_attribute(scope_num, $3);
+		insert_symbol(scope_num+1, $4, "variable", $3, "");
+		printf(ANSI_COLOR_BLUE "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $3, $4, scope_num+1); 
+	}
 	;
 
 parameter_declaration
-	: type declarator { printf(ANSI_COLOR_YELLOW "type: %d " ANSI_COLOR_RESET, $1); }
-	| type
+	: type declarator 
 	;
 
 identifier_list
@@ -328,7 +355,7 @@ int main(int argc, char** argv)
 	create_symbol();
     yyparse();
 	printf("\nTotal lines: %d \n",yylineno);
-	dump_symbol();
+	//dump_symbol();
 	--scope_num;
     return 0;
 }
@@ -356,29 +383,32 @@ void create_symbol()
 	symbol_table_tail = symbol_table_head;
 }
 
-void insert_symbol(char* name, char* kind, char* type, char* attribute) 
+void insert_symbol(int scope, char* name, char* kind, char* type, char* attribute) 
 {
 	Symbol_table* new_symbol = (Symbol_table*)malloc(sizeof(Symbol_table));
 	/* If the prev symbol's scope isn't the same as the new symbol, reset index to 0 */
-	if(scope_num != symbol_table_tail->scope) 
+	if(scope != symbol_table_tail->scope) 
 		new_symbol->index = 0;
 	/* If the prev symbol's scope is the same as the new symbol, increase the index */
 	else
 		new_symbol->index = symbol_table_tail->index + 1;
-	symbol_table_head->name = (char*)malloc(strlen(name)+1);
-	strcpy(symbol_table_head->name, name);
-	symbol_table_head->kind = (char*)malloc(strlen(kind)+1);
-	strcpy(symbol_table_head->kind, kind);
-	symbol_table_head->type = (char*)malloc(strlen(type)+1);
-	strcpy(symbol_table_head->type, type);
-	symbol_table_head->scope = scope_num;
-	symbol_table_head->attribute = (char*)malloc(strlen(attribute)+1);
-	strcpy(symbol_table_head->attribute, attribute);
+	new_symbol->name = (char*)malloc(strlen(name)+1);
+	strcpy(new_symbol->name, name);
+	new_symbol->kind = (char*)malloc(strlen(kind)+1);
+	strcpy(new_symbol->kind, kind);
+	new_symbol->type = (char*)malloc(strlen(type)+1);
+	strcpy(new_symbol->type, type);
+	new_symbol->scope = scope;
+	new_symbol->attribute = (char*)malloc(strlen(attribute)+1);
+	strcpy(new_symbol->attribute, attribute);
 	/* Concat new symbol to the tail of the symbol table, set the new tail to be this new symbol */
 	new_symbol->prev = symbol_table_tail;
 	new_symbol->next = NULL;
 	symbol_table_tail->next = new_symbol;
 	symbol_table_tail = new_symbol;
+	printf("insert ok!!!");
+	printf("%-10d%-10s%-12s%-10s%-10d%-10s\n",
+			new_symbol->index, new_symbol->name, new_symbol->kind, new_symbol->type, new_symbol->scope, new_symbol->attribute);
 }
 
 int lookup_symbol(char* name) {
@@ -401,6 +431,7 @@ void dump_symbol() {
 	char* print_out_dumped = NULL;	// For storing the dump variable's data, because we dump symbols from tail to head, need to reverse
 	/* Only if the symbol's scope is equal to the scope_num, then we need to dump it */
 	while(symbol_dumped->scope == scope_num && scope_num != -1) { 
+		printf("lol\n");
 		/* get the length of line of print out this dumped symbol's data */
 		ssize_t dumped_line_length = snprintf(NULL, 0, "%-10d%-10s%-12s%-10s%-10d%-10s\n", symbol_dumped->index, symbol_dumped->name, 
 														symbol_dumped->kind, symbol_dumped->type, 
@@ -426,5 +457,35 @@ void dump_symbol() {
 	if(print_out_dumped != NULL) {
 		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n%s",
 			"Index", "Name", "Kind", "Type", "Scope", "Attribute", print_out_dumped);
+	}
+	printf("dump complete\n");
+}
+
+void insert_attribute(int scope, char* type) {
+	if(attribute_count == 0)
+		insert_symbol(scope, "", "function", "", type);
+	else {
+		Symbol_table* function_symbol = symbol_table_tail;
+		while(symbol_table_tail->scope != scope) {
+			function_symbol = function_symbol->prev;
+			printf("lolllllllllllllllllllllllll\n");
+		}
+		// char* append_attribute = ", ";
+		// append_attribute = realloc(append_attribute, strlen(append_attribute)+strlen(type)+1);
+		// strcat(append_attribute, type);
+		// function_symbol->attribute = realloc(function_symbol->attribute, strlen(function_symbol->attribute)+strlen(append_attribute)+1);
+		// strcat(function_symbol->attribute, append_attribute);
+	}
+	++attribute_count;
+	if_insert_attribute = 1;
+	printf("add attribute!\n");
+}
+
+void print_test() {
+	Symbol_table* test = symbol_table_tail;
+	while(test != symbol_table_head) {
+		printf("%-10d%-10s%-12s%-10s%-10d%-10s\n",
+			test->index, test->name, test->kind, test->type, test->scope, test->attribute);
+		test = test->prev;
 	}
 }
