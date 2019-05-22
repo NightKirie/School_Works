@@ -569,7 +569,7 @@ char buf[BUF_SIZE];
 void printLine();
 /* This macro is used to record code line */
 #define CONCAT { strncat(buf, yytext, BUF_SIZE - strlen(buf) - 1); }
-#define FREEBUF { memset(buf, 0, BUF_SIZE); }
+#define FREEBUF { buf[0] = '\0'; }
 #line 574 "lex.yy.c"
 /* Define regular expression label */
 

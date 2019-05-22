@@ -4,8 +4,11 @@
 
 float c = 1.5; //set
 
-void printout();
-
+//void printout();
+int printout() {
+    int a;
+}
+bool loop(int n, int m, int k);
 bool loop(int n, int m, int k) {
     while (n > m) {
         n--;
@@ -31,7 +34,7 @@ int main() {
         print(x + 3 * a);
     }
     loop(x, i);
-    int c = add(a, x) * 3;
+    int c = 3 * loop(a, x, i);
     print("Hello World");
     if (x + 2 == 0)
         print(x);

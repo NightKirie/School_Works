@@ -107,21 +107,48 @@ function_definition
 	;
 
 function_definition_declarator
-	: type declarator scope_start { 
+	: type declarator scope_start { 		
+		printf(ANSI_COLOR_RED"func_name: %s\n" ANSI_COLOR_RESET, $2);
+		print_test();
 		Symbol_table* find_function = symbol_table_tail;
-		while(strcmp(find_function->kind, "function") && find_function != symbol_table_head) 
+		while(find_function != symbol_table_head) {
+			/* If this function has forward declaration */
+			if(!strcmp(find_function->name, $2)) {
+				Symbol_table* duplicated = find_function->next;
+				/* Duplicated function must added after the forward delcaration */
+				while(duplicated != symbol_table_tail) {
+					if(!strcmp(duplicated->kind, "function")) {
+						printf(ANSI_COLOR_RED"found duplicated %s\n" ANSI_COLOR_RESET, duplicated->name);
+						free(duplicated->kind);
+						Symbol_table* prev = duplicated->prev;
+						Symbol_table* next = duplicated->next;
+						if(prev != NULL)
+							prev->next = next;
+						if(next != NULL)
+							next->prev = prev;
+						free(duplicated);
+						break;
+					}
+					duplicated = duplicated->next;
+				}
+				break;
+			}
 			find_function = find_function->prev;
-		/* If this function doesn't have forward declaration, and have no parameter */
-		if(find_function == symbol_table_head)
-			insert_symbol(0, $2, "function", $1, "");
-		/* If this function has forward declaration */
-		else
-			find_function->name = malloc(strlen($2) + 1);
-			strcpy(find_function->name, $2);
-			find_function->type = malloc(strlen($1) + 1);
-			strcpy(find_function->type, $1);
-
-		printf(ANSI_COLOR_MAGENTA "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $1, $2, scope_num);
+		}
+		
+		insert_symbol(0, $2, "function", $1, "");
+		printf(ANSI_COLOR_RED"new_func_name: %s\n" ANSI_COLOR_RESET, $2);
+		// /* If this function doesn't have forward declaration, and have no parameter */
+		// if(find_function == symbol_table_head)
+		// 	insert_symbol(0, $2, "function", $1, "");
+		// /* If this function has parameters, no forward declaration */
+		// else {
+		// 	find_function->name = malloc(strlen($2) + 1);
+		// 	strcpy(find_function->name, $2);
+		// 	find_function->type = malloc(strlen($1) + 1);
+		// 	strcpy(find_function->type, $1);
+		// }
+		
 	}
 	;
 
@@ -139,14 +166,12 @@ compound_statement
 scope_start
 	: LCB	{ 
 		 ++scope_num;
-		printf(ANSI_COLOR_GREEN "%d scope start!!!" ANSI_COLOR_RESET "\n", scope_num);
 	}
 	;
 
 scope_end 
 	: RCB	{ 
 		dump_symbol();
-		printf(ANSI_COLOR_RED "%d scope end!!!" ANSI_COLOR_RESET "\n", scope_num); 
 		--scope_num;
 	}
 	;
@@ -196,14 +221,30 @@ print_statement
 declaration
 	: type init_declarator SEMICOLON { 
 		/* If it is function declaration, need to remove the parameter inside the symbol table */
-		if(is_function) {
-			if(if_insert_attribute) {
-				remove_symbol_parameter();
-				if_insert_attribute = 0;
-				attribute_count = 0;
-			}
+		if(is_function && if_insert_attribute) {
+			/* Remove the parameters */
+			remove_symbol_parameter();
+			printf(ANSI_COLOR_MAGENTA"ashdguahgfhsakfgsahldfgashdfsdfsdF\n"ANSI_COLOR_RESET);
+			/* Set the function declaration data in the symbol table */
+			Symbol_table* find_function = symbol_table_tail;
+			find_function->name = malloc(strlen($2) + 1);
+			strcpy(find_function->name, $2);
+			find_function->type = malloc(strlen($1) + 1);
+			strcpy(find_function->type, $1);
+			if_insert_attribute = 0;
+			attribute_count = 0;
 			is_function = 0;
 		}
+		/* If it is function declaration without parameter, just set the function declaration */
+		else if(is_function && !if_insert_attribute) {
+			Symbol_table* find_function = symbol_table_tail;
+			find_function->name = malloc(strlen($2) + 1);
+			strcpy(find_function->name, $2);
+			find_function->type = malloc(strlen($1) + 1);
+			strcpy(find_function->type, $1);
+			is_function = 0;
+		}
+		/* For variable declaration */
 		else {
 			switch(lookup_symbol($2)) {
 				/* For variable isn't in the symbol table or in the lower scope */
@@ -216,7 +257,6 @@ declaration
 					break;
 			}
 		}
-		printf(ANSI_COLOR_YELLOW "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $1, $2, scope_num); 
 	}
 	;
 
@@ -234,11 +274,17 @@ init_declarator
 	;
 
 declarator
-	: ID 	{ is_function = 0; }
-	| declarator LB parameter_list RB 		{ printf("I am function!"); is_function = 1; }
-	| declarator LB RB						{ 
-		printf("I am function!"); 
+	: ID 	{ 
+		is_function = 0; 
+		$$ = $1; 
+	}
+	| declarator LB parameter_list RB 	{ 
 		is_function = 1; 
+		$$ = $1;	
+	}
+	| declarator LB RB	{
+		is_function = 1; 
+		$$ = $1;
 	}
 	//| declarator LB identifier_list RB
 	;
@@ -258,14 +304,8 @@ logical_or_expression
 	;
 
 logical_and_expression
-	: equality_expression
-	| logical_and_expression AND equality_expression
-	;
-
-equality_expression
 	: relational_expression
-	| equality_expression EQ relational_expression
-	| equality_expression NE relational_expression
+	| logical_and_expression AND relational_expression
 	;
 
 relational_expression
@@ -274,6 +314,8 @@ relational_expression
 	| relational_expression LT additive_expression
 	| relational_expression MTE additive_expression
 	| relational_expression LTE additive_expression
+	| relational_expression EQ additive_expression
+	| relational_expression NE additive_expression
 	;
 
 additive_expression
@@ -338,12 +380,10 @@ parameter_list
 	: type declarator { 
 		insert_attribute(scope_num, $1);
 		insert_symbol(scope_num+1, $2, "variable", $1, "");
-		printf(ANSI_COLOR_BLUE "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $1, $2, scope_num+1); 
 	}
 	| parameter_list COMMA type declarator { 
 		insert_attribute(scope_num, $3);
 		insert_symbol(scope_num+1, $4, "variable", $3, "");
-		printf(ANSI_COLOR_BLUE "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $3, $4, scope_num+1); 
 	}
 	;
 
@@ -390,7 +430,6 @@ int main(int argc, char** argv)
     yyparse();
 	printf("\nTotal lines: %d \n",yylineno);
 	dump_symbol();
-	print_test();
 	--scope_num;
     return 0;
 }
@@ -446,12 +485,12 @@ void insert_symbol(int scope, char* name, char* kind, char* type, char* attribut
 int lookup_symbol(char* name) {
 	/* look back from tail to head, for better performance */
 	Symbol_table* symbol_lookup = symbol_table_tail;
-	while(symbol_lookup != symbol_table_head){
+	while(symbol_lookup != symbol_table_head) {
 		/* If we find a variable/function previously defined at the same scope */
-		if(strcmp(symbol_lookup->name, name) == 0 && symbol_lookup->scope == scope_num)
+		if(!strcmp(symbol_lookup->name, name) && symbol_lookup->scope == scope_num) 
 			return 2;	// For redeclared, as for undeclared only check if it's true
 		/* If we find a variable/function previously defined at the lower scope */
-		if(strcmp(symbol_lookup->name, name) == 0 && symbol_lookup->scope > scope_num)
+		if(!strcmp(symbol_lookup->name, name) && symbol_lookup->scope > scope_num)
 			return 1;	// For redeclared, as for undeclared only check if it's true
 		symbol_lookup = symbol_lookup->prev;
 	}
@@ -543,10 +582,10 @@ void remove_symbol_parameter() {
 }
 
 void print_test() {
-	Symbol_table* test = symbol_table_tail;
-	while(test != symbol_table_head) {
+	Symbol_table* test = symbol_table_head->next;
+	while(test != NULL) {
 		printf("%-10d%-10s%-12s%-10s%-10d%-10s\n",
 			test->index, test->name, test->kind, test->type, test->scope, test->attribute);
-		test = test->prev;
+		test = test->next;
 	}
 }
