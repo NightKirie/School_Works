@@ -108,9 +108,19 @@ function_definition
 
 function_definition_declarator
 	: type declarator scope_start { 
-		// if(!lookup_symbol($2)) {
-		printf("sdfsdfsdfsdfsd\n");
-		// }
+		Symbol_table* find_function = symbol_table_tail;
+		while(strcmp(find_function->kind, "function") && find_function != symbol_table_head) 
+			find_function = find_function->prev;
+		/* If this function doesn't have forward declaration, and have no parameter */
+		if(find_function == symbol_table_head)
+			insert_symbol(0, $2, "function", $1, "");
+		/* If this function has forward declaration */
+		else
+			find_function->name = malloc(strlen($2) + 1);
+			strcpy(find_function->name, $2);
+			find_function->type = malloc(strlen($1) + 1);
+			strcpy(find_function->type, $1);
+
 		printf(ANSI_COLOR_MAGENTA "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $1, $2, scope_num);
 	}
 	;
@@ -185,14 +195,26 @@ print_statement
 
 declaration
 	: type init_declarator SEMICOLON { 
-		if(if_insert_attribute && is_function) {
-			remove_symbol_parameter();
-			if_insert_attribute = 0;
-			attribute_count = 0;
-			printf("lololololol\n");
+		/* If it is function declaration, need to remove the parameter inside the symbol table */
+		if(is_function) {
+			if(if_insert_attribute) {
+				remove_symbol_parameter();
+				if_insert_attribute = 0;
+				attribute_count = 0;
+			}
+			is_function = 0;
 		}
 		else {
-			insert_symbol(scope_num, $2, "variable", $1, "");
+			switch(lookup_symbol($2)) {
+				/* For variable isn't in the symbol table or in the lower scope */
+				case 0: case 1:
+					insert_symbol(scope_num, $2, "variable", $1, "");
+					break;
+				/* For the variable is in the same scope, print error */
+				case 2:
+					printf("sdfsdfdsfdsfdsfdsfsdf\n");
+					break;
+			}
 		}
 		printf(ANSI_COLOR_YELLOW "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $1, $2, scope_num); 
 	}
@@ -214,7 +236,10 @@ init_declarator
 declarator
 	: ID 	{ is_function = 0; }
 	| declarator LB parameter_list RB 		{ printf("I am function!"); is_function = 1; }
-	| declarator LB RB						{ printf("I am function!"); is_function = 1; }
+	| declarator LB RB						{ 
+		printf("I am function!"); 
+		is_function = 1; 
+	}
 	//| declarator LB identifier_list RB
 	;
 
@@ -416,8 +441,6 @@ void insert_symbol(int scope, char* name, char* kind, char* type, char* attribut
 	new_symbol->next = NULL;
 	symbol_table_tail->next = new_symbol;
 	symbol_table_tail = new_symbol;
-	printf("%-10d%-10s%-12s%-10s%-10d%-10s\n",
-			new_symbol->index, new_symbol->name, new_symbol->kind, new_symbol->type, new_symbol->scope, new_symbol->attribute);
 }
 
 int lookup_symbol(char* name) {
@@ -460,7 +483,7 @@ void dump_symbol() {
 			print_out_dumped = (char*)realloc(print_out_dumped, strlen(temp)+dumped_line_length);
 			strcat(print_out_dumped, temp);
 		}
-		
+		/* Free the last symbol in the symbol table */
 		free(symbol_dumped->name);
 		free(symbol_dumped->kind);
 		free(symbol_dumped->type);
@@ -470,20 +493,23 @@ void dump_symbol() {
 		symbol_dumped->prev = NULL;
 		symbol_dumped->next = NULL;
 		free(symbol_dumped);
+		/* Set the next dump symbol to the dumped prev */
 		symbol_dumped = prev_symbol;
-		printf("remove last one\n");
+		/* Reset the tail of the symbol table */
+		symbol_table_tail = symbol_dumped;
 	}
 	/* If there are some dumped symbols need to print out */
 	if(print_out_dumped != NULL) {
 		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n%s",
 			"Index", "Name", "Kind", "Type", "Scope", "Attribute", print_out_dumped);
 	}
-	printf("dump complete\n");
 }
 
 void insert_attribute(int scope, char* type) {
+	/* If the function of the parameters belong to hasn't been inserted to symbol table */
 	if(attribute_count == 0)
 		insert_symbol(scope, "", "function", "", type);
+	/* If function is in the symbol table */
 	else {
 		Symbol_table* function_symbol = symbol_table_tail;
 		while(function_symbol->scope != scope) 
@@ -497,7 +523,6 @@ void insert_attribute(int scope, char* type) {
 	}
 	++attribute_count;
 	if_insert_attribute = 1;
-	printf("add attribute!\n");
 }
 
 void remove_symbol_parameter() {
@@ -513,7 +538,7 @@ void remove_symbol_parameter() {
 		remove_parameter->next = NULL;
 		free(remove_parameter);
 		remove_parameter = prev_symbol;
-		printf("remove last one\n");
+		symbol_table_tail = remove_parameter;
 	}
 }
 

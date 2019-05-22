@@ -579,17 +579,17 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    95,    95,    96,    97,   101,   102,   106,   110,   124,
-     125,   130,   137,   145,   146,   150,   151,   155,   156,   157,
-     158,   159,   160,   164,   165,   169,   170,   174,   178,   179,
-     183,   187,   202,   203,   204,   205,   206,   210,   211,   215,
-     216,   217,   222,   226,   227,   231,   232,   236,   237,   241,
-     242,   243,   247,   248,   249,   250,   251,   255,   256,   257,
-     261,   262,   263,   264,   268,   269,   273,   274,   275,   276,
-     281,   282,   283,   287,   288,   289,   290,   291,   295,   296,
-     297,   298,   302,   303,   304,   308,   309,   313,   318,   335,
-     336,   337,   338,   339,   340,   344,   345,   349,   350,   354,
-     355
+       0,    95,    95,    96,    97,   101,   102,   106,   110,   135,
+     136,   141,   148,   156,   157,   161,   162,   166,   167,   168,
+     169,   170,   171,   175,   176,   180,   181,   185,   189,   190,
+     194,   198,   225,   226,   227,   228,   229,   233,   234,   238,
+     239,   240,   248,   252,   253,   257,   258,   262,   263,   267,
+     268,   269,   273,   274,   275,   276,   277,   281,   282,   283,
+     287,   288,   289,   290,   294,   295,   299,   300,   301,   302,
+     307,   308,   309,   313,   314,   315,   316,   317,   321,   322,
+     323,   324,   328,   329,   330,   334,   335,   339,   344,   361,
+     362,   363,   364,   365,   366,   370,   371,   375,   376,   380,
+     381
 };
 #endif
 
@@ -1502,132 +1502,158 @@ yyreduce:
         case 8:
 #line 110 "compiler_hw2.y" /* yacc.c:1646  */
     { 
+		Symbol_table* find_function = symbol_table_tail;
+		while(strcmp(find_function->kind, "function") && find_function != symbol_table_head) 
+			find_function = find_function->prev;
+		/* If this function doesn't have forward declaration, and have no parameter */
+		if(find_function == symbol_table_head)
+			insert_symbol(0, (yyvsp[-1].str_val), "function", (yyvsp[-2].str_val), "");
+		else
+			find_function->name = malloc(strlen((yyvsp[-1].str_val)) + 1);
+			strcpy(find_function->name, (yyvsp[-1].str_val));
+			find_function->type = malloc(strlen((yyvsp[-2].str_val)) + 1);
+			strcpy(find_function->type, (yyvsp[-2].str_val));
 		// if(!lookup_symbol($2)) {
-		printf("sdfsdfsdfsdfsd\n");
+		// 	
 		// }
 		printf(ANSI_COLOR_MAGENTA "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, (yyvsp[-2].str_val), (yyvsp[-1].str_val), scope_num);
 	}
-#line 1511 "y.tab.c" /* yacc.c:1646  */
+#line 1522 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 130 "compiler_hw2.y" /* yacc.c:1646  */
+#line 141 "compiler_hw2.y" /* yacc.c:1646  */
     { 
 		 ++scope_num;
 		printf(ANSI_COLOR_GREEN "%d scope start!!!" ANSI_COLOR_RESET "\n", scope_num);
 	}
-#line 1520 "y.tab.c" /* yacc.c:1646  */
+#line 1531 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 137 "compiler_hw2.y" /* yacc.c:1646  */
+#line 148 "compiler_hw2.y" /* yacc.c:1646  */
     { 
 		dump_symbol();
 		printf(ANSI_COLOR_RED "%d scope end!!!" ANSI_COLOR_RESET "\n", scope_num); 
 		--scope_num;
 	}
-#line 1530 "y.tab.c" /* yacc.c:1646  */
+#line 1541 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 187 "compiler_hw2.y" /* yacc.c:1646  */
+#line 198 "compiler_hw2.y" /* yacc.c:1646  */
     { 
-		if(if_insert_attribute && is_function) {
-			remove_symbol_parameter();
-			if_insert_attribute = 0;
-			attribute_count = 0;
-			printf("lololololol\n");
+		/* If it is function declaration, need to remove the parameter inside the symbol table */
+		if(is_function) {
+			if(if_insert_attribute) {
+				remove_symbol_parameter();
+				if_insert_attribute = 0;
+				attribute_count = 0;
+			}
+			is_function = 0;
 		}
 		else {
-			insert_symbol(scope_num, (yyvsp[-1].str_val), "variable", (yyvsp[-2].str_val), "");
+			switch(lookup_symbol((yyvsp[-1].str_val))) {
+				/* For variable isn't in the symbol table or in the lower scope */
+				case 0: case 1:
+					insert_symbol(scope_num, (yyvsp[-1].str_val), "variable", (yyvsp[-2].str_val), "");
+					break;
+				/* For the variable is in the same scope, print error */
+				case 2:
+					printf("sdfsdfdsfdsfdsfdsfsdf\n");
+					break;
+			}
 		}
 		printf(ANSI_COLOR_YELLOW "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, (yyvsp[-2].str_val), (yyvsp[-1].str_val), scope_num); 
 	}
-#line 1547 "y.tab.c" /* yacc.c:1646  */
+#line 1570 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 202 "compiler_hw2.y" /* yacc.c:1646  */
+#line 225 "compiler_hw2.y" /* yacc.c:1646  */
     {(yyval.str_val) = "int";}
-#line 1553 "y.tab.c" /* yacc.c:1646  */
+#line 1576 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 203 "compiler_hw2.y" /* yacc.c:1646  */
+#line 226 "compiler_hw2.y" /* yacc.c:1646  */
     {(yyval.str_val) = "float";}
-#line 1559 "y.tab.c" /* yacc.c:1646  */
+#line 1582 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 204 "compiler_hw2.y" /* yacc.c:1646  */
+#line 227 "compiler_hw2.y" /* yacc.c:1646  */
     {(yyval.str_val) = "bool";}
-#line 1565 "y.tab.c" /* yacc.c:1646  */
+#line 1588 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 205 "compiler_hw2.y" /* yacc.c:1646  */
+#line 228 "compiler_hw2.y" /* yacc.c:1646  */
     {(yyval.str_val) = "string";}
-#line 1571 "y.tab.c" /* yacc.c:1646  */
+#line 1594 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 206 "compiler_hw2.y" /* yacc.c:1646  */
+#line 229 "compiler_hw2.y" /* yacc.c:1646  */
     {(yyval.str_val) = "void";}
-#line 1577 "y.tab.c" /* yacc.c:1646  */
+#line 1600 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 210 "compiler_hw2.y" /* yacc.c:1646  */
+#line 233 "compiler_hw2.y" /* yacc.c:1646  */
     { (yyval.str_val) = (yyvsp[-2].str_val); }
-#line 1583 "y.tab.c" /* yacc.c:1646  */
+#line 1606 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 211 "compiler_hw2.y" /* yacc.c:1646  */
+#line 234 "compiler_hw2.y" /* yacc.c:1646  */
     { (yyval.str_val) = (yyvsp[0].str_val); }
-#line 1589 "y.tab.c" /* yacc.c:1646  */
+#line 1612 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 215 "compiler_hw2.y" /* yacc.c:1646  */
+#line 238 "compiler_hw2.y" /* yacc.c:1646  */
     { is_function = 0; }
-#line 1595 "y.tab.c" /* yacc.c:1646  */
+#line 1618 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 216 "compiler_hw2.y" /* yacc.c:1646  */
+#line 239 "compiler_hw2.y" /* yacc.c:1646  */
     { printf("I am function!"); is_function = 1; }
-#line 1601 "y.tab.c" /* yacc.c:1646  */
+#line 1624 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 217 "compiler_hw2.y" /* yacc.c:1646  */
-    { printf("I am function!"); is_function = 1; }
-#line 1607 "y.tab.c" /* yacc.c:1646  */
+#line 240 "compiler_hw2.y" /* yacc.c:1646  */
+    { 
+		printf("I am function!"); 
+		is_function = 1; 
+	}
+#line 1633 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 313 "compiler_hw2.y" /* yacc.c:1646  */
+#line 339 "compiler_hw2.y" /* yacc.c:1646  */
     { 
 		insert_attribute(scope_num, (yyvsp[-1].str_val));
 		insert_symbol(scope_num+1, (yyvsp[0].str_val), "variable", (yyvsp[-1].str_val), "");
 		printf(ANSI_COLOR_BLUE "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, (yyvsp[-1].str_val), (yyvsp[0].str_val), scope_num+1); 
 	}
-#line 1617 "y.tab.c" /* yacc.c:1646  */
+#line 1643 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 88:
-#line 318 "compiler_hw2.y" /* yacc.c:1646  */
+#line 344 "compiler_hw2.y" /* yacc.c:1646  */
     { 
 		insert_attribute(scope_num, (yyvsp[-1].str_val));
 		insert_symbol(scope_num+1, (yyvsp[0].str_val), "variable", (yyvsp[-1].str_val), "");
 		printf(ANSI_COLOR_BLUE "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, (yyvsp[-1].str_val), (yyvsp[0].str_val), scope_num+1); 
 	}
-#line 1627 "y.tab.c" /* yacc.c:1646  */
+#line 1653 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1631 "y.tab.c" /* yacc.c:1646  */
+#line 1657 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1855,7 +1881,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 358 "compiler_hw2.y" /* yacc.c:1906  */
+#line 384 "compiler_hw2.y" /* yacc.c:1906  */
 
 
 /* C code section */
@@ -1917,8 +1943,6 @@ void insert_symbol(int scope, char* name, char* kind, char* type, char* attribut
 	new_symbol->next = NULL;
 	symbol_table_tail->next = new_symbol;
 	symbol_table_tail = new_symbol;
-	printf("%-10d%-10s%-12s%-10s%-10d%-10s\n",
-			new_symbol->index, new_symbol->name, new_symbol->kind, new_symbol->type, new_symbol->scope, new_symbol->attribute);
 }
 
 int lookup_symbol(char* name) {
@@ -1961,7 +1985,7 @@ void dump_symbol() {
 			print_out_dumped = (char*)realloc(print_out_dumped, strlen(temp)+dumped_line_length);
 			strcat(print_out_dumped, temp);
 		}
-		
+		/* Free the last symbol in the symbol table */
 		free(symbol_dumped->name);
 		free(symbol_dumped->kind);
 		free(symbol_dumped->type);
@@ -1971,20 +1995,23 @@ void dump_symbol() {
 		symbol_dumped->prev = NULL;
 		symbol_dumped->next = NULL;
 		free(symbol_dumped);
+		/* Set the next dump symbol to the dumped prev */
 		symbol_dumped = prev_symbol;
-		printf("remove last one\n");
+		/* Reset the tail of the symbol table */
+		symbol_table_tail = symbol_dumped;
 	}
 	/* If there are some dumped symbols need to print out */
 	if(print_out_dumped != NULL) {
 		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n%s",
 			"Index", "Name", "Kind", "Type", "Scope", "Attribute", print_out_dumped);
 	}
-	printf("dump complete\n");
 }
 
 void insert_attribute(int scope, char* type) {
+	/* If the function of the parameters belong to hasn't been inserted to symbol table */
 	if(attribute_count == 0)
 		insert_symbol(scope, "", "function", "", type);
+	/* If function is in the symbol table */
 	else {
 		Symbol_table* function_symbol = symbol_table_tail;
 		while(function_symbol->scope != scope) 
@@ -1998,7 +2025,6 @@ void insert_attribute(int scope, char* type) {
 	}
 	++attribute_count;
 	if_insert_attribute = 1;
-	printf("add attribute!\n");
 }
 
 void remove_symbol_parameter() {
@@ -2014,7 +2040,7 @@ void remove_symbol_parameter() {
 		remove_parameter->next = NULL;
 		free(remove_parameter);
 		remove_parameter = prev_symbol;
-		printf("remove last one\n");
+		symbol_table_tail = remove_parameter;
 	}
 }
 

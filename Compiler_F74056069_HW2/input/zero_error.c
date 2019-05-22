@@ -4,7 +4,7 @@
 
 float c = 1.5; //set
 
-bool loop(int n, int m, int k);
+void printout();
 
 bool loop(int n, int m, int k) {
     while (n > m) {
