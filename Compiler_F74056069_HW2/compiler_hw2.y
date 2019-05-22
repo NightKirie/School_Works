@@ -16,6 +16,7 @@ void create_symbol();
 void insert_symbol(int, char*, char*, char*, char*);
 void dump_symbol();
 void insert_attribute(int, char*);
+void remove_symbol_parameter();
 void print_test();
 
 int assign_flag = 0;
@@ -24,6 +25,7 @@ int type_flag = 0;
 int scope_num = 0;
 int id_flag = 0;
 int if_insert_attribute = 0;
+int is_function = 0;
 int attribute_count = 0;
 
 typedef struct data {
@@ -107,7 +109,7 @@ function_definition
 function_definition_declarator
 	: type declarator scope_start { 
 		// if(!lookup_symbol($2)) {
-			
+		printf("sdfsdfsdfsdfsd\n");
 		// }
 		printf(ANSI_COLOR_MAGENTA "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $1, $2, scope_num);
 	}
@@ -133,10 +135,8 @@ scope_start
 
 scope_end 
 	: RCB	{ 
-		print_test();
 		dump_symbol();
 		printf(ANSI_COLOR_RED "%d scope end!!!" ANSI_COLOR_RESET "\n", scope_num); 
-		
 		--scope_num;
 	}
 	;
@@ -185,6 +185,15 @@ print_statement
 
 declaration
 	: type init_declarator SEMICOLON { 
+		if(if_insert_attribute && is_function) {
+			remove_symbol_parameter();
+			if_insert_attribute = 0;
+			attribute_count = 0;
+			printf("lololololol\n");
+		}
+		else {
+			insert_symbol(scope_num, $2, "variable", $1, "");
+		}
 		printf(ANSI_COLOR_YELLOW "type: %s ID: %s Scope: %d, " ANSI_COLOR_RESET, $1, $2, scope_num); 
 	}
 	;
@@ -203,9 +212,9 @@ init_declarator
 	;
 
 declarator
-	: ID 
-	| declarator LB parameter_list RB 		{printf("I am function!");}
-	| declarator LB RB						{printf("I am function!");}
+	: ID 	{ is_function = 0; }
+	| declarator LB parameter_list RB 		{ printf("I am function!"); is_function = 1; }
+	| declarator LB RB						{ printf("I am function!"); is_function = 1; }
 	//| declarator LB identifier_list RB
 	;
 
@@ -355,7 +364,8 @@ int main(int argc, char** argv)
 	create_symbol();
     yyparse();
 	printf("\nTotal lines: %d \n",yylineno);
-	//dump_symbol();
+	dump_symbol();
+	print_test();
 	--scope_num;
     return 0;
 }
@@ -406,7 +416,6 @@ void insert_symbol(int scope, char* name, char* kind, char* type, char* attribut
 	new_symbol->next = NULL;
 	symbol_table_tail->next = new_symbol;
 	symbol_table_tail = new_symbol;
-	printf("insert ok!!!");
 	printf("%-10d%-10s%-12s%-10s%-10d%-10s\n",
 			new_symbol->index, new_symbol->name, new_symbol->kind, new_symbol->type, new_symbol->scope, new_symbol->attribute);
 }
@@ -431,7 +440,6 @@ void dump_symbol() {
 	char* print_out_dumped = NULL;	// For storing the dump variable's data, because we dump symbols from tail to head, need to reverse
 	/* Only if the symbol's scope is equal to the scope_num, then we need to dump it */
 	while(symbol_dumped->scope == scope_num && scope_num != -1) { 
-		printf("lol\n");
 		/* get the length of line of print out this dumped symbol's data */
 		ssize_t dumped_line_length = snprintf(NULL, 0, "%-10d%-10s%-12s%-10s%-10d%-10s\n", symbol_dumped->index, symbol_dumped->name, 
 														symbol_dumped->kind, symbol_dumped->type, 
@@ -452,7 +460,18 @@ void dump_symbol() {
 			print_out_dumped = (char*)realloc(print_out_dumped, strlen(temp)+dumped_line_length);
 			strcat(print_out_dumped, temp);
 		}
-		symbol_dumped = symbol_dumped->prev;
+		
+		free(symbol_dumped->name);
+		free(symbol_dumped->kind);
+		free(symbol_dumped->type);
+		free(symbol_dumped->attribute);
+		Symbol_table* prev_symbol = symbol_dumped->prev;
+		prev_symbol->next = NULL;
+		symbol_dumped->prev = NULL;
+		symbol_dumped->next = NULL;
+		free(symbol_dumped);
+		symbol_dumped = prev_symbol;
+		printf("remove last one\n");
 	}
 	/* If there are some dumped symbols need to print out */
 	if(print_out_dumped != NULL) {
@@ -467,19 +486,35 @@ void insert_attribute(int scope, char* type) {
 		insert_symbol(scope, "", "function", "", type);
 	else {
 		Symbol_table* function_symbol = symbol_table_tail;
-		while(function_symbol->scope != scope) {
+		while(function_symbol->scope != scope) 
 			function_symbol = function_symbol->prev;
-			printf("lolllllllllllllllllllllllll\n");
-		}
-		// char* append_attribute = ", ";
-		// append_attribute = realloc(append_attribute, strlen(append_attribute)+strlen(type)+1);
-		// strcat(append_attribute, type);
-		// function_symbol->attribute = realloc(function_symbol->attribute, strlen(function_symbol->attribute)+strlen(append_attribute)+1);
-		// strcat(function_symbol->attribute, append_attribute);
+		char* append_attribute = (char*)malloc(sizeof(char) * 3);
+		strcpy(append_attribute, ", ");
+		append_attribute = (char*)realloc(append_attribute, strlen(append_attribute)+strlen(type)+1);
+		strcat(append_attribute, type);
+		function_symbol->attribute = realloc(function_symbol->attribute, strlen(function_symbol->attribute)+strlen(append_attribute)+1);
+		strcat(function_symbol->attribute, append_attribute);
 	}
 	++attribute_count;
 	if_insert_attribute = 1;
 	printf("add attribute!\n");
+}
+
+void remove_symbol_parameter() {
+	Symbol_table* remove_parameter = symbol_table_tail;
+	while(strcmp(remove_parameter->kind, "function")) {
+		free(remove_parameter->name);
+		free(remove_parameter->kind);
+		free(remove_parameter->type);
+		free(remove_parameter->attribute);
+		Symbol_table* prev_symbol = remove_parameter->prev;
+		prev_symbol->next = NULL;
+		remove_parameter->prev = NULL;
+		remove_parameter->next = NULL;
+		free(remove_parameter);
+		remove_parameter = prev_symbol;
+		printf("remove last one\n");
+	}
 }
 
 void print_test() {
