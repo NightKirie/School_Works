@@ -91,6 +91,7 @@ int id_flag = 0;
 int if_insert_attribute = 0;
 int is_function = 0;
 int attribute_count = 0;
+int need_dump = 0;
 
 typedef struct data {
 	int index;
@@ -116,7 +117,7 @@ Symbol_table* symbol_table_tail;	// Tail of linked list for dynamic storing symb
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 
-#line 120 "y.tab.c" /* yacc.c:339  */
+#line 121 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -254,13 +255,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 59 "compiler_hw2.y" /* yacc.c:355  */
+#line 60 "compiler_hw2.y" /* yacc.c:355  */
 
     int i_val;
     double f_val;
     char* str_val;
 
-#line 264 "y.tab.c" /* yacc.c:355  */
+#line 265 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -277,7 +278,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 281 "y.tab.c" /* yacc.c:358  */
+#line 282 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -579,16 +580,16 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    95,    95,    96,    97,   101,   102,   106,   110,   161,
-     162,   167,   173,   180,   181,   185,   186,   190,   191,   192,
-     193,   194,   195,   199,   200,   204,   205,   209,   213,   214,
-     218,   222,   264,   265,   266,   267,   268,   272,   273,   277,
-     281,   285,   293,   297,   298,   302,   303,   307,   308,   312,
-     313,   314,   315,   316,   317,   318,   322,   323,   324,   328,
-     329,   330,   331,   335,   336,   340,   341,   342,   343,   348,
-     349,   350,   354,   355,   356,   357,   358,   362,   363,   364,
-     365,   369,   370,   371,   375,   376,   380,   384,   400,   401,
-     402,   403,   404,   405,   409,   410,   414,   415,   419,   420
+       0,    96,    96,    97,    98,   102,   103,   107,   111,   161,
+     162,   167,   173,   182,   183,   187,   188,   192,   193,   194,
+     195,   196,   197,   201,   202,   206,   207,   211,   215,   216,
+     220,   224,   265,   266,   267,   268,   269,   273,   274,   278,
+     282,   286,   294,   298,   299,   303,   304,   308,   309,   313,
+     314,   315,   316,   317,   318,   319,   323,   324,   325,   329,
+     330,   331,   332,   336,   337,   341,   342,   343,   344,   349,
+     350,   351,   355,   356,   357,   358,   359,   363,   364,   365,
+     366,   370,   371,   372,   376,   377,   381,   385,   401,   402,
+     403,   404,   405,   406,   410,   411,   415,   416,   420,   421
 };
 #endif
 
@@ -1501,10 +1502,9 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 110 "compiler_hw2.y" /* yacc.c:1646  */
+#line 111 "compiler_hw2.y" /* yacc.c:1646  */
     { 		
-		printf(ANSI_COLOR_RED"func_name: %s\n" ANSI_COLOR_RESET, (yyvsp[-1].str_val));
-		print_test();
+		int is_duplicated = 0;
 		Symbol_table* find_function = symbol_table_tail;
 		while(find_function != symbol_table_head) {
 			/* If this function has forward declaration */
@@ -1513,7 +1513,6 @@ yyreduce:
 				/* Duplicated function must added after the forward delcaration */
 				while(duplicated != symbol_table_tail) {
 					if(!strcmp(duplicated->kind, "function")) {
-						printf(ANSI_COLOR_RED"found duplicated %s\n" ANSI_COLOR_RESET, duplicated->name);
 						free(duplicated->kind);
 						Symbol_table* prev = duplicated->prev;
 						Symbol_table* next = duplicated->next;
@@ -1522,6 +1521,7 @@ yyreduce:
 						if(next != NULL)
 							next->prev = prev;
 						free(duplicated);
+						is_duplicated = 1;
 						break;
 					}
 					duplicated = duplicated->next;
@@ -1530,9 +1530,9 @@ yyreduce:
 			}
 			find_function = find_function->prev;
 		}
+		if(is_duplicated == 0) 
+			insert_symbol(0, (yyvsp[-1].str_val), "function", (yyvsp[-2].str_val), "");
 		
-		insert_symbol(0, (yyvsp[-1].str_val), "function", (yyvsp[-2].str_val), "");
-		printf(ANSI_COLOR_RED"new_func_name: %s\n" ANSI_COLOR_RESET, (yyvsp[-1].str_val));
 		// /* If this function doesn't have forward declaration, and have no parameter */
 		// if(find_function == symbol_table_head)
 		// 	insert_symbol(0, $2, "function", $1, "");
@@ -1559,20 +1559,21 @@ yyreduce:
   case 12:
 #line 173 "compiler_hw2.y" /* yacc.c:1646  */
     { 
-		dump_symbol();
-		--scope_num;
+		//dump_symbol();
+		
+		need_dump = 1;
+		
 	}
-#line 1566 "y.tab.c" /* yacc.c:1646  */
+#line 1568 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 222 "compiler_hw2.y" /* yacc.c:1646  */
+#line 224 "compiler_hw2.y" /* yacc.c:1646  */
     { 
 		/* If it is function declaration, need to remove the parameter inside the symbol table */
 		if(is_function && if_insert_attribute) {
 			/* Remove the parameters */
 			remove_symbol_parameter();
-			printf(ANSI_COLOR_MAGENTA"ashdguahgfhsakfgsahldfgashdfsdfsdF\n"ANSI_COLOR_RESET);
 			/* Set the function declaration data in the symbol table */
 			Symbol_table* find_function = symbol_table_tail;
 			find_function->name = malloc(strlen((yyvsp[-1].str_val)) + 1);
@@ -1606,98 +1607,98 @@ yyreduce:
 			}
 		}
 	}
-#line 1610 "y.tab.c" /* yacc.c:1646  */
+#line 1611 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 264 "compiler_hw2.y" /* yacc.c:1646  */
+#line 265 "compiler_hw2.y" /* yacc.c:1646  */
     {(yyval.str_val) = "int";}
-#line 1616 "y.tab.c" /* yacc.c:1646  */
+#line 1617 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 265 "compiler_hw2.y" /* yacc.c:1646  */
+#line 266 "compiler_hw2.y" /* yacc.c:1646  */
     {(yyval.str_val) = "float";}
-#line 1622 "y.tab.c" /* yacc.c:1646  */
+#line 1623 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 266 "compiler_hw2.y" /* yacc.c:1646  */
+#line 267 "compiler_hw2.y" /* yacc.c:1646  */
     {(yyval.str_val) = "bool";}
-#line 1628 "y.tab.c" /* yacc.c:1646  */
+#line 1629 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 267 "compiler_hw2.y" /* yacc.c:1646  */
+#line 268 "compiler_hw2.y" /* yacc.c:1646  */
     {(yyval.str_val) = "string";}
-#line 1634 "y.tab.c" /* yacc.c:1646  */
+#line 1635 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 268 "compiler_hw2.y" /* yacc.c:1646  */
+#line 269 "compiler_hw2.y" /* yacc.c:1646  */
     {(yyval.str_val) = "void";}
-#line 1640 "y.tab.c" /* yacc.c:1646  */
+#line 1641 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 272 "compiler_hw2.y" /* yacc.c:1646  */
+#line 273 "compiler_hw2.y" /* yacc.c:1646  */
     { (yyval.str_val) = (yyvsp[-2].str_val); }
-#line 1646 "y.tab.c" /* yacc.c:1646  */
+#line 1647 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 273 "compiler_hw2.y" /* yacc.c:1646  */
+#line 274 "compiler_hw2.y" /* yacc.c:1646  */
     { (yyval.str_val) = (yyvsp[0].str_val); }
-#line 1652 "y.tab.c" /* yacc.c:1646  */
+#line 1653 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 277 "compiler_hw2.y" /* yacc.c:1646  */
+#line 278 "compiler_hw2.y" /* yacc.c:1646  */
     { 
 		is_function = 0; 
 		(yyval.str_val) = (yyvsp[0].str_val); 
 	}
-#line 1661 "y.tab.c" /* yacc.c:1646  */
+#line 1662 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 281 "compiler_hw2.y" /* yacc.c:1646  */
+#line 282 "compiler_hw2.y" /* yacc.c:1646  */
     { 
 		is_function = 1; 
 		(yyval.str_val) = (yyvsp[-3].str_val);	
 	}
-#line 1670 "y.tab.c" /* yacc.c:1646  */
+#line 1671 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 285 "compiler_hw2.y" /* yacc.c:1646  */
+#line 286 "compiler_hw2.y" /* yacc.c:1646  */
     {
 		is_function = 1; 
 		(yyval.str_val) = (yyvsp[-2].str_val);
 	}
-#line 1679 "y.tab.c" /* yacc.c:1646  */
+#line 1680 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 380 "compiler_hw2.y" /* yacc.c:1646  */
+#line 381 "compiler_hw2.y" /* yacc.c:1646  */
     { 
 		insert_attribute(scope_num, (yyvsp[-1].str_val));
 		insert_symbol(scope_num+1, (yyvsp[0].str_val), "variable", (yyvsp[-1].str_val), "");
 	}
-#line 1688 "y.tab.c" /* yacc.c:1646  */
+#line 1689 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 384 "compiler_hw2.y" /* yacc.c:1646  */
+#line 385 "compiler_hw2.y" /* yacc.c:1646  */
     { 
 		insert_attribute(scope_num, (yyvsp[-1].str_val));
 		insert_symbol(scope_num+1, (yyvsp[0].str_val), "variable", (yyvsp[-1].str_val), "");
 	}
-#line 1697 "y.tab.c" /* yacc.c:1646  */
+#line 1698 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1701 "y.tab.c" /* yacc.c:1646  */
+#line 1702 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1925,7 +1926,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 423 "compiler_hw2.y" /* yacc.c:1906  */
+#line 424 "compiler_hw2.y" /* yacc.c:1906  */
 
 
 /* C code section */
@@ -1934,8 +1935,8 @@ int main(int argc, char** argv)
     yylineno = 0;
 	create_symbol();
     yyparse();
-	printf("\nTotal lines: %d \n",yylineno);
 	dump_symbol();
+	printf("\nTotal lines: %d \n",yylineno);
 	--scope_num;
     return 0;
 }
@@ -2004,7 +2005,6 @@ int lookup_symbol(char* name) {
 }
 
 void dump_symbol() {
-	print_test();
 	Symbol_table* symbol_dumped = symbol_table_tail;
 	char* print_out_dumped = NULL;	// For storing the dump variable's data, because we dump symbols from tail to head, need to reverse
 	/* Only if the symbol's scope is equal to the scope_num, then we need to dump it */
@@ -2046,7 +2046,7 @@ void dump_symbol() {
 	}
 	/* If there are some dumped symbols need to print out */
 	if(print_out_dumped != NULL) {
-		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n%s",
+		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n%s\n",
 			"Index", "Name", "Kind", "Type", "Scope", "Attribute", print_out_dumped);
 	}
 }
@@ -2072,10 +2072,8 @@ void insert_attribute(int scope, char* type) {
 }
 
 void remove_symbol_parameter() {
-	print_test();
 	Symbol_table* remove_parameter = symbol_table_tail;
 	while(strcmp(remove_parameter->kind, "function")) {
-		printf(ANSI_COLOR_RED "removing symbol!!!!!!!\n"ANSI_COLOR_RESET);
 		free(remove_parameter->name);
 		free(remove_parameter->kind);
 		free(remove_parameter->type);

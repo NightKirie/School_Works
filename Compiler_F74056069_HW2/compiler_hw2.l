@@ -7,6 +7,9 @@
 #include <string.h>
 #include <ctype.h>
 extern YYSTYPE yylval; //YYSTYPE
+extern void dump_symbol();
+extern int need_dump;
+extern int scope_num;
 char buf[BUF_SIZE];
 void printLine();
 /* This macro is used to record code line */
@@ -236,6 +239,11 @@ int yywrap()
 
 void printLine() {
     printf("%d: %s", yylineno, buf);
+    if(need_dump) {
+        dump_symbol();
+        need_dump = 0;
+        --scope_num;
+    }
     FREEBUF
 
 }

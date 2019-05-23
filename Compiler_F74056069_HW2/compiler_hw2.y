@@ -27,6 +27,7 @@ int id_flag = 0;
 int if_insert_attribute = 0;
 int is_function = 0;
 int attribute_count = 0;
+int need_dump = 0;
 
 typedef struct data {
 	int index;
@@ -108,8 +109,7 @@ function_definition
 
 function_definition_declarator
 	: type declarator scope_start { 		
-		printf(ANSI_COLOR_RED"func_name: %s\n" ANSI_COLOR_RESET, $2);
-		print_test();
+		int is_duplicated = 0;
 		Symbol_table* find_function = symbol_table_tail;
 		while(find_function != symbol_table_head) {
 			/* If this function has forward declaration */
@@ -118,7 +118,6 @@ function_definition_declarator
 				/* Duplicated function must added after the forward delcaration */
 				while(duplicated != symbol_table_tail) {
 					if(!strcmp(duplicated->kind, "function")) {
-						printf(ANSI_COLOR_RED"found duplicated %s\n" ANSI_COLOR_RESET, duplicated->name);
 						free(duplicated->kind);
 						Symbol_table* prev = duplicated->prev;
 						Symbol_table* next = duplicated->next;
@@ -127,6 +126,7 @@ function_definition_declarator
 						if(next != NULL)
 							next->prev = prev;
 						free(duplicated);
+						is_duplicated = 1;
 						break;
 					}
 					duplicated = duplicated->next;
@@ -135,9 +135,9 @@ function_definition_declarator
 			}
 			find_function = find_function->prev;
 		}
+		if(is_duplicated == 0) 
+			insert_symbol(0, $2, "function", $1, "");
 		
-		insert_symbol(0, $2, "function", $1, "");
-		printf(ANSI_COLOR_RED"new_func_name: %s\n" ANSI_COLOR_RESET, $2);
 		// /* If this function doesn't have forward declaration, and have no parameter */
 		// if(find_function == symbol_table_head)
 		// 	insert_symbol(0, $2, "function", $1, "");
@@ -171,8 +171,10 @@ scope_start
 
 scope_end 
 	: RCB	{ 
-		dump_symbol();
-		--scope_num;
+		//dump_symbol();
+		
+		need_dump = 1;
+		
 	}
 	;
 
@@ -224,7 +226,6 @@ declaration
 		if(is_function && if_insert_attribute) {
 			/* Remove the parameters */
 			remove_symbol_parameter();
-			printf(ANSI_COLOR_MAGENTA"ashdguahgfhsakfgsahldfgashdfsdfsdF\n"ANSI_COLOR_RESET);
 			/* Set the function declaration data in the symbol table */
 			Symbol_table* find_function = symbol_table_tail;
 			find_function->name = malloc(strlen($2) + 1);
@@ -428,8 +429,8 @@ int main(int argc, char** argv)
     yylineno = 0;
 	create_symbol();
     yyparse();
-	printf("\nTotal lines: %d \n",yylineno);
 	dump_symbol();
+	printf("\nTotal lines: %d \n",yylineno);
 	--scope_num;
     return 0;
 }
@@ -539,7 +540,7 @@ void dump_symbol() {
 	}
 	/* If there are some dumped symbols need to print out */
 	if(print_out_dumped != NULL) {
-		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n%s",
+		printf("\n%-10s%-10s%-12s%-10s%-10s%-10s\n\n%s\n",
 			"Index", "Name", "Kind", "Type", "Scope", "Attribute", print_out_dumped);
 	}
 }
