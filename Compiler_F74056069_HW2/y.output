@@ -1,10 +1,3 @@
-Nonterminals useless in grammar
-
-   declaration_list
-   parameter_declaration
-   identifier_list
-
-
 Terminals unused in grammar
 
    AND
@@ -13,17 +6,6 @@ Terminals unused in grammar
    LSB
    RSB
    FOR
-
-
-Rules useless in grammar
-
-   94 declaration_list: declaration
-   95                 | declaration_list declaration
-
-   96 parameter_declaration: type declarator
-
-   97 identifier_list: ID
-   98                | identifier_list COMMA ID
 
 
 State 0 conflicts: 5 shift/reduce

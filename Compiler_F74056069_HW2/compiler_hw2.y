@@ -29,7 +29,7 @@ int is_function = 0;
 int attribute_count = 0;
 int need_dump = 0;
 int if_syntax_error = 0;
-int if_print_error = 0;
+int if_semantic_error = 0;
 
 typedef struct data {
 	int index;
@@ -159,11 +159,6 @@ function_definition_declarator
 	}
 	;
 
-declaration_list
-	: declaration
-	| declaration_list declaration
-	;
-
 compound_statement
 	: scope_end 
 	| block_item_list scope_end
@@ -291,7 +286,6 @@ declarator
 		is_function = 1; 
 		$$ = $1;
 	}
-	//| declarator LB identifier_list RB
 	;
 
 initializer
@@ -381,15 +375,6 @@ parameter_list
 	}
 	;
 
-parameter_declaration
-	: type declarator 
-	;
-
-identifier_list
-	: ID
-	| identifier_list COMMA ID
-	;
-
 assignment_operator
 	: ASGN
 	| MULASGN
@@ -432,31 +417,8 @@ int main(int argc, char** argv)
 
 void yyerror(char *s)
 {
-   	if(strstr(s, "syntax") != NULL) 
-	   if_syntax_error = 1;
-    if(print_error_flag != 0){
-        if(had_print_flag == 0){
-            if(buf[0] == '\n')
-                printf("%d:%s", yylineno, buf);
-            else
-                printf("%d: %s\n", yylineno+1, buf);
-            had_print_flag = 1;
-        }
-        print_error_flag = 0;
-        printf("\n|-----------------------------------------------|\n");
-        if(syntax_error_flag == 1)
-            printf("| Error found in line %d: %s\n", yylineno+1, buf);
-        else
-            printf("| Error found in line %d: %s", yylineno, buf);
-        printf("| %s", error_buf);
-        printf("\n|-----------------------------------------------|\n\n");
-    }
-
-    printf("\n|-----------------------------------------------|\n");
-    if(syntax_error_flag == 1)
-        printf("| Error found in line %d: %s\n", yylineno+1, buf);
-    else 
-        printf("| Error found in line %d: %s", yylineno, buf);
+	printf("\n|-----------------------------------------------|\n");
+    printf("| Error found in line %d: %s\n", yylineno, buf);
     printf("| %s", s);
     printf("\n|-----------------------------------------------|\n\n");
 }
