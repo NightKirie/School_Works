@@ -10,8 +10,13 @@ extern YYSTYPE yylval; //YYSTYPE
 extern void dump_symbol();
 extern int need_dump;
 extern int scope_num;
+extern char* expression_id[100];
+extern int expression_id_exist[100];
+extern char* expression_id_type[100];
+
 char buf[BUF_SIZE];
 void printLine();
+void clear_expression();
 /* This macro is used to record code line */
 #define CONCAT { strncat(buf, yytext, BUF_SIZE - strlen(buf) - 1); }
 #define FREEBUF { buf[0] = '\0'; }
@@ -225,6 +230,7 @@ id			{letter}+({letter}|{digit})*
     return SEMICOLON; }
 [\n]        { 
     CONCAT
+    clear_expression();
     printLine(); }
 [ \t]		{ CONCAT } /* Ignore */
 [^ \t\n] 	{ CONCAT } /* Ignore other charactor sets */
@@ -238,7 +244,10 @@ int yywrap()
 }
 
 void printLine() {
-    printf("%d: %s", yylineno, buf);
+    if(!strcmp(buf, "\n"))
+        printf("%d:%s", yylineno, buf);
+    else
+        printf("%d: %s", yylineno, buf);
     if(need_dump) {
         dump_symbol();
         need_dump = 0;
@@ -246,6 +255,16 @@ void printLine() {
     }
     FREEBUF
 
+}
+
+void clear_expression() {
+    for(int i = 0; i < 100; ++i) {
+        if(expression_id[i])
+            free(expression_id[i]);
+        expression_id_exist[i] = 1;
+        if(expression_id_type[i])
+            free(expression_id_type[i]);
+    }
 }
 
 

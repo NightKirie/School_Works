@@ -2318,7 +2318,10 @@ int yywrap()
 }
 
 void printLine() {
-    printf("%d: %s", yylineno, buf);
+    if(!strcmp(buf, "\n"))
+        printf("%d:%s", yylineno, buf);
+    else
+        printf("%d: %s", yylineno, buf);
     if(need_dump) {
         dump_symbol();
         need_dump = 0;

@@ -109,10 +109,10 @@ Grammar
    65               | SUB
 
    66 postfix_expression: primary_expression
-   67                   | postfix_expression LB RB
-   68                   | postfix_expression LB argument_expression_list RB
-   69                   | postfix_expression INC
-   70                   | postfix_expression DEC
+   67                   | primary_expression LB RB
+   68                   | primary_expression LB argument_expression_list RB
+   69                   | primary_expression INC
+   70                   | primary_expression DEC
 
    71 primary_expression: ID
    72                   | constant
@@ -258,9 +258,9 @@ unary_expression (76)
 unary_operator (77)
     on left: 64 65, on right: 63
 postfix_expression (78)
-    on left: 66 67 68 69 70, on right: 60 67 68 69 70
+    on left: 66 67 68 69 70, on right: 60
 primary_expression (79)
-    on left: 71 72 73 74, on right: 66
+    on left: 71 72 73 74, on right: 66 67 68 69 70
 constant (80)
     on left: 75 76 77, on right: 72
 boolean (81)
@@ -968,14 +968,6 @@ State 51
 State 52
 
    60 unary_expression: postfix_expression .
-   67 postfix_expression: postfix_expression . LB RB
-   68                   | postfix_expression . LB argument_expression_list RB
-   69                   | postfix_expression . INC
-   70                   | postfix_expression . DEC
-
-    INC  shift, and go to state 95
-    DEC  shift, and go to state 96
-    LB   shift, and go to state 97
 
     $default  reduce using rule 60 (unary_expression)
 
@@ -983,6 +975,14 @@ State 52
 State 53
 
    66 postfix_expression: primary_expression .
+   67                   | primary_expression . LB RB
+   68                   | primary_expression . LB argument_expression_list RB
+   69                   | primary_expression . INC
+   70                   | primary_expression . DEC
+
+    INC  shift, and go to state 95
+    DEC  shift, and go to state 96
+    LB   shift, and go to state 97
 
     $default  reduce using rule 66 (postfix_expression)
 
@@ -1635,22 +1635,22 @@ State 94
 
 State 95
 
-   69 postfix_expression: postfix_expression INC .
+   69 postfix_expression: primary_expression INC .
 
     $default  reduce using rule 69 (postfix_expression)
 
 
 State 96
 
-   70 postfix_expression: postfix_expression DEC .
+   70 postfix_expression: primary_expression DEC .
 
     $default  reduce using rule 70 (postfix_expression)
 
 
 State 97
 
-   67 postfix_expression: postfix_expression LB . RB
-   68                   | postfix_expression LB . argument_expression_list RB
+   67 postfix_expression: primary_expression LB . RB
+   68                   | primary_expression LB . argument_expression_list RB
 
     ADD        shift, and go to state 14
     SUB        shift, and go to state 15
@@ -1979,7 +1979,7 @@ State 122
 
 State 123
 
-   67 postfix_expression: postfix_expression LB RB .
+   67 postfix_expression: primary_expression LB RB .
 
     $default  reduce using rule 67 (postfix_expression)
 
@@ -1993,7 +1993,7 @@ State 124
 
 State 125
 
-   68 postfix_expression: postfix_expression LB argument_expression_list . RB
+   68 postfix_expression: primary_expression LB argument_expression_list . RB
    91 argument_expression_list: argument_expression_list . COMMA assignment_expression
 
     RB     shift, and go to state 136
@@ -2149,7 +2149,7 @@ State 135
 
 State 136
 
-   68 postfix_expression: postfix_expression LB argument_expression_list RB .
+   68 postfix_expression: primary_expression LB argument_expression_list RB .
 
     $default  reduce using rule 68 (postfix_expression)
 

@@ -17,6 +17,8 @@ void insert_symbol(int, char*, char*, char*, char*);
 void dump_symbol();
 void insert_attribute(int, char*);
 void remove_symbol_parameter();
+void semantic_error();
+void syntax_error();
 void print_test();
 
 int assign_flag = 0;
@@ -30,6 +32,10 @@ int attribute_count = 0;
 int need_dump = 0;
 int if_syntax_error = 0;
 int if_semantic_error = 0;
+char error_msg[256];
+char* expression_id[100];
+int expression_id_exist[100];
+char* expression_id_type[100];
 
 typedef struct data {
 	int index;
@@ -221,28 +227,31 @@ print_statement
 
 declaration
 	: type init_declarator SEMICOLON { 
-		/* If it is function declaration, need to remove the parameter inside the symbol table */
-		if(is_function && if_insert_attribute) {
+		/* If it is function declaration */
+		if(is_function) {
+			if(lookup_symbol($2)) {
+				if_semantic_error = 1;
+				printf(ANSI_COLOR_RED"redeclared function\n"ANSI_COLOR_RESET);
+			}
+			/* If need to remove the parameter inside the symbol table */
+			if(if_insert_attribute) {
 			/* Remove the parameters */
-			remove_symbol_parameter();
-			/* Set the function declaration data in the symbol table */
-			Symbol_table* find_function = symbol_table_tail;
-			find_function->name = malloc(strlen($2) + 1);
-			strcpy(find_function->name, $2);
-			find_function->type = malloc(strlen($1) + 1);
-			strcpy(find_function->type, $1);
-			if_insert_attribute = 0;
-			attribute_count = 0;
-			is_function = 0;
-		}
-		/* If it is function declaration without parameter, just set the function declaration */
-		else if(is_function && !if_insert_attribute) {
-			Symbol_table* find_function = symbol_table_tail;
-			find_function->name = malloc(strlen($2) + 1);
-			strcpy(find_function->name, $2);
-			find_function->type = malloc(strlen($1) + 1);
-			strcpy(find_function->type, $1);
-			is_function = 0;
+				remove_symbol_parameter();
+				/* Set the function declaration data in the symbol table */
+				Symbol_table* find_function = symbol_table_tail;
+				find_function->name = malloc(strlen($2) + 1);
+				strcpy(find_function->name, $2);
+				find_function->type = malloc(strlen($1) + 1);
+				strcpy(find_function->type, $1);
+				if_insert_attribute = 0;
+				attribute_count = 0;
+				is_function = 0;
+			}
+			/* If this function doesn't have any parameter, just insert the function */
+			else {
+				insert_symbol(scope_num, $2, "function", $1, "");
+			}
+
 		}
 		/* For variable declaration */
 		else {
@@ -253,7 +262,8 @@ declaration
 					break;
 				/* For the variable is in the same scope, print error */
 				case 2:
-					printf("sdfsdfdsfdsfdsfdsfsdf\n");
+					if_semantic_error = 1;
+					printf(ANSI_COLOR_RED"redeclared variable\n"ANSI_COLOR_RESET);
 					break;
 			}
 		}
@@ -280,11 +290,11 @@ declarator
 	}
 	| declarator LB parameter_list RB 	{ 
 		is_function = 1; 
-		$$ = $1;	
+		$$ = $1; 
 	}
 	| declarator LB RB	{
 		is_function = 1; 
-		$$ = $1;
+		$$ = $1; 
 	}
 	;
 
@@ -322,11 +332,11 @@ multiplicative_expression
 
 cast_expression
 	: unary_expression
-	| LB specifier_qualifier_list RB cast_expression
+	| LB specifier_qualifier_list RB cast_expression 
 	;
 
 unary_expression
-	: postfix_expression
+	: postfix_expression 
 	| INC unary_expression
 	| DEC unary_expression
 	| unary_operator cast_expression
@@ -339,18 +349,30 @@ unary_operator
 	;
 
 postfix_expression
-	: primary_expression
-	| postfix_expression LB RB
-	| postfix_expression LB argument_expression_list RB
-	| postfix_expression INC
-	| postfix_expression DEC
-	;
+	: primary_expression	{ 
+		printf(ANSI_COLOR_BLUE"variable\n"ANSI_COLOR_RESET);
+	}
+	| primary_expression LB RB 	{ 
+		printf(ANSI_COLOR_BLUE"function\n"ANSI_COLOR_RESET);
+	}	
+	| primary_expression LB argument_expression_list RB	{ 
+		printf(ANSI_COLOR_BLUE"function\n"ANSI_COLOR_RESET);
+	}	
+	| primary_expression INC	{ 
+		printf(ANSI_COLOR_BLUE"variable\n"ANSI_COLOR_RESET);
+	}	
+	| primary_expression DEC	{ 
+		printf(ANSI_COLOR_BLUE"variable\n"ANSI_COLOR_RESET);
+	}	
 
-primary_expression
-	: ID
-	| constant
-	| boolean
-	| LB expression RB
+primary_expression 
+	: ID	{ 
+		if(!lookup_symbol($1))
+		printf(ANSI_COLOR_RED"%s\n"ANSI_COLOR_RESET, $1);
+	}
+	| constant	{printf(ANSI_COLOR_RED"constant\n"ANSI_COLOR_RESET);}
+	| boolean	{printf(ANSI_COLOR_RED"boolean\n"ANSI_COLOR_RESET);}
+	| LB expression RB	{printf(ANSI_COLOR_RED"compound_statement\n"ANSI_COLOR_RESET);}
 	;
 
 constant
@@ -471,7 +493,7 @@ int lookup_symbol(char* name) {
 		if(!strcmp(symbol_lookup->name, name) && symbol_lookup->scope == scope_num) 
 			return 2;	// For redeclared, as for undeclared only check if it's true
 		/* If we find a variable/function previously defined at the lower scope */
-		if(!strcmp(symbol_lookup->name, name) && symbol_lookup->scope > scope_num)
+		if(!strcmp(symbol_lookup->name, name) && symbol_lookup->scope < scope_num)
 			return 1;	// For redeclared, as for undeclared only check if it's true
 		symbol_lookup = symbol_lookup->prev;
 	}
@@ -572,6 +594,13 @@ void remove_symbol_parameter() {
 		remove_parameter = prev_symbol;
 		symbol_table_tail = remove_parameter;
 	}
+}
+
+void semantic_error() {
+}
+
+void syntax_error() {
+
 }
 
 void print_test() {

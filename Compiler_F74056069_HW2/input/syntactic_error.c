@@ -18,7 +18,7 @@ int main() {
     int a = 5;
 
     // syntactical error
-    iff (a > 10) {
+    iff (a > 10 + a + 5) {
         x += a;
         print(x);
     } else {
