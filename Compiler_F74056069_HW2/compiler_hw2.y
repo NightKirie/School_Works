@@ -28,6 +28,8 @@ int if_insert_attribute = 0;
 int is_function = 0;
 int attribute_count = 0;
 int need_dump = 0;
+int if_syntax_error = 0;
+int if_print_error = 0;
 
 typedef struct data {
 	int index;
@@ -110,7 +112,9 @@ function_definition
 function_definition_declarator
 	: type declarator scope_start { 		
 		int is_duplicated = 0;
+		int has_parameter = 0;
 		Symbol_table* find_function = symbol_table_tail;
+		/* Find duplicated */
 		while(find_function != symbol_table_head) {
 			/* If this function has forward declaration */
 			if(!strcmp(find_function->name, $2)) {
@@ -135,20 +139,23 @@ function_definition_declarator
 			}
 			find_function = find_function->prev;
 		}
-		if(is_duplicated == 0) 
-			insert_symbol(0, $2, "function", $1, "");
-		
-		// /* If this function doesn't have forward declaration, and have no parameter */
-		// if(find_function == symbol_table_head)
-		// 	insert_symbol(0, $2, "function", $1, "");
-		// /* If this function has parameters, no forward declaration */
-		// else {
-		// 	find_function->name = malloc(strlen($2) + 1);
-		// 	strcpy(find_function->name, $2);
-		// 	find_function->type = malloc(strlen($1) + 1);
-		// 	strcpy(find_function->type, $1);
-		// }
-		
+		find_function = symbol_table_tail;
+		/* Find function with parameter, has a template in symbol table */
+		while(find_function != symbol_table_head) {
+			/* If this function has parameter, find the template */
+			if(!strcmp(find_function->kind, "function") && !strcmp(find_function->name, "")) {
+				find_function->name = malloc(strlen($2) + 1);
+				strcpy(find_function->name, $2);
+				find_function->type = malloc(strlen($1) + 1);
+				strcpy(find_function->type, $1);
+				has_parameter = 1;
+				break;
+			}
+			find_function = find_function->prev;
+		}
+		/* If no duplicated && no parameter, initialize the function */
+		if(!is_duplicated && !has_parameter) 
+			insert_symbol(0, $2, "function", $1, "");		
 	}
 	;
 
@@ -171,10 +178,7 @@ scope_start
 
 scope_end 
 	: RCB	{ 
-		//dump_symbol();
-		
 		need_dump = 1;
-		
 	}
 	;
 
@@ -295,18 +299,8 @@ initializer
 	;
 
 assignment_expression
-	: logical_or_expression
-	| unary_expression assignment_operator assignment_expression
-	;
-
-logical_or_expression
-	: logical_and_expression 
-	| logical_or_expression OR logical_and_expression
-	;
-
-logical_and_expression
 	: relational_expression
-	| logical_and_expression AND relational_expression
+	| unary_expression assignment_operator assignment_expression
 	;
 
 relational_expression
@@ -348,7 +342,6 @@ unary_expression
 unary_operator
 	: ADD 
 	| SUB 
-	| NOT
 	;
 
 postfix_expression
@@ -380,11 +373,11 @@ boolean
 parameter_list
 	: type declarator { 
 		insert_attribute(scope_num, $1);
-		insert_symbol(scope_num+1, $2, "variable", $1, "");
+		insert_symbol(scope_num+1, $2, "parameter", $1, "");
 	}
 	| parameter_list COMMA type declarator { 
 		insert_attribute(scope_num, $3);
-		insert_symbol(scope_num+1, $4, "variable", $3, "");
+		insert_symbol(scope_num+1, $4, "parameter", $3, "");
 	}
 	;
 
@@ -429,16 +422,41 @@ int main(int argc, char** argv)
     yylineno = 0;
 	create_symbol();
     yyparse();
-	dump_symbol();
-	printf("\nTotal lines: %d \n",yylineno);
-	--scope_num;
+	if(!if_syntax_error) {
+		dump_symbol();
+		printf("\nTotal lines: %d \n",yylineno);
+		--scope_num;
+	}
     return 0;
 }
 
 void yyerror(char *s)
 {
+   	if(strstr(s, "syntax") != NULL) 
+	   if_syntax_error = 1;
+    if(print_error_flag != 0){
+        if(had_print_flag == 0){
+            if(buf[0] == '\n')
+                printf("%d:%s", yylineno, buf);
+            else
+                printf("%d: %s\n", yylineno+1, buf);
+            had_print_flag = 1;
+        }
+        print_error_flag = 0;
+        printf("\n|-----------------------------------------------|\n");
+        if(syntax_error_flag == 1)
+            printf("| Error found in line %d: %s\n", yylineno+1, buf);
+        else
+            printf("| Error found in line %d: %s", yylineno, buf);
+        printf("| %s", error_buf);
+        printf("\n|-----------------------------------------------|\n\n");
+    }
+
     printf("\n|-----------------------------------------------|\n");
-    printf("| Error found in line %d: %s\n", yylineno, buf);
+    if(syntax_error_flag == 1)
+        printf("| Error found in line %d: %s\n", yylineno+1, buf);
+    else 
+        printf("| Error found in line %d: %s", yylineno, buf);
     printf("| %s", s);
     printf("\n|-----------------------------------------------|\n\n");
 }
@@ -504,14 +522,26 @@ void dump_symbol() {
 	/* Only if the symbol's scope is equal to the scope_num, then we need to dump it */
 	while(symbol_dumped->scope == scope_num && scope_num != -1) { 
 		/* get the length of line of print out this dumped symbol's data */
-		ssize_t dumped_line_length = snprintf(NULL, 0, "%-10d%-10s%-12s%-10s%-10d%-10s\n", symbol_dumped->index, symbol_dumped->name, 
+		ssize_t dumped_line_length = snprintf(NULL, 0, "%-10d%-10s%-12s%-10s%-10d", symbol_dumped->index, symbol_dumped->name, 
 														symbol_dumped->kind, symbol_dumped->type, 
-														symbol_dumped->scope, symbol_dumped->attribute) + 1;
+														symbol_dumped->scope) + 1;
 		/* Temporary store the line of this dumped symbol */
 		char* dumped_line = (char*)malloc(dumped_line_length);
-		snprintf(dumped_line, dumped_line_length, "%-10d%-10s%-12s%-10s%-10d%-10s\n", symbol_dumped->index, symbol_dumped->name, 
+		snprintf(dumped_line, dumped_line_length, "%-10d%-10s%-12s%-10s%-10d", symbol_dumped->index, symbol_dumped->name, 
 														symbol_dumped->kind, symbol_dumped->type, 
-														symbol_dumped->scope, symbol_dumped->attribute);
+														symbol_dumped->scope);
+		/* If this symbol has attribute */
+		if(strcmp(symbol_dumped->attribute, "")) {
+			dumped_line = (char*)realloc(dumped_line, strlen(dumped_line) + strlen(symbol_dumped->attribute) + 1);
+			dumped_line_length += strlen(symbol_dumped->attribute);
+			strcat(dumped_line, symbol_dumped->attribute);
+		}
+
+		/* Concat \n */
+		dumped_line = (char*)realloc(dumped_line, strlen(dumped_line) + strlen("\n") + 1);
+		dumped_line_length += strlen("\n");
+		strcat(dumped_line, "\n");
+
 		/* For copying first dumped symbol's data */
 		if(print_out_dumped == NULL)
 			print_out_dumped = strdup(dumped_line);

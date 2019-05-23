@@ -2,18 +2,13 @@
  * 2019 Spring Compiler Course Assignment 2 
  */
 
-float c = 1.5; //set
+float c = 1.5;
 
-//void printout();
-int printout() {
-    int a;
-}
-bool loop(int n, int m, int k);
-bool loop(int n, int m, int k) {
+bool loop(int n, int m) {
     while (n > m) {
         n--;
     }
-    return true;    //test
+    return true;
 }
 
 int main() {
@@ -26,17 +21,15 @@ int main() {
     print(y); // print
 
     // if condition
-    if (a + 2 > 10) {
+    if (a > 10) {
         x += a;
         print(x);
     } else {
         x = a % 10 + 10 * 7; /* Arithmetic */
-        print(x + 3 * a);
+        print(x);
     }
     loop(x, i);
-    int c = 3 * loop(a, x, i);
     print("Hello World");
-    if (x + 2 == 0)
-        print(x);
+
     return 0; 
 }
