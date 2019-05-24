@@ -11,7 +11,7 @@ extern void dump_symbol();
 extern int need_dump;
 extern int scope_num;
 extern int if_printed;
-extern void undeclared_error();
+extern void print_test();
 extern void print_error_msg();
 
 char buf[BUF_SIZE];

@@ -127,10 +127,11 @@ function_definition_declarator
 		while(find_function != symbol_table_head) {
 			/* If this function has forward declaration */
 			if(!strcmp(find_function->name, $2)) {
-				Symbol_table* duplicated = find_function->next;
+				is_duplicated = 1;
+				Symbol_table* duplicated = find_function;
 				/* Duplicated function must added after the forward delcaration */
 				while(duplicated != symbol_table_tail) {
-					if(!strcmp(duplicated->kind, "function")) {
+					if(!strcmp(duplicated->kind, "function") && !strcmp(find_function->name, "")) {
 						free(duplicated->kind);
 						Symbol_table* prev = duplicated->prev;
 						Symbol_table* next = duplicated->next;
@@ -139,7 +140,6 @@ function_definition_declarator
 						if(next != NULL)
 							next->prev = prev;
 						free(duplicated);
-						is_duplicated = 1;
 						break;
 					}
 					duplicated = duplicated->next;
@@ -150,17 +150,19 @@ function_definition_declarator
 		}
 		find_function = symbol_table_tail;
 		/* Find function with parameter, has a template in symbol table */
-		while(find_function != symbol_table_head) {
-			/* If this function has parameter, find the template */
-			if(!strcmp(find_function->kind, "function") && !strcmp(find_function->name, "")) {
-				find_function->name = malloc(strlen($2) + 1);
-				strcpy(find_function->name, $2);
-				find_function->type = malloc(strlen($1) + 1);
-				strcpy(find_function->type, $1);
-				has_parameter = 1;
-				break;
+		if(!is_duplicated) {
+			while(find_function != symbol_table_head) {
+				/* If this function has parameter, find the template */
+				if(!strcmp(find_function->kind, "function") && !strcmp(find_function->name, "")) {
+					find_function->name = malloc(strlen($2) + 1);
+					strcpy(find_function->name, $2);
+					find_function->type = malloc(strlen($1) + 1);
+					strcpy(find_function->type, $1);
+					has_parameter = 1;
+					break;
+				}
+				find_function = find_function->prev;
 			}
-			find_function = find_function->prev;
 		}
 		/* If no duplicated && no parameter, initialize the function */
 		if(!is_duplicated && !has_parameter) 
