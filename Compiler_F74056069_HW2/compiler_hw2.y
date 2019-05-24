@@ -17,25 +17,28 @@ void insert_symbol(int, char*, char*, char*, char*);
 void dump_symbol();
 void insert_attribute(int, char*);
 void remove_symbol_parameter();
+void undeclared_error();
 void semantic_error();
 void syntax_error();
+void print_error_msg();
+void clear_expression();
 void print_test();
 
-int assign_flag = 0;
-int error_flag = 0;
-int type_flag = 0;
 int scope_num = 0;
-int id_flag = 0;
 int if_insert_attribute = 0;
 int is_function = 0;
 int attribute_count = 0;
 int need_dump = 0;
 int if_syntax_error = 0;
-int if_semantic_error = 0;
+int if_undeclared = 0;
+int if_print_error = 0;
+int if_printed = 0;
 char error_msg[256];
-char* expression_id[100];
-int expression_id_exist[100];
-char* expression_id_type[100];
+char** expression_id;
+int* expression_id_exist;
+char** expression_id_type;
+int expression_id_num = 0;
+int expression_id_type_num = 0;
 
 typedef struct data {
 	int index;
@@ -190,7 +193,7 @@ block_item_list
 
 block_item
 	: declaration
-	| statement
+	| statement 
 	;
 
 statement
@@ -204,7 +207,7 @@ statement
 
 expression_statement
 	: SEMICOLON
-	| expression SEMICOLON
+	| expression SEMICOLON	
 	;
 
 selection_statement
@@ -230,8 +233,7 @@ declaration
 		/* If it is function declaration */
 		if(is_function) {
 			if(lookup_symbol($2)) {
-				if_semantic_error = 1;
-				printf(ANSI_COLOR_RED"redeclared function\n"ANSI_COLOR_RESET);
+				semantic_error("Redeclared function", $2);
 			}
 			/* If need to remove the parameter inside the symbol table */
 			if(if_insert_attribute) {
@@ -262,8 +264,7 @@ declaration
 					break;
 				/* For the variable is in the same scope, print error */
 				case 2:
-					if_semantic_error = 1;
-					printf(ANSI_COLOR_RED"redeclared variable\n"ANSI_COLOR_RESET);
+					semantic_error("Redeclared variable", $2);
 					break;
 			}
 		}
@@ -299,7 +300,7 @@ declarator
 	;
 
 initializer
-	: assignment_expression
+	: expression
 	;
 
 assignment_expression
@@ -350,29 +351,104 @@ unary_operator
 
 postfix_expression
 	: primary_expression	{ 
-		printf(ANSI_COLOR_BLUE"variable\n"ANSI_COLOR_RESET);
+		if(expression_id_type_num == 0) 
+			expression_id_type = (char **)malloc(sizeof(char *));		
+		else 
+			expression_id_type = (char **)realloc(expression_id_type, sizeof(char *) * (expression_id_type_num+1));
+		expression_id_type[expression_id_type_num] = strdup("variable");
+		++expression_id_type_num;
 	}
 	| primary_expression LB RB 	{ 
-		printf(ANSI_COLOR_BLUE"function\n"ANSI_COLOR_RESET);
+		if(expression_id_type_num == 0) 
+			expression_id_type = (char **)malloc(sizeof(char *));		
+		else 
+			expression_id_type = (char **)realloc(expression_id_type, sizeof(char *) * (expression_id_type_num+1));
+		expression_id_type[expression_id_type_num] = strdup("function");
+		++expression_id_type_num;
 	}	
 	| primary_expression LB argument_expression_list RB	{ 
-		printf(ANSI_COLOR_BLUE"function\n"ANSI_COLOR_RESET);
+		if(expression_id_type_num == 0) 
+			expression_id_type = (char **)malloc(sizeof(char *));		
+		else 
+			expression_id_type = (char **)realloc(expression_id_type, sizeof(char *) * (expression_id_type_num+1));
+		expression_id_type[expression_id_type_num] = strdup("function");
+		++expression_id_type_num;
 	}	
 	| primary_expression INC	{ 
-		printf(ANSI_COLOR_BLUE"variable\n"ANSI_COLOR_RESET);
+		if(expression_id_type_num == 0) 
+			expression_id_type = (char **)malloc(sizeof(char *));		
+		else 
+			expression_id_type = (char **)realloc(expression_id_type, sizeof(char *) * (expression_id_type_num+1));
+		expression_id_type[expression_id_type_num] = strdup("variable");
+		++expression_id_type_num;
 	}	
 	| primary_expression DEC	{ 
-		printf(ANSI_COLOR_BLUE"variable\n"ANSI_COLOR_RESET);
+		if(expression_id_type_num == 0) 
+			expression_id_type = (char **)malloc(sizeof(char *));		
+		else 
+			expression_id_type = (char **)realloc(expression_id_type, sizeof(char *) * (expression_id_type_num+1));
+		expression_id_type[expression_id_type_num] = strdup("variable");
+		++expression_id_type_num;
 	}	
 
 primary_expression 
 	: ID	{ 
-		if(!lookup_symbol($1))
-		printf(ANSI_COLOR_RED"%s\n"ANSI_COLOR_RESET, $1);
+		if(expression_id_num == 0) {
+			expression_id = (char **)malloc(sizeof(char *));
+			expression_id_exist = (int *)malloc(sizeof(int));
+		}
+		else {
+			expression_id = (char **)realloc(expression_id, sizeof(char *) * (expression_id_num+1));
+			expression_id_exist = (int *)realloc(expression_id_exist, sizeof(int) * (expression_id_num+1));
+		}
+		expression_id[expression_id_num] = strdup($1);
+		if(!lookup_symbol($1)) {
+			expression_id_exist[expression_id_num] = 0;
+			if_undeclared = 1;
+		}
+		else	
+			expression_id_exist[expression_id_num] = 1;
+		++expression_id_num;
 	}
-	| constant	{printf(ANSI_COLOR_RED"constant\n"ANSI_COLOR_RESET);}
-	| boolean	{printf(ANSI_COLOR_RED"boolean\n"ANSI_COLOR_RESET);}
-	| LB expression RB	{printf(ANSI_COLOR_RED"compound_statement\n"ANSI_COLOR_RESET);}
+	| constant	{
+		if(expression_id_num == 0) {
+			expression_id = (char **)malloc(sizeof(char *));
+			expression_id_exist = (int *)malloc(sizeof(int));
+		}
+		else {
+			expression_id = (char **)realloc(expression_id, sizeof(char *) * (expression_id_num+1));
+			expression_id_exist = (int *)realloc(expression_id_exist, sizeof(int) * (expression_id_num+1));
+		}
+		expression_id[expression_id_num] = strdup("constant");
+		expression_id_exist[expression_id_num] = 1;
+		++expression_id_num;
+	}
+	| boolean	{
+		if(expression_id_num == 0) {
+			expression_id = (char **)malloc(sizeof(char *));
+			expression_id_exist = (int *)malloc(sizeof(int));
+		}
+		else {
+			expression_id = (char **)realloc(expression_id, sizeof(char *) * (expression_id_num+1));
+			expression_id_exist = (int *)realloc(expression_id_exist, sizeof(int) * (expression_id_num+1));
+		}
+		expression_id[expression_id_num] = strdup("boolean");
+		expression_id_exist[expression_id_num] = 1;
+		++expression_id_num;
+	}
+	| LB assignment_expression RB	{
+		if(expression_id_num == 0) {
+			expression_id = (char **)malloc(sizeof(char *));
+			expression_id_exist = (int *)malloc(sizeof(int));
+		}
+		else {
+			expression_id = (char **)realloc(expression_id, sizeof(char *) * (expression_id_num+1));
+			expression_id_exist = (int *)realloc(expression_id_exist, sizeof(int) * (expression_id_num+1));
+		}
+		expression_id[expression_id_num] = strdup("compound_statement");
+		expression_id_exist[expression_id_num] = 1;
+		++expression_id_num;
+	}
 	;
 
 constant
@@ -417,8 +493,11 @@ argument_expression_list
 	;
 
 expression
-	: assignment_expression
-	| expression COMMA assignment_expression
+	: assignment_expression	{
+		if(if_undeclared) 
+        	undeclared_error();
+		clear_expression();
+	}
 	;
 
 %%
@@ -430,17 +509,44 @@ int main(int argc, char** argv)
 	create_symbol();
     yyparse();
 	if(!if_syntax_error) {
-		dump_symbol();
-		printf("\nTotal lines: %d \n",yylineno);
-		--scope_num;
+		if(buf[0] != '\0'){
+            printf("%d: %s\n", yylineno+1, buf);
+            ++yylineno;
+        }     
+        dump_symbol();
+        printf("\nTotal lines: %d \n",yylineno);		
 	}
+	--scope_num;
     return 0;
 }
 
 void yyerror(char *s)
 {
+	if(strstr(s, "syntax"))
+		if_syntax_error = 1;
+	if(if_print_error) {
+		if(!if_printed) {
+			if(buf[0] == '\n')
+                printf("%d:%s", yylineno, buf);
+            else
+                printf("%d: %s\n", yylineno+1, buf);
+            if_printed = 1;
+		}
+		if_print_error = 0;
+		printf("\n|-----------------------------------------------|\n");
+        if(if_syntax_error)
+            printf("| Error found in line %d: %s\n", yylineno+1, buf);
+        else
+            printf("| Error found in line %d: %s", yylineno, buf);
+        printf("| %s", error_msg);
+        printf("\n|-----------------------------------------------|\n\n");
+	}
+	
 	printf("\n|-----------------------------------------------|\n");
-    printf("| Error found in line %d: %s\n", yylineno, buf);
+    if(if_syntax_error)
+        printf("| Error found in line %d: %s\n", yylineno+1, buf);
+    else 
+        printf("| Error found in line %d: %s", yylineno, buf);
     printf("| %s", s);
     printf("\n|-----------------------------------------------|\n\n");
 }
@@ -596,11 +702,44 @@ void remove_symbol_parameter() {
 	}
 }
 
-void semantic_error() {
+void undeclared_error() {
+	char errorMsg[256];
+	for(int i = 0; i < expression_id_num; ++i) {
+		if(!expression_id_exist[i]) {
+			sprintf(errorMsg, "Undeclared %s", expression_id_type[expression_id_num-i-1]);
+			if_undeclared = 0;
+			semantic_error(errorMsg, expression_id[i]);
+			break;
+		}
+	}
 }
 
-void syntax_error() {
+void semantic_error(char* errorMsg, char* name) {
+	sprintf(error_msg, "%s %s", errorMsg, name);
+	if_print_error = 1;
+}
 
+void print_error_msg() {
+	if(if_print_error) {
+		if_print_error = 0;
+		yyerror(error_msg);	
+	}
+	if_print_error = 0;
+}
+
+void clear_expression() {
+	if(expression_id_num != 0) {
+		for(int i = expression_id_num-1; i >= 0; --i) {
+			free(expression_id[i]);
+			expression_id_exist[i] = 0;
+			free(expression_id_type[expression_id_num-1-i]);
+		}
+		free(expression_id);
+		free(expression_id_exist);
+		free(expression_id_type);
+		expression_id_num = 0;
+		expression_id_type_num = 0;
+	}
 }
 
 void print_test() {
