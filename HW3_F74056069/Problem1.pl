@@ -21,7 +21,7 @@ factor_loop(N, L) :-
     has_factor(N, L+6).
 
 % Default set the minimun of goldbach number 4's output is [2, 2]
-goldbach(4,[2,2]).
+goldbach(4,_) :- format("~s ~d ~d ~n", ["output:", 2, 2]).
 % If N is even number, > 4, recursively find the goldbach pair, starting one of the number is 3 (minimun prime number greater than 2)
 goldbach(N,L) :-
     N mod 2 =:= 0,
