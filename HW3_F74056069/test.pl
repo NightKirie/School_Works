@@ -1,13 +1,14 @@
-warm_blooded(penguin).
-warm_blooded(human).
-
-produce_milk(penguin).
-produce_milk(human).
-
-have_feathers(penguin).
-have_hair(human).
-
-mammal(X) :-
-    warm_blooded(X),
-    produce_milk(X),
-    have_hair(X).
+p(X):-a(X). 
+    
+p(X):-b(X),c(X),!,d(X),e(X). 
+ 
+p(X):-f(X). 
+ 
+a(1).   
+b(1).     
+c(1).      
+d(2).   
+e(2).   
+f(3).          
+b(2).   
+c(2).
