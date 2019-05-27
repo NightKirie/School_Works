@@ -1,10 +1,3 @@
-% Using a better version to find prime, links: https://www.geeksforgeeks.org/primality-test-set-1-introduction-and-school-method/
-% If N has factor L or L+2, return true
-
-% Recursively to find if N has N1 as a factor, until L * L < N 
-
-
-
 % Default set 2 & 3 as a prime
 is_prime(2) :- !.
 is_prime(3) :- !.
@@ -26,10 +19,6 @@ factor_loop(N, L) :-
     N mod L =:= 0;
     N mod (L+2) =:= 0;
     has_factor(N, L+6).
-
-% goldbach(N,L) :- L is the list of the two prime numbers that
-%    sum up to the given N (which must be even).
-%    (integer,integer) (+,-)
 
 % Default set the minimun of goldbach number 4's output is [2, 2]
 goldbach(4,[2,2]).
@@ -66,5 +55,4 @@ main :-
     goldbach(N, _),
     halt.
     
-
 :- initialization(main). 
