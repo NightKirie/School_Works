@@ -35,21 +35,21 @@ factor_loop(N, L) :-
 goldbach(4,[2,2]).
 % If N is even number, > 4, recursively find the goldbach pair, starting one of the number is 3 (minimun prime number greater than 2)
 goldbach(N,L) :-
-  N mod 2 =:= 0,
-  N > 4,
-  goldbach(N,L,3).
+    N mod 2 =:= 0,
+    N > 4,
+    goldbach(N,L,3).
 % If P + Q = N, Q is a prime, Q > P, then [P, Q] is an answer pair, if P < Q then redo goldbach(N, L, P)
 goldbach(N,[P,Q],P) :-
-  Q is N - P,
-  is_prime(Q), 
-  format("~s ~d ~d ~n", ["output:", P, Q]),
-  P >= Q.
+    Q is N - P,
+    is_prime(Q), 
+    format("~s ~d ~d ~n", ["output:", P, Q]),
+    P >= Q.
 % Get the next prime, then do goldbach again, if P1 > N / 2, then stop the recursion
 goldbach(N,L,P) :-
-  P < N,
-  next_prime(P,P1),
-  P1 =< N / 2 -> goldbach(N,L,P1)
-              ;!.
+    P < N,
+    next_prime(P,P1),
+    P1 =< N / 2 -> goldbach(N,L,P1)
+                ;!.
 
 % Check if P+2 is prime
 next_prime(P,P1) :- 
