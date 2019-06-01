@@ -5,7 +5,9 @@
 int main() {
     // Declaration
     int x;
-    int a = 5;
+    int asf6 = -b;
+    float sdfdsfds = -456.45;
+    string c[2] = {"sdfsdf", "sdfsdfsdf"};
     string y = "Hello World";
 
     print(y);

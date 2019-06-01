@@ -13,8 +13,8 @@ letter [a-zA-Z]
 digit [0-9]
 sign [+|-]
 id {letter}+({letter}|{digit})*
-i_const {sign}?{digit}+
-f_const {sign}?{digit}+"."{digit}+
+i_const {digit}+
+f_const {digit}+"."{digit}+
 cpp_comment ("//").*
 %x C_COMMENT
 %x STR_CONST
