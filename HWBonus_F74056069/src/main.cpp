@@ -4,6 +4,8 @@
 #include <nana/gui/widgets/button.hpp>
 #include <nana/gui/widgets/textbox.hpp>
 #include <fmt/format.h>
+#include <square/square.h>
+
 
 int main()
 {
@@ -18,9 +20,9 @@ int main()
     button btn{fm, u8"算!"};
     btn.events().click([&fm, &text]{
         auto val = atoi(text.caption().c_str());
-        
+        auto square_num = square(val);
         auto msg = msgbox(fm, u8"計算結果");
-        (msg<<fmt::format("{0}*{0}={1}", val, val*val)).show();
+        (msg<<fmt::format("{0}*{0}={1}", val, square_num)).show();
 
     });
 
