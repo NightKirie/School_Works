@@ -1280,7 +1280,7 @@ case 56:
 YY_RULE_SETUP
 #line 238 "compiler_hw3.l"
 { 
-    CONCAT   
+    CONCAT  
     printLine();
 }
 	YY_BREAK

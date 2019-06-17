@@ -87,7 +87,6 @@ void insert_attribute(int, char*);
 void remove_symbol_parameter();
 void undeclared_error();
 void semantic_error();
-void syntax_error();
 void print_error_msg();
 void clear_expression();
 void print_test();
@@ -110,6 +109,7 @@ int expression_id_num = 0;
 int expression_id_type_num = 0;
 int error_flag = 0;         // If error occurred, flag up
 int declaration_has_value = 0;
+int parameter_num = 0;
 
 /* Symbol table */
 typedef struct data {
@@ -602,16 +602,16 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   115,   115,   116,   117,   121,   122,   126,   130,   182,
-     183,   188,   194,   200,   201,   205,   206,   210,   211,   212,
-     213,   214,   215,   219,   220,   224,   225,   229,   233,   234,
-     238,   242,   286,   287,   288,   289,   290,   294,   298,   306,
-     310,   314,   321,   325,   326,   330,   331,   332,   333,   334,
-     335,   336,   340,   341,   342,   346,   347,   348,   349,   353,
-     354,   358,   359,   360,   361,   366,   367,   371,   379,   387,
-     395,   403,   413,   431,   444,   457,   473,   474,   475,   479,
-     480,   484,   488,   495,   496,   497,   498,   499,   500,   504,
-     505,   509,   510,   514
+       0,   115,   115,   116,   117,   121,   122,   126,   130,   186,
+     187,   192,   198,   204,   205,   209,   210,   214,   215,   216,
+     217,   218,   219,   223,   224,   228,   229,   233,   237,   238,
+     242,   246,   315,   316,   317,   318,   319,   323,   327,   335,
+     339,   343,   350,   354,   355,   359,   360,   361,   362,   363,
+     364,   365,   369,   370,   371,   375,   376,   377,   378,   382,
+     383,   387,   388,   389,   390,   395,   396,   400,   408,   416,
+     424,   432,   442,   460,   473,   486,   502,   503,   504,   508,
+     509,   513,   517,   524,   525,   526,   527,   528,   529,   533,
+     534,   538,   539,   543
 };
 #endif
 
@@ -1529,8 +1529,12 @@ yyreduce:
 				Symbol_table* duplicated = find_function;
 				/* Duplicated function must added after the forward delcaration */
 				while(duplicated != symbol_table_tail) {
-					if(!strcmp(duplicated->kind, "function") && !strcmp(find_function->name, "")) {
-						free(duplicated->kind);
+					if(!strcmp(duplicated->kind, "function") && !strcmp(duplicated->name, "")) {	
+                        /* If forward declaration's attribute is not the same as the function definition */
+                        if(strcmp(duplicated->attribute, find_function->attribute)) 
+                            semantic_error("function formal parameter is not the same", "");            
+                        free(duplicated->kind);
+                        free(duplicated->attribute);
 						Symbol_table* prev = duplicated->prev;
 						Symbol_table* next = duplicated->next;
 						if(prev != NULL)
@@ -1547,7 +1551,7 @@ yyreduce:
 			find_function = find_function->prev;
 		}
 		find_function = symbol_table_tail;
-		/* Find function with parameter, has a template in symbol table */
+		/* Find function with parameter, has a template in symbol table, but no forward declaration */
 		if(!is_duplicated) {
 			while(find_function != symbol_table_head) {
 				/* If this function has parameter, find the template */
@@ -1566,32 +1570,57 @@ yyreduce:
 		if(!is_duplicated && !has_parameter) 
 			insert_symbol(0, (yyvsp[-1].str_val), "function", (yyvsp[-2].str_val), "");		
 	}
-#line 1570 "y.tab.c" /* yacc.c:1646  */
+#line 1574 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 188 "compiler_hw3.y" /* yacc.c:1646  */
+#line 192 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		 ++scope_num;
 	}
-#line 1578 "y.tab.c" /* yacc.c:1646  */
+#line 1582 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 194 "compiler_hw3.y" /* yacc.c:1646  */
+#line 198 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		need_dump = 1;
 	}
-#line 1586 "y.tab.c" /* yacc.c:1646  */
+#line 1590 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 242 "compiler_hw3.y" /* yacc.c:1646  */
+#line 246 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		/* If it is function declaration */
 		if(is_function) {
 			if(lookup_symbol((yyvsp[-1].str_val))) {
-				semantic_error("Redeclared function", (yyvsp[-1].str_val));
+				Symbol_table* find_function = symbol_table_tail;
+                /* Find duplicated */
+                while(find_function != symbol_table_head) {
+                    /* If this function has forward declaration */
+                    if(!strcmp(find_function->name, (yyvsp[-1].str_val))) {
+                        Symbol_table* duplicated = find_function;
+                        /* Duplicated function must added after the forward delcaration */
+                        while(duplicated != symbol_table_tail) {
+                            if(!strcmp(duplicated->kind, "function") && !strcmp(duplicated->name, "")) {	
+                                free(duplicated->kind);
+                                Symbol_table* prev = duplicated->prev;
+                                Symbol_table* next = duplicated->next;
+                                if(prev != NULL)
+                                    prev->next = next;
+                                if(next != NULL)
+                                    next->prev = prev;
+                                free(duplicated);
+                                break;
+                            }
+                            duplicated = duplicated->next;
+                        }
+                        break;
+                    }
+                    find_function = find_function->prev;
+                }
+                semantic_error("Redeclared function", (yyvsp[-1].str_val));
 			}
 			/* If need to remove the parameter inside the symbol table */
 			if(if_insert_attribute) {
@@ -1628,86 +1657,86 @@ yyreduce:
 			}
 		}
 	}
-#line 1632 "y.tab.c" /* yacc.c:1646  */
+#line 1661 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 286 "compiler_hw3.y" /* yacc.c:1646  */
+#line 315 "compiler_hw3.y" /* yacc.c:1646  */
     {(yyval.str_val) = "int";}
-#line 1638 "y.tab.c" /* yacc.c:1646  */
+#line 1667 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 287 "compiler_hw3.y" /* yacc.c:1646  */
+#line 316 "compiler_hw3.y" /* yacc.c:1646  */
     {(yyval.str_val) = "float";}
-#line 1644 "y.tab.c" /* yacc.c:1646  */
+#line 1673 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 288 "compiler_hw3.y" /* yacc.c:1646  */
+#line 317 "compiler_hw3.y" /* yacc.c:1646  */
     {(yyval.str_val) = "bool";}
-#line 1650 "y.tab.c" /* yacc.c:1646  */
+#line 1679 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 289 "compiler_hw3.y" /* yacc.c:1646  */
+#line 318 "compiler_hw3.y" /* yacc.c:1646  */
     {(yyval.str_val) = "string";}
-#line 1656 "y.tab.c" /* yacc.c:1646  */
+#line 1685 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 290 "compiler_hw3.y" /* yacc.c:1646  */
+#line 319 "compiler_hw3.y" /* yacc.c:1646  */
     {(yyval.str_val) = "void";}
-#line 1662 "y.tab.c" /* yacc.c:1646  */
+#line 1691 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 294 "compiler_hw3.y" /* yacc.c:1646  */
+#line 323 "compiler_hw3.y" /* yacc.c:1646  */
     { 
         declaration_has_value = 1;
         (yyval.str_val) = (yyvsp[-2].str_val); 
     }
-#line 1671 "y.tab.c" /* yacc.c:1646  */
+#line 1700 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 298 "compiler_hw3.y" /* yacc.c:1646  */
+#line 327 "compiler_hw3.y" /* yacc.c:1646  */
     { 
         declaration_has_value = 0;
         (yyval.str_val) = (yyvsp[0].str_val); 
     }
-#line 1680 "y.tab.c" /* yacc.c:1646  */
+#line 1709 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 306 "compiler_hw3.y" /* yacc.c:1646  */
+#line 335 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		is_function = 0; 
 		(yyval.str_val) = (yyvsp[0].str_val); 
 	}
-#line 1689 "y.tab.c" /* yacc.c:1646  */
+#line 1718 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 310 "compiler_hw3.y" /* yacc.c:1646  */
+#line 339 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		is_function = 1; 
 		(yyval.str_val) = (yyvsp[-3].str_val); 
 	}
-#line 1698 "y.tab.c" /* yacc.c:1646  */
+#line 1727 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 314 "compiler_hw3.y" /* yacc.c:1646  */
+#line 343 "compiler_hw3.y" /* yacc.c:1646  */
     {
 		is_function = 1; 
 		(yyval.str_val) = (yyvsp[-2].str_val); 
 	}
-#line 1707 "y.tab.c" /* yacc.c:1646  */
+#line 1736 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 371 "compiler_hw3.y" /* yacc.c:1646  */
+#line 400 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		if(expression_id_type_num == 0) 
 			expression_id_type = (char **)malloc(sizeof(char *));		
@@ -1716,11 +1745,11 @@ yyreduce:
 		expression_id_type[expression_id_type_num] = strdup("variable");
 		++expression_id_type_num;
 	}
-#line 1720 "y.tab.c" /* yacc.c:1646  */
+#line 1749 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 379 "compiler_hw3.y" /* yacc.c:1646  */
+#line 408 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		if(expression_id_type_num == 0) 
 			expression_id_type = (char **)malloc(sizeof(char *));		
@@ -1729,11 +1758,11 @@ yyreduce:
 		expression_id_type[expression_id_type_num] = strdup("function");
 		++expression_id_type_num;
 	}
-#line 1733 "y.tab.c" /* yacc.c:1646  */
+#line 1762 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 387 "compiler_hw3.y" /* yacc.c:1646  */
+#line 416 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		if(expression_id_type_num == 0) 
 			expression_id_type = (char **)malloc(sizeof(char *));		
@@ -1742,11 +1771,11 @@ yyreduce:
 		expression_id_type[expression_id_type_num] = strdup("function");
 		++expression_id_type_num;
 	}
-#line 1746 "y.tab.c" /* yacc.c:1646  */
+#line 1775 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 395 "compiler_hw3.y" /* yacc.c:1646  */
+#line 424 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		if(expression_id_type_num == 0) 
 			expression_id_type = (char **)malloc(sizeof(char *));		
@@ -1755,11 +1784,11 @@ yyreduce:
 		expression_id_type[expression_id_type_num] = strdup("variable");
 		++expression_id_type_num;
 	}
-#line 1759 "y.tab.c" /* yacc.c:1646  */
+#line 1788 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 403 "compiler_hw3.y" /* yacc.c:1646  */
+#line 432 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		if(expression_id_type_num == 0) 
 			expression_id_type = (char **)malloc(sizeof(char *));		
@@ -1768,11 +1797,11 @@ yyreduce:
 		expression_id_type[expression_id_type_num] = strdup("variable");
 		++expression_id_type_num;
 	}
-#line 1772 "y.tab.c" /* yacc.c:1646  */
+#line 1801 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 413 "compiler_hw3.y" /* yacc.c:1646  */
+#line 442 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		if(expression_id_num == 0) {
 			expression_id = (char **)malloc(sizeof(char *));
@@ -1791,11 +1820,11 @@ yyreduce:
 			expression_id_exist[expression_id_num] = 1;
 		++expression_id_num;
 	}
-#line 1795 "y.tab.c" /* yacc.c:1646  */
+#line 1824 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 431 "compiler_hw3.y" /* yacc.c:1646  */
+#line 460 "compiler_hw3.y" /* yacc.c:1646  */
     {
 		if(expression_id_num == 0) {
 			expression_id = (char **)malloc(sizeof(char *));
@@ -1809,11 +1838,11 @@ yyreduce:
 		expression_id_exist[expression_id_num] = 1;
 		++expression_id_num;
 	}
-#line 1813 "y.tab.c" /* yacc.c:1646  */
+#line 1842 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 444 "compiler_hw3.y" /* yacc.c:1646  */
+#line 473 "compiler_hw3.y" /* yacc.c:1646  */
     {
 		if(expression_id_num == 0) {
 			expression_id = (char **)malloc(sizeof(char *));
@@ -1827,11 +1856,11 @@ yyreduce:
 		expression_id_exist[expression_id_num] = 1;
 		++expression_id_num;
 	}
-#line 1831 "y.tab.c" /* yacc.c:1646  */
+#line 1860 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 457 "compiler_hw3.y" /* yacc.c:1646  */
+#line 486 "compiler_hw3.y" /* yacc.c:1646  */
     {
 		if(expression_id_num == 0) {
 			expression_id = (char **)malloc(sizeof(char *));
@@ -1845,57 +1874,57 @@ yyreduce:
 		expression_id_exist[expression_id_num] = 1;
 		++expression_id_num;
 	}
-#line 1849 "y.tab.c" /* yacc.c:1646  */
+#line 1878 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 473 "compiler_hw3.y" /* yacc.c:1646  */
+#line 502 "compiler_hw3.y" /* yacc.c:1646  */
     { printf("%d\n", (yyvsp[0].i_val)); }
-#line 1855 "y.tab.c" /* yacc.c:1646  */
+#line 1884 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 474 "compiler_hw3.y" /* yacc.c:1646  */
+#line 503 "compiler_hw3.y" /* yacc.c:1646  */
     { printf("%f\n", (yyvsp[0].f_val)); }
-#line 1861 "y.tab.c" /* yacc.c:1646  */
+#line 1890 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 475 "compiler_hw3.y" /* yacc.c:1646  */
+#line 504 "compiler_hw3.y" /* yacc.c:1646  */
     { printf("%s\n", (yyvsp[0].str_val)); }
-#line 1867 "y.tab.c" /* yacc.c:1646  */
+#line 1896 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 81:
-#line 484 "compiler_hw3.y" /* yacc.c:1646  */
+#line 513 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		insert_attribute(scope_num, (yyvsp[-1].str_val));
 		insert_symbol(scope_num+1, (yyvsp[0].str_val), "parameter", (yyvsp[-1].str_val), "");
 	}
-#line 1876 "y.tab.c" /* yacc.c:1646  */
+#line 1905 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 488 "compiler_hw3.y" /* yacc.c:1646  */
+#line 517 "compiler_hw3.y" /* yacc.c:1646  */
     { 
 		insert_attribute(scope_num, (yyvsp[-1].str_val));
 		insert_symbol(scope_num+1, (yyvsp[0].str_val), "parameter", (yyvsp[-1].str_val), "");
 	}
-#line 1885 "y.tab.c" /* yacc.c:1646  */
+#line 1914 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 93:
-#line 514 "compiler_hw3.y" /* yacc.c:1646  */
+#line 543 "compiler_hw3.y" /* yacc.c:1646  */
     {
 		if(if_undeclared) 
         	undeclared_error();
 		clear_expression();
 	}
-#line 1895 "y.tab.c" /* yacc.c:1646  */
+#line 1924 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1899 "y.tab.c" /* yacc.c:1646  */
+#line 1928 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2123,7 +2152,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 522 "compiler_hw3.y" /* yacc.c:1906  */
+#line 551 "compiler_hw3.y" /* yacc.c:1906  */
 
 
 /* C code section */
@@ -2357,7 +2386,12 @@ void undeclared_error() {
 }
 
 void semantic_error(char* errorMsg, char* name) {
-	sprintf(error_msg, "%s %s", errorMsg, name);
+	/* For other than redeclared or undeclared error */
+    if(!strcmp(name, ""))
+        sprintf(error_msg, "%s", errorMsg);
+    /* For redeclared or un declared error */
+    else
+        sprintf(error_msg, "%s %s", errorMsg, name);
 	if_print_error = 1;
 }
 

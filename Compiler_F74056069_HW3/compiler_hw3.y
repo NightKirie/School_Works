@@ -23,7 +23,6 @@ void insert_attribute(int, char*);
 void remove_symbol_parameter();
 void undeclared_error();
 void semantic_error();
-void syntax_error();
 void print_error_msg();
 void clear_expression();
 void print_test();
@@ -46,6 +45,7 @@ int expression_id_num = 0;
 int expression_id_type_num = 0;
 int error_flag = 0;         // If error occurred, flag up
 int declaration_has_value = 0;
+int parameter_num = 0;
 
 /* Symbol table */
 typedef struct data {
@@ -139,8 +139,12 @@ function_definition_declarator
 				Symbol_table* duplicated = find_function;
 				/* Duplicated function must added after the forward delcaration */
 				while(duplicated != symbol_table_tail) {
-					if(!strcmp(duplicated->kind, "function") && !strcmp(find_function->name, "")) {
-						free(duplicated->kind);
+					if(!strcmp(duplicated->kind, "function") && !strcmp(duplicated->name, "")) {	
+                        /* If forward declaration's attribute is not the same as the function definition */
+                        if(strcmp(duplicated->attribute, find_function->attribute)) 
+                            semantic_error("function formal parameter is not the same", "");            
+                        free(duplicated->kind);
+                        free(duplicated->attribute);
 						Symbol_table* prev = duplicated->prev;
 						Symbol_table* next = duplicated->next;
 						if(prev != NULL)
@@ -157,7 +161,7 @@ function_definition_declarator
 			find_function = find_function->prev;
 		}
 		find_function = symbol_table_tail;
-		/* Find function with parameter, has a template in symbol table */
+		/* Find function with parameter, has a template in symbol table, but no forward declaration */
 		if(!is_duplicated) {
 			while(find_function != symbol_table_head) {
 				/* If this function has parameter, find the template */
@@ -243,7 +247,32 @@ declaration
 		/* If it is function declaration */
 		if(is_function) {
 			if(lookup_symbol($2)) {
-				semantic_error("Redeclared function", $2);
+				Symbol_table* find_function = symbol_table_tail;
+                /* Find duplicated */
+                while(find_function != symbol_table_head) {
+                    /* If this function has forward declaration */
+                    if(!strcmp(find_function->name, $2)) {
+                        Symbol_table* duplicated = find_function;
+                        /* Duplicated function must added after the forward delcaration */
+                        while(duplicated != symbol_table_tail) {
+                            if(!strcmp(duplicated->kind, "function") && !strcmp(duplicated->name, "")) {	
+                                free(duplicated->kind);
+                                Symbol_table* prev = duplicated->prev;
+                                Symbol_table* next = duplicated->next;
+                                if(prev != NULL)
+                                    prev->next = next;
+                                if(next != NULL)
+                                    next->prev = prev;
+                                free(duplicated);
+                                break;
+                            }
+                            duplicated = duplicated->next;
+                        }
+                        break;
+                    }
+                    find_function = find_function->prev;
+                }
+                semantic_error("Redeclared function", $2);
 			}
 			/* If need to remove the parameter inside the symbol table */
 			if(if_insert_attribute) {
@@ -752,7 +781,12 @@ void undeclared_error() {
 }
 
 void semantic_error(char* errorMsg, char* name) {
-	sprintf(error_msg, "%s %s", errorMsg, name);
+	/* For other than redeclared or undeclared error */
+    if(!strcmp(name, ""))
+        sprintf(error_msg, "%s", errorMsg);
+    /* For redeclared or un declared error */
+    else
+        sprintf(error_msg, "%s %s", errorMsg, name);
 	if_print_error = 1;
 }
 

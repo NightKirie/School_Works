@@ -235,7 +235,7 @@ id			{letter}+({letter}|{digit})*
     CONCAT 
     return SEMICOLON; }
 [\n]        { 
-    CONCAT   
+    CONCAT  
     printLine();
 }
 [ \t]		{ CONCAT } /* Ignore */
