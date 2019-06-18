@@ -78,6 +78,7 @@ int get_symbol_type(char*);
 int get_symbol_index(char*);
 int get_symbol_scope_num(char*);
 int is_global_symbol(char*);
+void gencode_
 
 /* For debugging colorful text */
 #define ANSI_COLOR_RED     "\x1b[31m"
@@ -497,6 +498,12 @@ postfix_expression
 			expression_id_type = (char **)realloc(expression_id_type, sizeof(char *) * (expression_id_type_num+1));
 		expression_id_type[expression_id_type_num] = strdup("variable");
 		++expression_id_type_num;
+        $$[0] = $1[0];
+        $$[1] = $1[1];
+        $$[0] = $1[0];
+        $$[0] = $1[0];
+        $$[0] = $1[0];
+        $$[0] = $1[0];
 	}	
 	| primary_expression DEC	{ 
 		if(expression_id_type_num == 0) 
