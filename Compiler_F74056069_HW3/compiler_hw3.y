@@ -37,7 +37,7 @@ int syntax_error_flag = 0;
 int if_undeclared = 0;
 int if_print_error = 0;
 int if_printed = 0;
-char error_msg[256];
+char error_msg[5][256]; // For multiple error in a line
 char** expression_id;
 int* expression_id_exist;
 char** expression_id_type;
@@ -46,6 +46,11 @@ int expression_id_type_num = 0;
 int error_flag = 0;         // If error occurred, flag up
 int declaration_has_value = 0;
 int parameter_num = 0;
+int error_msg_count = 0;
+char* now_function_type;    // For storing the function type now is insided
+char* now_string_value; // For storing the string value now is accessing
+// int now_variable_type = -1; // For storing the variable type now is accessing
+// int now_variable_value = 0; // For storing the variable value now is accessing
 
 /* Symbol table */
 typedef struct data {
@@ -55,16 +60,24 @@ typedef struct data {
 	char* type;
 	int scope;
 	char* attribute;
+    float value;
 	struct data* next;
 	struct data* prev;
-	
 } Symbol_table;
 Symbol_table* symbol_table_head;	// Head of linked list for dynamic storing symbols
 Symbol_table* symbol_table_tail;	// Tail of linked list for dynamic storing symbols
 
 /* code generation functions, just an example! */
 void gencode_function(char*);
-void gen_variable_declaration(char*, char*);
+void gencode_variable_declaration(char*, char*);
+void gencode_string_const(char*);
+char* get_type_bytecode(char*);
+float get_symbol_value(char*);
+void set_symbol_value(char*, float);
+int get_symbol_type(char*);
+int get_symbol_index(char*);
+int get_symbol_scope_num(char*);
+int is_global_symbol(char*);
 
 /* For debugging colorful text */
 #define ANSI_COLOR_RED     "\x1b[31m"
@@ -80,6 +93,15 @@ void gen_variable_declaration(char*, char*);
     int i_val;
     double f_val;
     char* str_val;
+    /* 
+        exp_spec[0]: type, 0: int, 1: float, 2: bool, 3: string
+        exp_spec[1]: value, 0 for string
+        exp_spec[2]: global: 0, local: 1, const: -1
+        exp_spec[3]: global: index, local: stack_num, const: -1
+        exp_spec[4]: if value is from id or not
+        exp_spec[5]: if generated code or not
+    */
+    float exp_spec[6];
 }
 
 /* Token without return */
@@ -104,6 +126,7 @@ void gen_variable_declaration(char*, char*);
 /* Nonterminal with return, which need to sepcify type */
 %type <str_val> type
 %type <str_val> declarator init_declarator
+%type <exp_spec> boolean constant assignment_expression primary_expression 
 
 /* Yacc will start at this nonterminal */
 %start program
@@ -140,9 +163,13 @@ function_definition_declarator
 				/* Duplicated function must added after the forward delcaration */
 				while(duplicated != symbol_table_tail) {
 					if(!strcmp(duplicated->kind, "function") && !strcmp(duplicated->name, "")) {	
-                        /* If forward declaration's attribute is not the same as the function definition */
+                        /* If forward declaration's return type is not the same as the function definition's */
+                        if(strcmp($1, find_function->type))        
+                            semantic_error("function return type is not the same", "");  
+                        /* If forward declaration's attribute is not the same as the function definition's */
                         if(strcmp(duplicated->attribute, find_function->attribute)) 
-                            semantic_error("function formal parameter is not the same", "");            
+                            semantic_error("function formal parameter is not the same", "");    
+                          
                         free(duplicated->kind);
                         free(duplicated->attribute);
 						Symbol_table* prev = duplicated->prev;
@@ -178,7 +205,30 @@ function_definition_declarator
 		}
 		/* If no duplicated && no parameter, initialize the function */
 		if(!is_duplicated && !has_parameter) 
-			insert_symbol(0, $2, "function", $1, "");		
+			insert_symbol(0, $2, "function", $1, "");	
+        /* Generate java bytecode */
+        gencode_function(".method public static ");
+        gencode_function($2);
+        /* If this is main function, generate specialized parameter */
+        if(!strcmp($2, "main")) 
+            gencode_function("([Ljava/lang/String;)");
+        else {
+            gencode_function("(");
+            if(has_parameter) {
+                char* para_type = strtok(find_function->attribute, ", ");
+                while(para_type != NULL) {
+                    gencode_function(get_type_bytecode(para_type));
+                    para_type = strtok(NULL, ", ");
+                }
+            }
+            gencode_function(")");
+        }
+        gencode_function(get_type_bytecode($1));
+        gencode_function("\n");
+        gencode_function(".limit stack 50\n");
+		gencode_function(".limit locals 50\n");
+        /* Copy the function return type for later usage */
+        now_function_type = strdup($1);
 	}
 	;
 
@@ -196,7 +246,12 @@ scope_start
 
 scope_end 
 	: RCB	{ 
-		need_dump = 1;
+		/* if scope number before '}' is 1, and there string in now_function_type, then this '}' must be the end of the function */
+        if(scope_num == 1 && strcmp(now_function_type, "")) {
+            gencode_function(".end method\n");
+            free(now_function_type);
+        }
+        need_dump = 1;
 	}
 	;
 
@@ -234,8 +289,27 @@ iteration_statement
 	;
 
 jump_statement
-	: RET SEMICOLON
-	| RET expression SEMICOLON
+	: RET SEMICOLON {
+        /* If the function return value in a void function, raise error */
+        if(strcmp(now_function_type, "void"))
+            semantic_error("Return value in a function returning void");
+        else
+            gencode_function("\treturn\n");
+    }
+	| RET expression SEMICOLON {
+        if(!strcmp(now_function_type, "int")) {
+            /* int return int */
+            /* int return float, need casting */
+        }
+        else if(!strcmp(now_function_type, "float")) {
+            /* float return float */
+            /* float return int, need casting */
+        }
+        else if(!strcmp(now_function_type, "bool")) {
+            /* No casting needed */
+            gencode_function("\tireturn\n");
+        }
+    }
 	;
 
 print_statement
@@ -299,7 +373,7 @@ declaration
 				/* For variable isn't in the symbol table or in the lower scope */
 				case 0: case 1:
                     /* Gen code first, later insert into symbol table */
-                    gen_variable_declaration($1, $2);
+                    gencode_variable_declaration($1, $2);
 					insert_symbol(scope_num, $2, "variable", $1, "");
 					break;
 				/* For the variable is in the same scope, print error */
@@ -372,28 +446,23 @@ additive_expression
 	;
 
 multiplicative_expression
-	: cast_expression
-	| multiplicative_expression MUL cast_expression
-	| multiplicative_expression DIV cast_expression
-	| multiplicative_expression MOD cast_expression
-	;
-
-cast_expression
 	: unary_expression
-	| LB specifier_qualifier_list RB cast_expression 
+	| multiplicative_expression MUL unary_expression
+	| multiplicative_expression DIV unary_expression
+	| multiplicative_expression MOD unary_expression
 	;
 
 unary_expression
 	: postfix_expression 
 	| INC unary_expression
 	| DEC unary_expression
-	| unary_operator cast_expression
+	| unary_operator unary_expression { }
 	;
 
 /* For positive/negative/not variable */
 unary_operator
-	: ADD 
-	| SUB 
+	: ADD {  } 
+	| SUB {  } 
 	;
 
 postfix_expression
@@ -449,16 +518,50 @@ primary_expression
 			expression_id_exist = (int *)realloc(expression_id_exist, sizeof(int) * (expression_id_num+1));
 		}
 		expression_id[expression_id_num] = strdup($1);
-		if(!lookup_symbol($1)) {
+		/* If not found symbol in symbol table */
+        if(!lookup_symbol($1)) {
 			expression_id_exist[expression_id_num] = 0;
 			if_undeclared = 1;
 		}
-		else	
+        /* If found symbol in symbol table */
+		else {	
 			expression_id_exist[expression_id_num] = 1;
+            $$[0] = get_symbol_type($1);
+            $$[2] = is_global_symbol($1);
+            if($$[2])
+                $$[3] = get_symbol_index($1);
+            else
+                $$[3] = get_symbol_index($1);
+            /* If this symbol's type is string */
+            if($$[0] == 3) {
+                $$[1] = 0;
+                /* If is global variable */
+                if($$[2]) {
+                    gencode_function("getstatic compiler_hw3/");
+                    gencode_function($1);
+                    gencode_function(" Ljava/lang/String;\n");
+                }
+                /* If is local variable */
+                else {
+                    char stack_index[64];
+                    gencode_function("aload ");
+                    sprintf(stack_index, "%d\n", get_symbol_index($1));
+                    gencode_function(stack_index);
+                }
+                $$[4] = 1;
+                $$[5] = 1;
+            }
+            /* If is other type symbol */
+            else {
+                $$[1] = get_symbol_value($1);
+                $$[4] = 1;
+                $$[5];
+            }
+        }
 		++expression_id_num;
 	}
 	| constant	{
-		if(expression_id_num == 0) {
+        if(expression_id_num == 0) {
 			expression_id = (char **)malloc(sizeof(char *));
 			expression_id_exist = (int *)malloc(sizeof(int));
 		}
@@ -469,6 +572,12 @@ primary_expression
 		expression_id[expression_id_num] = strdup("constant");
 		expression_id_exist[expression_id_num] = 1;
 		++expression_id_num;
+        $$[0] = $1[0];
+        $$[1] = $1[1];
+        $$[2] = $1[2];
+        $$[3] = $1[3];
+        $$[4] = $1[4];
+        $$[5] = $1[5];
 	}
 	| boolean	{
 		if(expression_id_num == 0) {
@@ -482,6 +591,12 @@ primary_expression
 		expression_id[expression_id_num] = strdup("boolean");
 		expression_id_exist[expression_id_num] = 1;
 		++expression_id_num;
+        $$[0] = $1[0];
+        $$[1] = $1[1];
+        $$[2] = $1[2];
+        $$[3] = $1[3];
+        $$[4] = $1[4];
+        $$[5] = $1[5];
 	}
 	| LB assignment_expression RB	{
 		if(expression_id_num == 0) {
@@ -495,18 +610,61 @@ primary_expression
 		expression_id[expression_id_num] = strdup("compound_statement");
 		expression_id_exist[expression_id_num] = 1;
 		++expression_id_num;
+        $$[0] = $2[0];
+        $$[1] = $2[1];
+        $$[2] = $2[2];
+        $$[3] = $2[3];
+        $$[4] = $2[4];
+        $$[5] = $2[5];
 	}
 	;
 
 constant
-	: I_CONST { printf("%d\n", $1); }
-	| F_CONST   { printf("%f\n", $1); }
-	| STR_CONST { printf("%s\n", $1); }
+	: I_CONST { 
+        $$[0] = 0;
+        $$[1] = $1;
+        $$[2] = -1;
+        $$[3] = -1;
+        $$[4] = 0;
+        $$[5] = 0;
+    }
+	| F_CONST {  
+        $$[0] = 1;
+        $$[1] = $1;
+        $$[2] = -1;
+        $$[3] = -1;
+        $$[4] = 0;
+        $$[5] = 0;
+    }
+	| STR_CONST { 
+        $$[0] = 3;
+        $$[1] = 0;
+        $$[2] = -1;
+        $$[3] = -1;
+        $$[4] = 0;
+        $$[5] = 1;
+        gencode_string_const($1);
+        now_string_value = strdup($1);
+    }
 	;
 
 boolean
-	: TRUE
-	| FALSE
+	: TRUE { 
+        $$[0] = 2;
+        $$[1] = 1;
+        $$[2] = -1;
+        $$[3] = -1;
+        $$[4] = 0;
+        $$[5] = 0;
+    }
+	| FALSE { 
+        $$[0] = 2;
+        $$[1] = 0;
+        $$[2] = -1;
+        $$[3] = -1;
+        $$[4] = 0;
+        $$[5] = 0;
+    }
 	;
 
 parameter_list
@@ -527,11 +685,6 @@ assignment_operator
 	| MODASGN
 	| ADDASGN
 	| SUBASGN
-	;
-
-specifier_qualifier_list
-	: type specifier_qualifier_list
-	| type
 	;
 
 argument_expression_list
@@ -574,10 +727,6 @@ int main(int argc, char** argv)
 	}
 	--scope_num;
 
-    fprintf(file,   ".method public static main([Ljava/lang/String;)V\n"
-                    "\treturn\n"
-                    ".end method\n");
-
     fclose(file);
     if(error_flag) 
         remove("compiler_hw3.j");
@@ -588,7 +737,8 @@ int main(int argc, char** argv)
 /* stmbol table functions */
 void yyerror(char *s)
 {
-	if(strstr(s, "syntax"))
+    error_flag = 1;
+    if(strstr(s, "syntax"))
 		syntax_error_flag = 1;
 	if(if_print_error) {
 		if(!if_printed) {
@@ -600,16 +750,16 @@ void yyerror(char *s)
 		}
 		if_print_error = 0;
 		printf("\n|-----------------------------------------------|\n");
-        if(syntax_error_flag)
+        if(buf[strlen(buf)-1] != '\n')
             printf("| Error found in line %d: %s\n", yylineno+1, buf);
         else
             printf("| Error found in line %d: %s", yylineno, buf);
-        printf("| %s", error_msg);
+        printf("| %s", s);
         printf("\n|-----------------------------------------------|\n\n");
 	}
 	
 	printf("\n|-----------------------------------------------|\n");
-    if(syntax_error_flag)
+    if(buf[strlen(buf)-1] != '\n')
         printf("| Error found in line %d: %s\n", yylineno+1, buf);
     else 
         printf("| Error found in line %d: %s", yylineno, buf);
@@ -663,9 +813,9 @@ int lookup_symbol(char* name) {
 	while(symbol_lookup != symbol_table_head) {
 		/* If we find a variable/function previously defined at the same scope */
 		if(!strcmp(symbol_lookup->name, name) && symbol_lookup->scope == scope_num) 
-			return 2;	// For redeclared, as for undeclared only check if it's true
+        	return 2;	// For redeclared, as for undeclared only check if it's true
 		/* If we find a variable/function previously defined at the lower scope */
-		if(!strcmp(symbol_lookup->name, name) && symbol_lookup->scope < scope_num)
+		if(!strcmp(symbol_lookup->name, name) && symbol_lookup->scope < scope_num) 
 			return 1;	// For redeclared, as for undeclared only check if it's true
 		symbol_lookup = symbol_lookup->prev;
 	}
@@ -783,18 +933,22 @@ void undeclared_error() {
 void semantic_error(char* errorMsg, char* name) {
 	/* For other than redeclared or undeclared error */
     if(!strcmp(name, ""))
-        sprintf(error_msg, "%s", errorMsg);
+        sprintf(error_msg[error_msg_count], "%s", errorMsg);
     /* For redeclared or un declared error */
     else
-        sprintf(error_msg, "%s %s", errorMsg, name);
+        sprintf(error_msg[error_msg_count], "%s %s", errorMsg, name);
+    ++error_msg_count;
 	if_print_error = 1;
 }
 
 void print_error_msg() {
 	if(if_print_error) {
 		if_print_error = 0;
-		yyerror(error_msg);	
+		for(int i = 0; i < error_msg_count; ++i) {
+            yyerror(error_msg[i]);	
+        }
 	}
+    error_msg_count = 0;
 	if_print_error = 0;
 }
 
@@ -829,10 +983,10 @@ void gencode_function(char* java_bytecode) {
 }
 
 
-void gen_variable_declaration(char* type, char* name) {
+void gencode_variable_declaration(char* type, char* name) {
     /* Only gen code if not declared */
     if(!lookup_symbol(name)) {
-        char java_bytecode[1000];   // For temporary store code, later pass to gencode_function
+        char java_bytecode[256];   // For temporary store code, later pass to gencode_function
 
         /* For global variable declaration, don't need to concern about type casting */
         if(scope_num == 0) {
@@ -871,3 +1025,110 @@ void gen_variable_declaration(char* type, char* name) {
     declaration_has_value = 0;
     
 }
+
+void gencode_string_const(char* string_const){
+    if(scope_num > 0) {
+        gencode_function("ldc \"");
+        gencode_function(string_const);
+        gencode_function("\"\n");
+    }
+}
+
+char* get_type_bytecode(char* type) {
+    if(!strcmp(type, "int"))
+        return "I";
+    else if(!strcmp(type, "float"))
+        return "F";
+    else if(!strcmp(type, "string"))
+        return "[Ljava/lang/String;";
+    else if(!strcmp(type, "void"))
+        return "V";
+    else if(!strcmp(type, "bool"))
+        return "Z";
+}
+
+float get_symbol_value(char* name) {
+    Symbol_table* symbol = symbol_table_tail;
+    while(symbol != symbol_table_head) {
+        if(!strcmp(symbol->name, name) && (symbol->scope == scope_num || symbol->scope < scope_num)) 
+            return symbol->value;
+        symbol = symbol->prev;
+    }
+    return 0.0;
+}
+
+void set_symbol_value(char* name, float value) {
+    Symbol_table* symbol = symbol_table_tail;
+    while(symbol != symbol_table_head) {
+        if(!strcmp(symbol->name, name) && (symbol->scope == scope_num || symbol->scope < scope_num)) {
+            symbol->value = value;
+            return;
+        }
+        symbol = symbol->prev;
+    }
+    return;
+}
+
+int get_symbol_type(char* name) {
+    Symbol_table* symbol = symbol_table_tail;
+    while(symbol != symbol_table_head) {
+        if(!strcmp(symbol->name, name) && (symbol->scope == scope_num || symbol->scope < scope_num)) {
+            if(!strcmp(symbol->type, "int"))
+                return 0;
+            else if(!strcmp(symbol->type, "float"))
+                return 1;
+            else if(!strcmp(symbol->type, "bool"))
+                return 2;
+            else if(!strcmp(symbol->type, "string"))
+                return 3;
+            else if(!strcmp(symbol->type, "void"))
+                return 4;
+        }
+        symbol = symbol->prev;
+    }
+    return -1;
+}
+
+int get_symbol_index(char* name) {
+    int stack_index = 0;
+    Symbol_table* symbol = symbol_table_head;
+    while(symbol != NULL) {
+        if(!strcmp(symbol->name, name) && (symbol->scope == scope_num || symbol->scope < scope_num)) {
+            if(symbol->scope != 0)
+                return stack_index;
+            else    
+                return symbol->index;
+        }
+        else if(symbol->scope > 0)
+            ++stack_index;
+        symbol = symbol->next;
+    }
+    return -1;
+}
+
+int get_symbol_scope_num(char* name) {
+    
+    Symbol_table* symbol = symbol_table_tail;
+    while(symbol != symbol_table_head) {
+        if(!strcmp(symbol->name, name) && (symbol->scope == scope_num || symbol->scope < scope_num)) {
+            return symbol->scope;
+        }
+        symbol = symbol->prev;
+    }
+    return -1;
+}
+
+int is_global_symbol(char* name) {
+    Symbol_table* symbol = symbol_table_tail;
+    while(symbol != symbol_table_head) {
+        if(!strcmp(symbol->name, name) && (symbol->scope == scope_num || symbol->scope < scope_num)) {
+            if(symbol->scope > 0)
+                return 0;
+            else 
+                return 1;
+        }
+        symbol = symbol->prev;
+    }
+    return -1;
+}
+

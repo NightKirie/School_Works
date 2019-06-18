@@ -148,13 +148,22 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 79 "compiler_hw3.y" /* yacc.c:1909  */
+#line 92 "compiler_hw3.y" /* yacc.c:1909  */
 
     int i_val;
     double f_val;
     char* str_val;
+    /* 
+        exp_spec[0]: type, 0: int, 1: float, 2: bool, 3: string
+        exp_spec[1]: value, 0 for string
+        exp_spec[2]: global: 0, local: 1, const: -1
+        exp_spec[3]: global: index, local: stack_num, const: -1
+        exp_spec[4]: if value is from id or not
+        exp_spec[5]: if generated code or not
+    */
+    float exp_spec[6];
 
-#line 158 "y.tab.h" /* yacc.c:1909  */
+#line 167 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
