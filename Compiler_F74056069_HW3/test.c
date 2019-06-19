@@ -1,21 +1,54 @@
-// Remember the last line \n
-
-int a = 10;
-float b = 1.3;
-string c = "123";
-bool d = true;
-int d = 1;
-
-int loop(int a, int b);
-string test() {
-    return "123";
-}
-
-void main() {
-    if(1 > 3) {
-        int c = 0;
-    }
-    int a = 1 + 2 - 5 * 4 % 3;
-    int b = -a;
-    return;
-}
+.class public compiler_hw3
+.super java/lang/Object
+.field public static out I = -1
+.method public static main([Ljava/lang/String;)V
+.limit stack 51
+.limit locals 51
+	ldc 5
+	istore 0
+	ldc 4.000000
+	fstore 1
+	getstatic compiler_hw3/out I
+    ineg
+	ldc 3
+	iload 0
+	ldc 1
+	ldc 2
+	iadd
+	imul
+	fload 1
+	fstore 50
+	i2f
+	fload 50
+	fdiv
+	fstore 50
+	i2f
+	fload 50
+	fadd
+	ldc 10
+	i2f
+	fadd
+	ldc 100
+	i2f
+	fsub
+	ldc 11.620000
+	fsub
+	fstore 50
+	i2f
+	fload 50
+	fmul
+	ldc 1
+	ldc 100
+	iadd
+	ldc 1
+	isub
+	i2f
+	fmul
+	f2i
+	istore 2
+	iload 2
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(I)V
+	return
+.end method

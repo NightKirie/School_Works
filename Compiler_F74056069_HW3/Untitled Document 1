@@ -1,0 +1,19 @@
+/* 
+        exp_spec[0]: type, 0: int, 1: float, 2: bool, 3: string
+        exp_spec[1]: value, 0 for string
+        exp_spec[2]: global: 0, local: 1, const: -1
+        exp_spec[3]: global: index, local: stack_num, const: -1
+        exp_spec[4]: 0: const, 1: id
+        exp_spec[5]: 0: code not gen, 1: code gened
+    */
+
+float variable_pack[6];   //0: value  1:type 2:has been load 3: load from id? 4: if(3) stack num(if global->index) 5:global
+
+// 1:int 2:float 3:bool 4:string 5:void
+
+0 -> 1
+1 -> 0
+2 -> 5
+3 -> 4
+4 -> 3
+5 -> 2

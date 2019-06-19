@@ -80,7 +80,6 @@ int get_symbol_scope_num(char*);
 int is_global_symbol(char*);
 void gencode_load_value(float*);
 Symbol_table* get_global_symbol(int);
-void gencode_postfix(float*, int);
 
 /* For debugging colorful text */
 #define ANSI_COLOR_RED     "\x1b[31m"
@@ -504,36 +503,8 @@ postfix_expression
         $$[1] = $1[1];
         $$[2] = $1[2];
         $$[3] = $1[3];
-        $$[4] = 0;
-        $$[5] = 1;
         gencode_load_value($1);
-        gencode_postfix($1, 1);
-
-        /* After postfix, need to store the value back */
-        char value[32];
-        if($1[5] == 0){
-            /* If this is global */
-            if($1[2]){
-                Symbol_table *global_symbol = get_global_symbol($1[3]);
-                gencode_store_global(global_symbol->name);
-            }
-            /* If this is local */
-            else {
-                switch($1[0]) {
-                    case 0: case 2:
-                        gencode_function("istore ");
-                        break;
-                    case 1:
-                        gencode_function("fstore ");
-                        break;
-                    case 3:
-                        gencode_function("astore ");
-                        break;
-                }
-                sprintf(value, "%d\n", (int)$1[3]);
-                gencode_function(value);
-            }
-        }
+        gencode_INC_DEC($1);
 	}	
 	| primary_expression DEC	{ 
 		if(expression_id_type_num == 0) 
@@ -542,40 +513,7 @@ postfix_expression
 			expression_id_type = (char **)realloc(expression_id_type, sizeof(char *) * (expression_id_type_num+1));
 		expression_id_type[expression_id_type_num] = strdup("variable");
 		++expression_id_type_num;
-        $$[0] = $1[0];
-        $$[1] = $1[1];
-        $$[2] = $1[2];
-        $$[3] = $1[3];
-        $$[4] = 0;
-        $$[5] = 1;
-        gencode_load_value($1);
-        gencode_postfix($1, 0);
-
-        /* After postfix, need to store the value back */
-        char value[32];
-        if($1[5] == 0){
-            /* If this is global */
-            if($1[2]){
-                Symbol_table *global_symbol = get_global_symbol($1[3]);
-                gencode_store_global(global_symbol->name);
-            }
-            /* If this is local */
-            else {
-                switch($1[0]) {
-                    case 0: case 2:
-                        gencode_function("istore ");
-                        break;
-                    case 1:
-                        gencode_function("fstore ");
-                        break;
-                    case 3:
-                        gencode_function("astore ");
-                        break;
-                }
-                sprintf(value, "%d\n", (int)$1[3]);
-                gencode_function(value);
-            }
-        }
+        
 	}	
 
 primary_expression 
@@ -1207,7 +1145,7 @@ void gencode_load_value(float* var) {
     /* If this var hasn't been generated code yet' */
     if(!var[5]) {
         /* If this var is const */
-        if(!var[4]) {
+        if(var[4]) {
             char value[64];
             gencode_function("ldc ");
             switch(var[0]) {
@@ -1224,50 +1162,15 @@ void gencode_load_value(float* var) {
             }
         }
         /* If this var is id */
-        else {   
+        else {
+            char value[64];
             /* If this id is global variable */
             if(var[2]) {
                 gencode_function("getstatic compiler_hw3/");
                 Symbol_table* global_symbol = get_global_symbol(var[3]);
                 gencode_function(global_symbol->name);
-                switch(var[0]) {
-                    case 0:
-                        gencode_function(" I\n");
-                        break;
-                    case 1:
-                        gencode_function(" F\n");
-                        break;
-                    case 2:
-                        gencode_function(" Z\n");
-                        break;
-                    case 3:
-                        gencode_function(" Ljava/lang/String;\n");
-                        break;
-                }
-            }
-            /* If this id is local variable */
-            else {
-                char value[64];
-                switch(var[0]) {
-                    /* Load int / bool from stack */
-                    case 0: case 2:
-                        gencode_function("iload ");
-                        sprintf(value, "%d\n", (int)var[3]);
-                        gencode_function(value);
-                        break;
-                    /* Load floar from stack */
-                    case 1:
-                        gencode_function("fload ");
-                        sprintf(value, "%d\n", (int)var[3]);
-                        gencode_function(value);
-                        break;
-                    /* Load string from stack */
-                    case 3:
-                        gencode_function("aload ");
-                        sprintf(value, "%d\n", (int)var[3]);
-                        gencode_function(value);
-                        break;
-                }
+                
+                if(var[])
             }
         }
     }
@@ -1281,42 +1184,4 @@ Symbol_table* get_global_symbol(int index) {
         symbol = symbol->next;
     }
     return NULL;
-}
-
-/* Only int will have postfix */
-void gencode_postfix(float* var, int post_type) {
-    /* If this var hasn't been generated code yet' */
-    if(!var1[5]){
-        /* If this is cosnt */
-        if(!var[4]){
-            char value[32];
-            gencode_function("ldc ");
-            sprintf(value, "%d\n", (int)var[1]);
-            gencode_function(value);          
-        }
-        /* If this is id */
-        else{
-            
-            /* If this id is from global */
-            if(var[2]){
-                gencode_function("getstatic compiler_hw3/");
-                Symbol_table* global_symbol = get_symbol_index(var[3]);
-                gencode_function(global_symbol->name);
-                gencode_function(" I\n");
-            }
-            /* If this id is from local */
-            else {
-                char value[32];
-                gencode_function("iload ");
-                sprintf(value, "%d\n", (int)var1[4]);
-                gencode_function(value);
-            }
-        }
-    }
-    gencode_function("ldc 1\n");
-    if(post_type)
-        gencode_function("iadd\n");
-    else    
-        gencode_function("isub\n");
-
 }
