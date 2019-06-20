@@ -45,10 +45,19 @@ int expression_id_num = 0;
 int expression_id_type_num = 0;
 int error_flag = 0;         // If error occurred, flag up
 int declaration_has_value = 0;
-int parameter_num = 0;
 int error_msg_count = 0;
 char* now_function_type;    // For storing the function type now is insided
-char* now_string_value; // For storing the string value now is accessing
+int relational_type = 0;   // For storing the relation type
+int while_label = 0;  // For storing the while begin label
+int while_true_label = 0;   // For storing the while true label
+int while_false_label = 0;  // For storing the while false label
+int if_label = 0;   // For storing the if begin label
+int if_true_label = 0;  // For storing the if true label
+int if_false_label = 0; // For storing the if false label
+int argument_num = 0;   // For storing the argument num in this function call
+float argument_spec[64][6];   // For storing the spec of each argument
+int has_postfix = 0;    // For one more iload
+
 // int now_variable_type = -1; // For storing the variable type now is accessing
 // int now_variable_value = 0; // For storing the variable value now is accessing
 
@@ -81,6 +90,13 @@ int is_global_symbol(char*);
 void gencode_load_value(float*);
 Symbol_table* get_global_symbol(int);
 void gencode_postfix(float*, int);
+void gencode_store_global(char*, char*);
+void gencode_unary_operator(float*, int);
+void gencode_calculation(float*, float*, int);
+void gencode_relational(float*, float*, int);
+void gencode_print_function(float*);
+int is_parameter_match(char*, int);
+void gencode_call_function(char*);
 
 /* For debugging colorful text */
 #define ANSI_COLOR_RED     "\x1b[31m"
@@ -105,6 +121,16 @@ void gencode_postfix(float*, int);
         exp_spec[5]: if generated code or not
     */
     float exp_spec[6];
+    /* 
+        For while:
+            nest_spec[0]: false_label
+            nest_spec[1]: exit_label
+        
+        For if-else:
+            nest_spec[0]: false_label
+            nest_spec[1]: exit_label
+     */
+    int nest_spec[2];
 }
 
 /* Token without return */
@@ -128,8 +154,12 @@ void gencode_postfix(float*, int);
 
 /* Nonterminal with return, which need to sepcify type */
 %type <str_val> type
-%type <str_val> declarator init_declarator
+%type <str_val> declarator unary_operator assignment_operator
 %type <exp_spec> boolean constant assignment_expression primary_expression 
+%type <exp_spec> postfix_expression relational_expression unary_expression
+%type <exp_spec> multiplicative_expression additive_expression 
+%type <exp_spec> expression initializer
+%type <nest_spec> while_start while if_start if 
 
 /* Yacc will start at this nonterminal */
 %start program
@@ -227,11 +257,12 @@ function_definition_declarator
             gencode_function(")");
         }
         gencode_function(get_type_bytecode($1));
-        gencode_function("\n");
-        gencode_function(".limit stack 50\n");
+        gencode_function("\n.limit stack 50\n");
 		gencode_function(".limit locals 50\n");
         /* Copy the function return type for later usage */
         now_function_type = strdup($1);
+        attribute_count = 0;
+		is_function = 0;
 	}
 	;
 
@@ -283,13 +314,178 @@ expression_statement
 	;
 
 selection_statement
-	: IF LB expression RB statement ELSE statement
-	| IF LB expression RB statement
+	: if_start {
+        /* Gen if exit label */
+        char exit_label[64];
+        sprintf(exit_label, "IF_EXIT_%d:\n", $1[1]);
+        gencode_function(exit_label);
+    }
+    | if_start else_start {
+        /* Gen if exit label */
+        char exit_label[64];
+        sprintf(exit_label, "IF_EXIT_%d:\n", $1[1]);
+        gencode_function(exit_label);
+    }
 	;
 
+if_start
+    : if statement {
+        char exit_label[64];
+        /* If if finish, goto if exit */
+        sprintf(exit_label, "\tgoto IF_EXIT_%d\n", $1[1]);
+        gencode_function(exit_label);
+        
+        /* Gen if false label */
+        char false_label[64];
+        sprintf(false_label, "IF_FALSE_%d:\n", $1[0]);
+        gencode_function(false_label);
+
+        /* store this if's false label, prevent nested if label error  */
+        $$[0] = $1[0];
+    }
+    ;
+
+if
+    : IF LB expression RB {
+        switch(relational_type) {
+            /* MT */
+            case 0:
+                gencode_function("\tifgt ");
+                break;
+            /* LT */
+            case 1:
+                gencode_function("\tiflt ");
+                break;
+            /* MTE */
+            case 2:
+                gencode_function("\tifge ");
+                break;
+            /* LTE */
+            case 3:
+                gencode_function("\tifle ");
+                break;
+            /* EQ */
+            case 4:
+                gencode_function("\tifeq ");
+                break;
+            /* NE */
+            case 5:
+                gencode_function("\tifne ");
+                break;
+
+        }
+        char true_label[64];
+        char false_label[64];
+
+        /* Gen if if is true, go to true label */
+        sprintf(true_label, "IF_TRUE_%d", if_true_label);
+        gencode_function(true_label);
+        gencode_function("\n");
+
+        /* Gen if if is false, go to false label */
+        sprintf(false_label, "\tgoto IF_FALSE_%d\n", if_false_label);
+        gencode_function(false_label);
+
+        /* True label start */
+        gencode_function(true_label);
+        gencode_function(":\n");
+
+        /* Store this if's false & exit label, prevent nested if label error */
+        $$[0] = if_false_label;
+        $$[1] = if_label;
+
+        ++if_label;
+        ++if_true_label;
+        ++if_false_label;
+    }
+    ;
+
+else_start 
+    : ELSE statement 
+    ;
+
 iteration_statement
-	: WHILE LB expression RB statement
+	: while_start statement {
+        char label[64];
+        /* At the end of while, gen go back to while begin */
+        sprintf(label, "\tgoto WHILE_BEGIN_%d\n", $1[1]);
+        gencode_function(label);
+        /* Gen while false label */
+        sprintf(label, "WHILE_FALSE_%d:\n", $1[0]);
+        gencode_function(label);
+        /* If while false, goto while exit */
+        sprintf(label, "\tgoto WHILE_EXIT_%d\n", $1[1]);
+        gencode_function(label);
+        /* Gen while exit label */
+        sprintf(label, "WHILE_EXIT_%d:\n", $1[1]);
+        gencode_function(label);
+    }
 	;
+
+while_start
+    : while LB expression RB {
+        switch(relational_type) {
+            /* MT */
+            case 0:
+                gencode_function("\tifgt ");
+                break;
+            /* LT */
+            case 1:
+                gencode_function("\tiflt ");
+                break;
+            /* MTE */
+            case 2:
+                gencode_function("\tifge ");
+                break;
+            /* LTE */
+            case 3:
+                gencode_function("\tifle ");
+                break;
+            /* EQ */
+            case 4:
+                gencode_function("\tifeq ");
+                break;
+            /* NE */
+            case 5:
+                gencode_function("\tifne ");
+                break;
+        }
+        
+        char true_label[64];
+        char false_label[64];
+
+        /* Gen if while is true, go to true label */
+        sprintf(true_label, "WHILE_TRUE_%d", while_true_label);
+        gencode_function(true_label);
+        gencode_function("\n");
+
+        /* Gen if while is false, go to false label */
+        sprintf(false_label, "\tgoto WHILE_FALSE_%d\n", while_false_label);
+        gencode_function(false_label);
+
+        /* True label start */
+        gencode_function(true_label);
+        gencode_function(":\n");
+
+        /* Store this while's false & exit label, prevent nested while label error */
+        $$[0] = while_false_label;
+        $$[1] = $1[1];
+
+        ++while_true_label;
+        ++while_false_label;
+    }
+    ;
+
+while 
+    : WHILE {
+        char label[64];
+        sprintf(label, "WHILE_BEGIN_%d:\n", while_label);
+        gencode_function(label);
+        /* store this while's exit label, prevent nested while label error  */
+        $$[1] = while_label;
+        ++while_label;
+    }
+    ;
 
 jump_statement
 	: RET SEMICOLON {
@@ -300,28 +496,42 @@ jump_statement
             gencode_function("\treturn\n");
     }
 	| RET expression SEMICOLON {
+        gencode_load_value($2);
         if(!strcmp(now_function_type, "int")) {
-            /* int return int */
-            /* int return float, need casting */
+            if($2[0] == 1)  
+                gencode_function("\tf2i\n");    
+            gencode_function("\tireturn\n");
         }
         else if(!strcmp(now_function_type, "float")) {
-            /* float return float */
-            /* float return int, need casting */
+            if($2[0] == 0 || $2[0] == 2)  
+                gencode_function("\ti2f\n");    
+            gencode_function("\tfreturn\n");
         }
         else if(!strcmp(now_function_type, "bool")) {
-            /* No casting needed */
+            if($2[0] == 1)  
+                gencode_function("\tf2i\n");    
             gencode_function("\tireturn\n");
+        }
+        else if(!strcmp(now_function_type, "string")) {
+            gencode_function("\tareturn\n");
+        }
+        else {
+            semantic_error("Return value isn't match function return type");
         }
     }
 	;
 
 print_statement
-	: PRINT LB expression RB SEMICOLON
+	: PRINT LB expression RB SEMICOLON {
+        gencode_load_value($3);
+        gencode_print_function($3);
+    }
 	;
 
 declaration
-	: type init_declarator SEMICOLON { 
-		/* If it is function declaration */
+	: type declarator ASGN initializer SEMICOLON { 
+		declaration_has_value = 1;
+        /* If it is function declaration */
 		if(is_function) {
 			if(lookup_symbol($2)) {
 				Symbol_table* find_function = symbol_table_tail;
@@ -375,9 +585,21 @@ declaration
 			switch(lookup_symbol($2)) {
 				/* For variable isn't in the symbol table or in the lower scope */
 				case 0: case 1:
-                    /* Gen code first, later insert into symbol table */
-                    gencode_variable_declaration($1, $2);
+                    /* Insert into symbol table first, for later gen code search */
 					insert_symbol(scope_num, $2, "variable", $1, "");
+                    /* If is local, need to gen load, and need to check type*/
+                    if(!is_global_symbol($2)) {
+                        gencode_load_value($4);
+                        /* declarator is int, initializer is float */
+                        if(!strcmp($1, "int") && $4[0] == 1)
+                            gencode_function("\tf2i\n");
+                        /* declarator is float, initializer is int  */
+                        else if(!strcmp($1, "float") && $4[0] == 0)
+                            gencode_function("\ti2f\n");
+                    }
+                    /* Set value into symbol table */
+                    set_symbol_value($2, $4[1]);
+                    gencode_variable_declaration($1, $2);
 					break;
 				/* For the variable is in the same scope, print error */
 				case 2:
@@ -386,6 +608,92 @@ declaration
 			}
 		}
 	}
+    | type declarator SEMICOLON {
+        declaration_has_value = 0;
+        /* If it is function declaration */
+		if(is_function) {
+			if(lookup_symbol($2)) {
+				Symbol_table* find_function = symbol_table_tail;
+                /* Find duplicated */
+                while(find_function != symbol_table_head) {
+                    /* If this function has forward declaration */
+                    if(!strcmp(find_function->name, $2)) {
+                        Symbol_table* duplicated = find_function;
+                        /* Duplicated function must added after the forward delcaration */
+                        while(duplicated != symbol_table_tail) {
+                            if(!strcmp(duplicated->kind, "function") && !strcmp(duplicated->name, "")) {	
+                                free(duplicated->kind);
+                                Symbol_table* prev = duplicated->prev;
+                                Symbol_table* next = duplicated->next;
+                                if(prev != NULL)
+                                    prev->next = next;
+                                if(next != NULL)
+                                    next->prev = prev;
+                                free(duplicated);
+                                break;
+                            }
+                            duplicated = duplicated->next;
+                        }
+                        break;
+                    }
+                    find_function = find_function->prev;
+                }
+                semantic_error("Redeclared function", $2);
+			}
+			/* If need to remove the parameter inside the symbol table */
+			if(if_insert_attribute) {
+			/* Remove the parameters */
+				remove_symbol_parameter();
+				/* Set the function declaration data in the symbol table */
+				Symbol_table* find_function = symbol_table_tail;
+				find_function->name = malloc(strlen($2) + 1);
+				strcpy(find_function->name, $2);
+				find_function->type = malloc(strlen($1) + 1);
+				strcpy(find_function->type, $1);
+				if_insert_attribute = 0;
+				attribute_count = 0;
+				is_function = 0;
+			}
+			/* If this function doesn't have any parameter, just insert the function */
+			else {
+				insert_symbol(scope_num, $2, "function", $1, "");
+			}
+		}
+		/* For variable declaration */
+		else {
+			switch(lookup_symbol($2)) {
+				/* For variable isn't in the symbol table or in the lower scope */
+				case 0: case 1:
+                    /* Insert into symbol table first, for later gen code search */
+					insert_symbol(scope_num, $2, "variable", $1, "");
+                    /* If is not global, need to load */
+                    if(!is_global_symbol($2)) { 
+                        char value[64];
+                        /* Default value for int / bool is 0 */
+                        if(!strcmp($1, "int") || !strcmp($1, "bool")) {
+                            sprintf(value, "\tldc %d\n", 0);
+                        }
+                        /* Default value for int is 0.0 */
+                        else if(!strcmp($1, "float")) {
+                            sprintf(value, "\tldc %f\n", 0.0);
+                        }
+                        /* Default value for string is "" */
+                        else if(!strcmp($1, "string")) {
+                            sprintf(value, "\tldc \"\"\n");
+                        }
+                        gencode_function(value);
+                    }
+                    /* Set value into symbol table */
+                    set_symbol_value($2, 0.0);
+                    gencode_variable_declaration($1, $2);
+					break;
+				/* For the variable is in the same scope, print error */
+				case 2:
+					semantic_error("Redeclared variable", $2);
+					break;
+			}
+		}
+    }
 	;
 
 type 
@@ -394,17 +702,6 @@ type
     | BOOL      {$$ = "bool";}
     | STRING    {$$ = "string";}
     | VOID      {$$ = "void";}
-	;
-
-init_declarator
-	: declarator ASGN initializer	{ 
-        declaration_has_value = 1;
-        $$ = $1; 
-    }	
-	| declarator	{ 
-        declaration_has_value = 0;
-        $$ = $1; 
-    }
 	;
 
 
@@ -424,48 +721,597 @@ declarator
 	;
 
 initializer
-	: expression
+	: expression {
+        $$[0] = $1[0];
+        $$[1] = $1[1];
+        $$[2] = $1[2];
+        $$[3] = $1[3];
+        $$[4] = $1[4];
+        $$[5] = $1[5];
+    }
+	;
+
+assignment_operator
+	: ASGN      { $$ = "ASGN"; }
+	| MULASGN   { $$ = "MULASGN"; }
+	| DIVASGN   { $$ = "DIVASGN"; }
+	| MODASGN   { $$ = "MODASGN"; }
+	| ADDASGN   { $$ = "ADDASGN"; }  
+	| SUBASGN   { $$ = "SUBASGN"; }
 	;
 
 assignment_expression
-	: relational_expression
-	| unary_expression assignment_operator assignment_expression
+	: relational_expression {
+        $$[0] = $1[0];
+        $$[1] = $1[1];
+        $$[2] = $1[2];
+        $$[3] = $1[3];
+        $$[4] = $1[4];
+        $$[5] = $1[5];
+    }
+	| unary_expression assignment_operator assignment_expression {
+        if(!strcmp($2, "ASGN")) {
+            /* If $3 hasn't been loaded */
+            if(!$3[5])
+                gencode_load_value($3);
+            /* If $1 is global */
+            if(!$1[2]){
+                if($1[0] == 0 && $3[1] == 1) 
+                    gencode_function("\tf2i\n");
+                if($1[0] == 1 && $3[1] == 0) 
+                    gencode_function("\ti2f\n");
+                Symbol_table *global_symbol = get_global_symbol($1[3]);
+                gencode_store_global(global_symbol->name, global_symbol->type);
+            }
+            /* If $1 is local */
+            else {
+                char stack_num[64];
+                switch((int)$1[0]) {
+                    case 0: case 2:
+                        if($3[0] == 1)  
+                            gencode_function("\tf2i\n");
+                        gencode_function("\tistore ");
+                        break;
+                    case 1:
+                        if($3[0] == 0) 
+                            gencode_function("\ti2f\n");
+                        gencode_function("\tfstore ");
+                        break;
+                    case 3:
+                        gencode_function("\tastore ");
+                        break;
+                }
+                sprintf(stack_num, "%d\n", (int)$1[3]);
+                gencode_function(stack_num);
+            }  
+        }
+        else if(!strcmp($2, "MULASGN")) {
+            gencode_calculation($1, $3, 2);
+            /* Either var1 or var2 is float, return float */
+            if($1[0] == 1 || $3[0] == 1)
+                $$[0] = 1;
+            /* Both var1 and var2 are int */
+            else
+            $$[0] = 0;
+            $1[1] = $1[1] * $3[1];
+            $1[5] = 1;
+            /* If $1 is global */
+            if(!$1[2]){
+                if($1[0] == 0 && $3[1] == 1) 
+                    gencode_function("\tf2i\n");
+                if($1[0] == 1 && $3[1] == 0) 
+                    gencode_function("\ti2f\n");
+                Symbol_table *global_symbol = get_global_symbol($1[3]);
+                gencode_store_global(global_symbol->name, global_symbol->type);
+            }
+            /* If $1 is local */
+            else {
+                char stack_num[64];
+                switch((int)$1[0]) {
+                    case 0: case 2:
+                        if($3[0] == 1)  
+                            gencode_function("\tf2i\n");
+                        gencode_function("\tistore ");
+                        break;
+                    case 1:
+                        if($3[0] == 0) 
+                            gencode_function("\ti2f\n");
+                        gencode_function("\tfstore ");
+                        break;
+                    case 3:
+                        gencode_function("\tastore ");
+                        break;
+                }
+                sprintf(stack_num, "%d\n", (int)$1[3]);
+                gencode_function(stack_num);
+            }   
+        }
+        else if(!strcmp($2, "DIVASGN")) {
+            /* If divisor is 0, raise error */
+            if($3[1] == 0) {
+                semantic_error("Divided by Zero", "");
+                $$[1] = 0;
+            }
+            else {
+                gencode_calculation($1, $3, 3);
+                /* Either var1 or var2 is float, return float */
+                if($1[0] == 1 || $3[0] == 1)
+                    $$[0] = 1;
+                /* Both var1 and var2 are int */
+                else
+                $$[0] = 0;
+                $1[1] = $1[1] / $3[1];
+                $1[5] = 1;
+                /* If $1 is global */
+                if(!$1[2]){
+                    if($1[0] == 0 && $3[1] == 1) 
+                        gencode_function("\tf2i\n");
+                    if($1[0] == 1 && $3[1] == 0) 
+                        gencode_function("\ti2f\n");
+                    Symbol_table *global_symbol = get_global_symbol($1[3]);
+                    gencode_store_global(global_symbol->name, global_symbol->type);
+                }
+                /* If $1 is local */
+                else {
+                    char stack_num[64];
+                    switch((int)$1[0]) {
+                        case 0: case 2:
+                            if($3[0] == 1)  
+                                gencode_function("\tf2i\n");
+                            gencode_function("\tistore ");
+                            break;
+                        case 1:
+                            if($3[0] == 0) 
+                                gencode_function("\ti2f\n");
+                            gencode_function("\tfstore ");
+                            break;
+                        case 3:
+                            gencode_function("\tastore ");
+                            break;
+                    }
+                    sprintf(stack_num, "%d\n", (int)$1[3]);
+                    gencode_function(stack_num);
+                }  
+            } 
+        }
+        else if(!strcmp($2, "MODASGN")) {
+            /* Both $1 and $3 must to be int that can mod */
+            if ($1[0] != 0 || $3[0] != 0)
+                semantic_error("Mod with non integer", "");
+            
+            /* If mod by 0, invalid */
+            if ($3[1] == 0) 
+                semantic_error("Mod by Zero", "");
+            /* If error occur, return with 0 */
+            if($3[1] == 0 || $1[0] != 1 || $3[0] != 1) 
+                $$[1] = 0;
+            else {    
+                gencode_calculation($1, $3, 4);
+                /* Either var1 or var2 is float, return float */
+                if($1[0] == 1 || $3[0] == 1)
+                    $$[0] = 1;
+                /* Both var1 and var2 are int */
+                else
+                $$[0] = 0;
+                $1[1] = (int)$1[1] % (int)$3[1];
+                $1[5] = 1;
+                /* If $1 is global */
+                if(!$1[2]){
+                    if($1[0] == 0 && $3[1] == 1) 
+                        gencode_function("\tf2i\n");
+                    if($1[0] == 1 && $3[1] == 0) 
+                        gencode_function("\ti2f\n");
+                    Symbol_table *global_symbol = get_global_symbol($1[3]);
+                    gencode_store_global(global_symbol->name, global_symbol->type);
+                }
+                /* If $1 is local */
+                else {
+                    char stack_num[64];
+                    switch((int)$1[0]) {
+                        case 0: case 2:
+                            if($3[0] == 1)  
+                                gencode_function("\tf2i\n");
+                            gencode_function("\tistore ");
+                            break;
+                        case 1:
+                            if($3[0] == 0) 
+                                gencode_function("\ti2f\n");
+                            gencode_function("\tfstore ");
+                            break;
+                        case 3:
+                            gencode_function("\tastore ");
+                            break;
+                    }
+                    sprintf(stack_num, "%d\n", (int)$1[3]);
+                    gencode_function(stack_num);
+                }   
+            }
+        }
+        else if(!strcmp($2, "ADDASGN")) {
+            gencode_calculation($1, $3, 0);
+            /* Either var1 or var2 is float, return float */
+            if($1[0] == 1 || $3[0] == 1)
+                $$[0] = 1;
+            /* Both var1 and var2 are int */
+            else
+            $$[0] = 0;
+            $1[1] = $1[1] + $3[1];
+            $1[5] = 1;
+            /* If $1 is global */
+            if(!$1[2]){
+                if($1[0] == 0 && $3[1] == 1) 
+                    gencode_function("\tf2i\n");
+                if($1[0] == 1 && $3[1] == 0) 
+                    gencode_function("\ti2f\n");
+                Symbol_table *global_symbol = get_global_symbol($1[3]);
+                gencode_store_global(global_symbol->name, global_symbol->type);
+            }
+            /* If $1 is local */
+            else {
+                char stack_num[64];
+                switch((int)$1[0]) {
+                    case 0: case 2:
+                        if($3[0] == 1)  
+                            gencode_function("\tf2i\n");
+                        gencode_function("\tistore ");
+                        break;
+                    case 1:
+                        if($3[0] == 0) 
+                            gencode_function("\ti2f\n");
+                        gencode_function("\tfstore ");
+                        break;
+                    case 3:
+                        gencode_function("\tastore ");
+                        break;
+                }
+                sprintf(stack_num, "%d\n", (int)$1[3]);
+                gencode_function(stack_num);
+            }   
+        }
+        else if(!strcmp($2, "SUBASGN")) {
+            gencode_calculation($1, $3, 1);
+            /* Either var1 or var2 is float, return float */
+            if($1[0] == 1 || $3[0] == 1)
+                $$[0] = 1;
+            /* Both var1 and var2 are int */
+            else
+            $$[0] = 0;
+            $1[1] = $1[1] - $3[1];
+            $1[5] = 1;
+            /* If $1 is global */
+            if(!$1[2]){
+                if($1[0] == 0 && $3[1] == 1) 
+                    gencode_function("\tf2i\n");
+                if($1[0] == 1 && $3[1] == 0) 
+                    gencode_function("\ti2f\n");
+                Symbol_table *global_symbol = get_global_symbol($1[3]);
+                gencode_store_global(global_symbol->name, global_symbol->type);
+            }
+            /* If $1 is local */
+            else {
+                char stack_num[64];
+                switch((int)$1[0]) {
+                    case 0: case 2:
+                        if($3[0] == 1)  
+                            gencode_function("\tf2i\n");
+                        gencode_function("\tistore ");
+                        break;
+                    case 1:
+                        if($3[0] == 0) 
+                            gencode_function("\ti2f\n");
+                        gencode_function("\tfstore ");
+                        break;
+                    case 3:
+                        gencode_function("\tastore ");
+                        break;
+                }
+                sprintf(stack_num, "%d\n", (int)$1[3]);
+                gencode_function(stack_num);
+            }   
+        }
+        
+        
+    }
 	;
 
 relational_expression
-	: additive_expression
-	| relational_expression MT additive_expression
-	| relational_expression LT additive_expression
-	| relational_expression MTE additive_expression
-	| relational_expression LTE additive_expression
-	| relational_expression EQ additive_expression
-	| relational_expression NE additive_expression
+	: additive_expression {
+        $$[0] = $1[0];
+        $$[1] = $1[1];
+        $$[2] = $1[2];
+        $$[3] = $1[3];
+        $$[4] = $1[4];
+        $$[5] = $1[5];
+    }
+	| relational_expression MT additive_expression {
+        $$[0] = 2;
+        if($1[1] > $3[1])   
+            $$[1] = 1;
+        else                
+            $$[1] = 0;
+        $$[2] = -1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+        gencode_relational($1, $3, 0);
+    }
+	| relational_expression LT additive_expression {
+        $$[0] = 2;
+        if($1[1] < $3[1])   
+            $$[1] = 1;
+        else                
+            $$[1] = 0;
+        $$[2] = -1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+        gencode_relational($1, $3, 1);
+    }
+	| relational_expression MTE additive_expression {
+        $$[0] = 2;
+        if($1[1] >= $3[1])   
+            $$[1] = 1;
+        else                
+            $$[1] = 0;
+        $$[2] = -1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+        gencode_relational($1, $3, 2);
+    }
+	| relational_expression LTE additive_expression {
+        $$[0] = 2;
+        if($1[1] <= $3[1])   
+            $$[1] = 1;
+        else                
+            $$[1] = 0;
+        $$[2] = -1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+        gencode_relational($1, $3, 3);
+    }
+	| relational_expression EQ additive_expression {
+        $$[0] = 2;
+        if($1[1] == $3[1])   
+            $$[1] = 1;
+        else                
+            $$[1] = 0;
+        $$[2] = -1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+        gencode_relational($1, $3, 4);
+    }
+	| relational_expression NE additive_expression {
+        $$[0] = 2;
+        if($1[1] != $3[1])   
+            $$[1] = 1;
+        else                
+            $$[1] = 0;
+        $$[2] = -1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+        gencode_relational($1, $3, 5);
+    }
 	;
 
 additive_expression
-	: multiplicative_expression
-	| additive_expression ADD multiplicative_expression
-	| additive_expression SUB multiplicative_expression
+	: multiplicative_expression {
+        $$[0] = $1[0];
+        $$[1] = $1[1];
+        $$[2] = $1[2];
+        $$[3] = $1[3];
+        $$[4] = $1[4];
+        $$[5] = $1[5];
+    }
+	| additive_expression ADD multiplicative_expression {
+        /* Either var1 or var2 is float, return float */
+        if($1[0] == 1 || $3[0] == 1)
+            $$[0] = 1;
+        /* Both var1 and var2 are int */
+        else
+            $$[0] = 0;
+        
+        $$[1] = $1[1] + $3[1]; 
+        $$[2] = -1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+        gencode_calculation($1, $3, 0);
+    }
+	| additive_expression SUB multiplicative_expression {
+        /* Either var1 or var2 is float, return float */
+        if($1[0] == 1 || $3[0] == 1)
+            $$[0] = 1;
+        /* Both var1 and var2 are int */
+        else
+            $$[0] = 0;
+        
+        $$[1] = $1[1] - $3[1]; 
+        $$[2] = -1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+
+        gencode_calculation($1, $3, 1);
+    }
 	;
 
 multiplicative_expression
-	: unary_expression
-	| multiplicative_expression MUL unary_expression
-	| multiplicative_expression DIV unary_expression
-	| multiplicative_expression MOD unary_expression
+	: unary_expression {
+        $$[0] = $1[0];
+        $$[1] = $1[1];
+        $$[2] = $1[2];
+        $$[3] = $1[3];
+        $$[4] = $1[4];
+        $$[5] = $1[5];
+    }
+	| multiplicative_expression MUL unary_expression {
+        /* Either var1 or var2 is float, return float */
+        if($1[0] == 1 || $3[0] == 1)
+            $$[0] = 1;
+        /* Both var1 and var2 are int */
+        else
+            $$[0] = 0;
+        
+        $$[1] = $1[1] * $3[1]; 
+        $$[2] = -1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+
+        gencode_calculation($1, $3, 2);
+    }
+	| multiplicative_expression DIV unary_expression {
+        /* If divisor is 0, raise error, return 0 */
+        if($3[0] == 0) {
+            semantic_error("Divided by Zero", "");
+            $$[1] = 0;
+        }
+        else{
+            $$[1] = $1[1] / $3[1]; 
+        }
+        /* Either var1 or var2 is float, return float */
+        if($1[0] == 1 || $3[0] == 1)
+            $$[0] = 1;
+        /* Both var1 and var2 are int */
+        else
+            $$[0] = 0;
+        $$[2] = -1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+
+        gencode_calculation($1, $3, 3);
+    }
+	| multiplicative_expression MOD unary_expression {
+        /* Both $1 and $3 must to be int that can mod */
+        if ($1[0] != 0 || $3[0] != 0)
+            semantic_error("Mod with non integer", "");
+        
+        /* If mod by 0, invalid */
+        if ($3[1] == 0) 
+            semantic_error("Mod by Zero", "");
+        
+        /* If error occur, return with 0 */
+        if($3[1] == 0 || $1[0] != 1 || $3[0] != 1) 
+            $$[1] = 0;
+        /* Else return value after mod */
+        else 
+            $$[1] = (int)$1[1] % (int)$3[1]; 
+        
+        $$[0] = 0;
+        $$[2] = -1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+        gencode_calculation($1, $3, 4);
+    }
 	;
 
 unary_expression
-	: postfix_expression 
-	| INC unary_expression
-	| DEC unary_expression
-	| unary_operator unary_expression { }
+	: postfix_expression {
+        $$[0] = $1[0];
+        $$[1] = $1[1];
+        $$[2] = $1[2];
+        $$[3] = $1[3];
+        $$[4] = $1[4];
+        $$[5] = $1[5];
+    }
+	| INC unary_expression {
+        $$[0] = $2[0]; 
+        $$[1] = $2[1] + 1;
+        $$[2] = $2[2];          
+        $$[3] = $2[3];
+        $$[4] = 0;      
+        $$[5] = 0;
+        gencode_postfix($2, 1);
+        /* If not loaded */
+        if(!$2[5]){
+            /* If is global */
+            if(!$2[2]){
+                Symbol_table *global_symbol = get_global_symbol($2[3]);
+                gencode_store_global(global_symbol->name, global_symbol->type);
+                gencode_load_value($$);
+            }
+            /* If is id */
+            else if ($2[4]) {
+                char stack_num[64];
+                switch((int)$2[0]) {
+                    case 0: case 2:
+                        gencode_function("\tistore ");
+                        break;
+                    case 1:
+                        gencode_function("\tfstore ");
+                        break;
+                    case 3:
+                        gencode_function("\tastore ");
+                        break;
+                }
+                sprintf(stack_num, "%d\n", (int)$2[3]);
+                gencode_function(stack_num);
+            }
+        }
+    }
+	| DEC unary_expression {
+        $$[0] = $2[0];
+        $$[1] = $2[1] - 1;
+        $$[2] = $2[2];          
+        $$[3] = $2[3];
+        $$[4] = 0;      
+        $$[5] = 0;
+        gencode_postfix($2, 0);
+        /* If not loaded */
+        if(!$2[5]){
+            /* If is global */
+            if(!$2[2]){
+                Symbol_table *global_symbol = get_global_symbol($2[3]);
+                gencode_store_global(global_symbol->name, global_symbol->type);
+                gencode_load_value($$);
+            }
+            /* If is id */
+            else if ($2[4]) {
+                char stack_num[64];
+                switch((int)$2[0]) {
+                    case 0: case 2:
+                        gencode_function("\tistore ");
+                        break;
+                    case 1:
+                        gencode_function("\tfstore ");
+                        break;
+                    case 3:
+                        gencode_function("\tastore ");
+                        break;
+                }
+                sprintf(stack_num, "%d\n", (int)$2[3]);
+                gencode_function(stack_num);
+            }
+        }
+        
+    }
+	| unary_operator unary_expression { 
+        $$[0] = $2[0];
+        $$[2] = $2[2];
+        $$[3] = $2[3];
+        $$[4] = 0;
+        $$[5] = 1;
+        if(!strcmp($1, "add")) {          
+            $$[1] = $2[1];
+            gencode_unary_operator($2, 1);
+        }
+        else if(!strcmp($1, "sub")) {
+            $$[1] = $2[1] * -1;
+            gencode_unary_operator($2, 0);
+        }
+    }
 	;
 
 /* For positive/negative/not variable */
 unary_operator
-	: ADD {  } 
-	| SUB {  } 
+	: ADD { $$ = "add"; } 
+	| SUB { $$ = "sub"; } 
 	;
 
 postfix_expression
@@ -476,7 +1322,14 @@ postfix_expression
 			expression_id_type = (char **)realloc(expression_id_type, sizeof(char *) * (expression_id_type_num+1));
 		expression_id_type[expression_id_type_num] = strdup("variable");
 		++expression_id_type_num;
+        $$[0] = $1[0];
+        $$[1] = $1[1];
+        $$[2] = $1[2];
+        $$[3] = $1[3];
+        $$[4] = $1[4];
+        $$[5] = $1[5];
 	}
+    /* call function without argument */
 	| primary_expression LB RB 	{ 
 		if(expression_id_type_num == 0) 
 			expression_id_type = (char **)malloc(sizeof(char *));		
@@ -484,7 +1337,18 @@ postfix_expression
 			expression_id_type = (char **)realloc(expression_id_type, sizeof(char *) * (expression_id_type_num+1));
 		expression_id_type[expression_id_type_num] = strdup("function");
 		++expression_id_type_num;
+        $$[0] = $1[0];
+        $$[1] = 0;
+        $$[2] = 1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+        char* name = get_global_symbol($1[3])->name;
+        if(is_parameter_match(name, 0))
+            gencode_call_function(name);
+
 	}	
+    /* call function with argument */
 	| primary_expression LB argument_expression_list RB	{ 
 		if(expression_id_type_num == 0) 
 			expression_id_type = (char **)malloc(sizeof(char *));		
@@ -492,8 +1356,17 @@ postfix_expression
 			expression_id_type = (char **)realloc(expression_id_type, sizeof(char *) * (expression_id_type_num+1));
 		expression_id_type[expression_id_type_num] = strdup("function");
 		++expression_id_type_num;
+        $$[0] = $1[0];
+        $$[1] = 0;
+        $$[2] = 1;  
+        $$[3] = -1;
+        $$[4] = 0; 
+        $$[5] = 1;
+        char* name = get_global_symbol($1[3])->name;
+        if(is_parameter_match(name, 1))
+            gencode_call_function(name);
 	}	
-	| primary_expression INC	{ 
+	| primary_expression INC { 
 		if(expression_id_type_num == 0) 
 			expression_id_type = (char **)malloc(sizeof(char *));		
 		else 
@@ -505,33 +1378,34 @@ postfix_expression
         $$[2] = $1[2];
         $$[3] = $1[3];
         $$[4] = 0;
-        $$[5] = 1;
-        gencode_load_value($1);
+        $$[5] = 0;
+        //gencode_load_value($1);
         gencode_postfix($1, 1);
-
+        has_postfix = 1;
         /* After postfix, need to store the value back */
-        char value[32];
-        if($1[5] == 0){
+        char stack_num[32];
+        /* Only id need to store back */
+        if($1[4] == 1){
             /* If this is global */
-            if($1[2]){
+            if(!$1[2]){
                 Symbol_table *global_symbol = get_global_symbol($1[3]);
-                gencode_store_global(global_symbol->name);
+                gencode_store_global(global_symbol->name, global_symbol->type);
             }
             /* If this is local */
             else {
-                switch($1[0]) {
+                switch((int)$1[0]) {
                     case 0: case 2:
-                        gencode_function("istore ");
+                        gencode_function("\tistore ");
                         break;
                     case 1:
-                        gencode_function("fstore ");
+                        gencode_function("\tfstore ");
                         break;
                     case 3:
-                        gencode_function("astore ");
+                        gencode_function("\tastore ");
                         break;
                 }
-                sprintf(value, "%d\n", (int)$1[3]);
-                gencode_function(value);
+                sprintf(stack_num, "%d\n", (int)$1[3]);
+                gencode_function(stack_num);
             }
         }
 	}	
@@ -547,33 +1421,34 @@ postfix_expression
         $$[2] = $1[2];
         $$[3] = $1[3];
         $$[4] = 0;
-        $$[5] = 1;
-        gencode_load_value($1);
+        $$[5] = 0;
+        //gencode_load_value($1);
         gencode_postfix($1, 0);
+        has_postfix = 1;
 
         /* After postfix, need to store the value back */
-        char value[32];
         if($1[5] == 0){
             /* If this is global */
-            if($1[2]){
+            if(!$1[2]){
                 Symbol_table *global_symbol = get_global_symbol($1[3]);
-                gencode_store_global(global_symbol->name);
+                gencode_store_global(global_symbol->name, global_symbol->type);
             }
             /* If this is local */
             else {
-                switch($1[0]) {
+                char stack_num[64];
+                switch((int)$1[0]) {
                     case 0: case 2:
-                        gencode_function("istore ");
+                        gencode_function("\tistore ");
                         break;
                     case 1:
-                        gencode_function("fstore ");
+                        gencode_function("\tfstore ");
                         break;
                     case 3:
-                        gencode_function("astore ");
+                        gencode_function("\tastore ");
                         break;
                 }
-                sprintf(value, "%d\n", (int)$1[3]);
-                gencode_function(value);
+                sprintf(stack_num, "%d\n", (int)$1[3]);
+                gencode_function(stack_num);
             }
         }
 	}	
@@ -598,25 +1473,21 @@ primary_expression
 		else {	
 			expression_id_exist[expression_id_num] = 1;
             $$[0] = get_symbol_type($1);
-            $$[2] = is_global_symbol($1);
-            if($$[2])
-                $$[3] = get_symbol_index($1);
-            else
-                $$[3] = get_symbol_index($1);
+            $$[2] = !is_global_symbol($1);
+            $$[3] = get_symbol_index($1);
             /* If this symbol's type is string */
             if($$[0] == 3) {
                 $$[1] = 0;
                 /* If is global variable */
-                if($$[2]) {
-                    gencode_function("getstatic compiler_hw3/");
+                if(!$$[2]) {
+                    gencode_function("\tgetstatic compiler_hw3/");
                     gencode_function($1);
                     gencode_function(" Ljava/lang/String;\n");
                 }
                 /* If is local variable */
                 else {
                     char stack_index[64];
-                    gencode_function("aload ");
-                    sprintf(stack_index, "%d\n", get_symbol_index($1));
+                    sprintf(stack_index, "\taload %d\n", get_symbol_index($1));
                     gencode_function(stack_index);
                 }
                 $$[4] = 1;
@@ -626,7 +1497,7 @@ primary_expression
             else {
                 $$[1] = get_symbol_value($1);
                 $$[4] = 1;
-                $$[5];
+                $$[5] = 0;
             }
         }
 		++expression_id_num;
@@ -715,7 +1586,6 @@ constant
         $$[4] = 0;
         $$[5] = 1;
         gencode_string_const($1);
-        now_string_value = strdup($1);
     }
 	;
 
@@ -749,23 +1619,36 @@ parameter_list
 	}
 	;
 
-assignment_operator
-	: ASGN
-	| MULASGN
-	| DIVASGN
-	| MODASGN
-	| ADDASGN
-	| SUBASGN
-	;
-
 argument_expression_list
-	: assignment_expression
-	| argument_expression_list COMMA assignment_expression
+	: assignment_expression {
+        argument_spec[argument_num][0] = $1[0];
+        argument_spec[argument_num][1] = $1[1];
+        argument_spec[argument_num][2] = $1[2];
+        argument_spec[argument_num][3] = $1[3];
+        argument_spec[argument_num][4] = $1[4];
+        argument_spec[argument_num][5] = $1[5];
+        ++argument_num;
+    }
+	| argument_expression_list COMMA assignment_expression {
+        argument_spec[argument_num][0] = $3[0];
+        argument_spec[argument_num][1] = $3[1];
+        argument_spec[argument_num][2] = $3[2];
+        argument_spec[argument_num][3] = $3[3];
+        argument_spec[argument_num][4] = $3[4];
+        argument_spec[argument_num][5] = $3[5];
+        ++argument_num;
+    }
 	;
 
 expression
 	: assignment_expression	{
-		if(if_undeclared) 
+		$$[0] = $1[0];
+        $$[1] = $1[1];
+        $$[2] = $1[2];
+        $$[3] = $1[3];
+        $$[4] = $1[4];
+        $$[5] = $1[5];
+        if(if_undeclared) 
         	undeclared_error();
 		clear_expression();
 	}
@@ -1055,51 +1938,57 @@ void gencode_function(char* java_bytecode) {
 
 
 void gencode_variable_declaration(char* type, char* name) {
-    /* Only gen code if not declared */
-    if(!lookup_symbol(name)) {
-        char java_bytecode[256];   // For temporary store code, later pass to gencode_function
-
-        /* For global variable declaration, don't need to concern about type casting */
-        if(scope_num == 0) {
-            if(!strcmp(type, "int")) {
-                if(declaration_has_value)
-                    sprintf(java_bytecode, ".field public static %s %s = %d\n", name, "I", yylval.i_val);
-                else
-                    sprintf(java_bytecode, ".field public static %s %s = %d\n", name, "I", 0);
-            }
-            else if(!strcmp(type, "float")) {
-                if(declaration_has_value)
-                    sprintf(java_bytecode, ".field public static %s %s = %f\n", name, "F", yylval.f_val);
-                else
-                    sprintf(java_bytecode, ".field public static %s %s = %f\n", name, "F", 0.0);
-            }
-            else if(!strcmp(type, "string")) {
-                /* String must have value */
-                sprintf(java_bytecode, ".field public static %s %s = \"%s\"\n", name, "Ljava/lang/String;", yylval.str_val);
-            }
-            else if(!strcmp(type, "bool")) {
-                if(declaration_has_value)
-                    sprintf(java_bytecode, ".field public static %s %s = %d\n", name, "B", yylval.i_val);
-                else
-                    sprintf(java_bytecode, ".field public static %s %s = %d\n", name, "B", 0);
-            }
+    char java_bytecode[256];   // For temporary store code, later pass to gencode_function
+    /* For global variable declaration, don't need to concern about type casting */
+    if(scope_num == 0) {
+        if(!strcmp(type, "int")) {
+            if(declaration_has_value)
+                sprintf(java_bytecode, ".field public static %s %s = %d\n", name, "I", yylval.i_val);
+            else
+                sprintf(java_bytecode, ".field public static %s %s = %d\n", name, "I", 0);
         }
-        /* For local variable declaration */
-        else {
-
+        else if(!strcmp(type, "float")) {
+            if(declaration_has_value)
+                sprintf(java_bytecode, ".field public static %s %s = %f\n", name, "F", yylval.f_val);
+            else
+                sprintf(java_bytecode, ".field public static %s %s = %f\n", name, "F", 0.0);
         }
-
-        /* If successfully generated some java bytecode, write it to file */
-        if(strcmp(java_bytecode, ""))
-            gencode_function(java_bytecode);
+        else if(!strcmp(type, "bool")) {
+            if(declaration_has_value)
+                sprintf(java_bytecode, ".field public static %s %s = %d\n", name, "B", yylval.i_val);
+            else
+                sprintf(java_bytecode, ".field public static %s %s = %d\n", name, "B", 0);
+        }
+        else if(!strcmp(type, "string")) {
+            /* String must have value */
+            sprintf(java_bytecode, ".field public static %s %s = \"%s\"\n", name, "Ljava/lang/String;", yylval.str_val);
+        }    
     }
+    /* For local variable declaration */
+    else {
+        int stack_num = get_symbol_index(name);
+        if(!strcmp(type, "int")) 
+            gencode_function("\tistore ");
+        else if(!strcmp(type, "float")) 
+            gencode_function("\tfstore ");
+        else if(!strcmp(type, "bool")) 
+            gencode_function("\tistore ");
+        else if(!strcmp(type, "string")) 
+            gencode_function("\tastore ");
+        sprintf(java_bytecode, "%d\n", stack_num);
+    }
+
+    /* If successfully generated some java bytecode, write it to file */
+    if(strcmp(java_bytecode, ""))
+        gencode_function(java_bytecode);
+    
     declaration_has_value = 0;
     
 }
 
 void gencode_string_const(char* string_const){
     if(scope_num > 0) {
-        gencode_function("ldc \"");
+        gencode_function("\tldc \"");
         gencode_function(string_const);
         gencode_function("\"\n");
     }
@@ -1121,7 +2010,7 @@ char* get_type_bytecode(char* type) {
 float get_symbol_value(char* name) {
     Symbol_table* symbol = symbol_table_tail;
     while(symbol != symbol_table_head) {
-        if(!strcmp(symbol->name, name) && (symbol->scope == scope_num || symbol->scope < scope_num)) 
+        if(!strcmp(symbol->name, name) && symbol->scope <= scope_num) 
             return symbol->value;
         symbol = symbol->prev;
     }
@@ -1161,18 +2050,29 @@ int get_symbol_type(char* name) {
 }
 
 int get_symbol_index(char* name) {
+    /* First get total local stack number */
+    int local_num = 0;
+    Symbol_table* symbol = symbol_table_tail;
+    while(symbol != symbol_table_head) {
+        if(symbol->scope != 0) {
+            ++local_num;
+        }
+        symbol = symbol->prev;
+    }
+
     int stack_index = 0;
-    Symbol_table* symbol = symbol_table_head->next;
-    while(symbol != NULL) {
-        if(!strcmp(symbol->name, name) && (symbol->scope == scope_num || symbol->scope < scope_num)) {
-            if(symbol->scope != 0)
-                return stack_index;
+    symbol = symbol_table_tail;
+    while(symbol != symbol_table_head) {
+        if(symbol->scope != 0) {
+            ++stack_index;
+        }
+        if(!strcmp(symbol->name, name) && symbol->scope <= scope_num) {
+            if(symbol->scope != 0) 
+                return local_num - stack_index;
             else    
                 return symbol->index;
         }
-        else if(symbol->scope > 0)
-            ++stack_index;
-        symbol = symbol->next;
+        symbol = symbol->prev;
     }
     return -1;
 }
@@ -1181,7 +2081,7 @@ int get_symbol_scope_num(char* name) {
     
     Symbol_table* symbol = symbol_table_tail;
     while(symbol != symbol_table_head) {
-        if(!strcmp(symbol->name, name) && (symbol->scope == scope_num || symbol->scope < scope_num)) {
+        if(!strcmp(symbol->name, name) && symbol->scope <= scope_num) {
             return symbol->scope;
         }
         symbol = symbol->prev;
@@ -1192,7 +2092,7 @@ int get_symbol_scope_num(char* name) {
 int is_global_symbol(char* name) {
     Symbol_table* symbol = symbol_table_tail;
     while(symbol != symbol_table_head) {
-        if(!strcmp(symbol->name, name) && (symbol->scope == scope_num || symbol->scope < scope_num)) {
+        if(!strcmp(symbol->name, name) && symbol->scope <= scope_num) {
             if(symbol->scope > 0)
                 return 0;
             else 
@@ -1209,16 +2109,15 @@ void gencode_load_value(float* var) {
         /* If this var is const */
         if(!var[4]) {
             char value[64];
-            gencode_function("ldc ");
-            switch(var[0]) {
+            switch((int)var[0]) {
                 /* For int */
                 case 0: case 2:
-                    sprintf(value, "%d\n", (int)var[1]);
+                    sprintf(value, "\tldc %d\n", (int)var[1]);
                     gencode_function(value);
                     break;
                 /* For float */
                 case 1:
-                    sprintf(value, "%d\n", (float)var[1]);
+                    sprintf(value, "\tldc %f\n", (float)var[1]);
                     gencode_function(value);
                     break;
             }
@@ -1226,11 +2125,11 @@ void gencode_load_value(float* var) {
         /* If this var is id */
         else {   
             /* If this id is global variable */
-            if(var[2]) {
-                gencode_function("getstatic compiler_hw3/");
+            if(!var[2]) {
+                gencode_function("\tgetstatic compiler_hw3/");
                 Symbol_table* global_symbol = get_global_symbol(var[3]);
                 gencode_function(global_symbol->name);
-                switch(var[0]) {
+                switch((int)var[0]) {
                     case 0:
                         gencode_function(" I\n");
                         break;
@@ -1247,25 +2146,22 @@ void gencode_load_value(float* var) {
             }
             /* If this id is local variable */
             else {
-                char value[64];
-                switch(var[0]) {
+                char stack_num[64];
+                switch((int)var[0]) {
                     /* Load int / bool from stack */
                     case 0: case 2:
-                        gencode_function("iload ");
-                        sprintf(value, "%d\n", (int)var[3]);
-                        gencode_function(value);
+                        sprintf(stack_num, "\tiload %d\n", (int)var[3]);
+                        gencode_function(stack_num);
                         break;
-                    /* Load floar from stack */
+                    /* Load float from stack */
                     case 1:
-                        gencode_function("fload ");
-                        sprintf(value, "%d\n", (int)var[3]);
-                        gencode_function(value);
+                        sprintf(stack_num, "\tfload %d\n", (int)var[3]);
+                        gencode_function(stack_num);
                         break;
                     /* Load string from stack */
                     case 3:
-                        gencode_function("aload ");
-                        sprintf(value, "%d\n", (int)var[3]);
-                        gencode_function(value);
+                        sprintf(stack_num, "\taload %d\n", (int)var[3]);
+                        gencode_function(stack_num);
                         break;
                 }
             }
@@ -1286,37 +2182,457 @@ Symbol_table* get_global_symbol(int index) {
 /* Only int will have postfix */
 void gencode_postfix(float* var, int post_type) {
     /* If this var hasn't been generated code yet' */
-    if(!var1[5]){
+    if(!var[5]){
         /* If this is cosnt */
         if(!var[4]){
             char value[32];
-            gencode_function("ldc ");
-            sprintf(value, "%d\n", (int)var[1]);
+            sprintf(value, "\tldc %d\n", (int)var[1]);
             gencode_function(value);          
         }
         /* If this is id */
-        else{
-            
+        else{ 
             /* If this id is from global */
-            if(var[2]){
-                gencode_function("getstatic compiler_hw3/");
-                Symbol_table* global_symbol = get_symbol_index(var[3]);
+            if(!var[2]){
+                gencode_function("\tgetstatic compiler_hw3/");
+                Symbol_table* global_symbol = get_global_symbol(var[3]);
                 gencode_function(global_symbol->name);
                 gencode_function(" I\n");
             }
             /* If this id is from local */
             else {
-                char value[32];
-                gencode_function("iload ");
-                sprintf(value, "%d\n", (int)var1[4]);
-                gencode_function(value);
+                char stack_num[32];
+                sprintf(stack_num, "\tiload %d\n", (int)var[3]);
+                gencode_function(stack_num);
             }
         }
     }
-    gencode_function("ldc 1\n");
+    gencode_function("\ticonst_1\n");
     if(post_type)
-        gencode_function("iadd\n");
+        gencode_function("\tiadd\n");
     else    
-        gencode_function("isub\n");
+        gencode_function("\tisub\n");
+}
+
+void gencode_store_global(char* name, char* type){
+    gencode_function("\tputstatic compiler_hw3/");
+    gencode_function(name);
+    if(!strcmp(type, "int"))
+        gencode_function(" I\n");
+    else if(!strcmp(type, "float"))
+        gencode_function(" F\n");
+    else if(!strcmp(type, "bool"))
+        gencode_function(" Z\n");
+    else if(!strcmp(type, "string"))
+        gencode_function(" Ljava/lang/String;\n");
+    else if(!strcmp(type, "void"))
+        gencode_function(" V\n");
+}
+
+void gencode_unary_operator(float* var, int unary_type) {
+    /* If hasn't been loaded */
+    if(!var[5]){
+        /* If this is const */
+        if(!var[4]){
+            char stack_num[64];
+            if(var[0] == 0){
+                sprintf(stack_num, "\tldc %d\n", (int)var[1]);
+                gencode_function(stack_num);
+            }  
+            else if(var[0] == 1){
+                sprintf(stack_num, "\tldc %f\n", (float)var[1]);
+                gencode_function(stack_num);
+            }
+        }
+        /* If this is id */
+        else {
+            /* If is global */
+            if(!var[2]){
+                gencode_function("\tgetstatic compiler_hw3/");
+                Symbol_table *global_symbol = get_global_symbol(var[3]);
+                gencode_function(global_symbol->name);
+                if(var[0] == 0){
+                    gencode_function(" I\n");
+                }  
+                else if(var[0] == 1){
+                    gencode_function(" F\n");
+                }
+            }
+            /* If is local */
+            else if(var[2]){
+                char stack_num[64];
+                /* for int */
+                if(var[0] == 0){
+                    sprintf(stack_num, "\tiload %d\n", (int)var[3]);
+                    gencode_function(stack_num);
+                }  
+                /* for float */
+                else if(var[0] == 1){
+                    sprintf(stack_num, "\tfload %d\n", (int)var[3]);
+                    gencode_function(stack_num);
+                }
+            }
+        }
+    }
+    /* For negative */
+    if(!unary_type){
+        /* For int */
+        if(var[0] == 0)
+            gencode_function("\tineg\n");
+        /* For float */
+        else if(var[0] == 1)
+            gencode_function("\tfneg\n");
+
+    }  
+}
+
+void gencode_calculation(float* var1, float* var2, int cal_type) {
+    /* If there's no code gen for var1 */
+    if(!var1[5]){
+        /* var1 is const */
+        if(!var1[4]){
+            char value[64];
+            /* var1 is int */
+            if(var1[0] == 0)
+                sprintf(value, "\tldc %d\n", (int)var1[1]);
+            /* var1 is float */ 
+            else if(var1[0] == 1)
+                sprintf(value, "\tldc %f\n", (float)var1[1]);
+            gencode_function(value);
+        }
+        /* var1 is id */
+        else if(var1[4]){
+            /* var1 is global */
+            if(!var1[2]){
+                gencode_function("\tgetstatic compiler_hw3/");
+                Symbol_table *global_symbol = get_global_symbol(var1[3]);
+                gencode_function(global_symbol->name);
+                /* var1 is int */
+                if(var1[0] == 0)
+                    gencode_function(" I\n");
+                /* var1 is float */
+                else if(var1[0] == 1)
+                    gencode_function(" F\n");
+            }
+            /* var1 is local */
+            else if(var1[2]){
+                char stack_num[64];
+                /* var1 is int */
+                if(var1[0] == 0)
+                    gencode_function("\tiload ");
+                /* var1 is float */
+                else if(var1[0] == 1)
+                    gencode_function("\tfload ");
+                sprintf(stack_num, "%d\n", (int)var1[3]);
+                gencode_function(stack_num);
+            }
+        }
+    }
+    /* If var1 is int, var2 is float, need to casting var1 */
+    if(var1[0] == 0 && var2[0] == 1)
+        gencode_function("\ti2f\n");
+
+    /* If there's no code gen for var2 */
+    if(!var2[5]){
+        /* var2 is const */
+        if(!var2[4]){
+            gencode_function("\tldc ");
+            char value[64];
+            /* var2 is int */
+            if(var2[0] == 0)
+                sprintf(value, "%d\n", (int)var2[1]);
+            /* var2 is float */ 
+            else if(var2[0] == 1)
+                sprintf(value, "%f\n", (float)var2[1]);
+            gencode_function(value);
+        }
+        /* var2 is id */
+        else if(var2[4]){
+            /* var2 is global */
+            if(!var2[2]){
+                gencode_function("\tgetstatic compiler_hw3/");
+                Symbol_table *global_symbol = get_global_symbol(var2[3]);
+                gencode_function(global_symbol->name);
+                /* var2 is int */
+                if(var2[0] == 0)
+                    gencode_function(" I\n");
+                /* var2 is float */
+                else if(var2[0] == 1)
+                    gencode_function(" F\n");
+            }
+            /* var2 is local */
+            else if(var2[2]){
+                char stack_num[64];
+                /* var2 is int */
+                if(var2[0] == 0)
+                    gencode_function("\tiload ");
+                /* var2 is float */
+                else if(var2[0] == 1)
+                    gencode_function("\tfload ");
+                sprintf(stack_num, "%d\n", (int)var2[3]);
+                gencode_function(stack_num);
+            }
+        }
+    }
+    /* If var1 is float, var2 is int, need to casting var2 */
+    if(var1[0] == 1 && var2[0] == 0)
+        gencode_function("\ti2f\n");
+
+    /* Either var1 or var2 is float, calculating in float, mod can't calculate in float */
+    if(var1[0] == 1 || var2[0] == 1){
+        switch(cal_type) {
+            case 0:
+                gencode_function("\tfadd\n");
+                break;
+            case 1:
+                gencode_function("\tfsub\n");
+                break;
+            case 2:
+                gencode_function("\tfmul\n");
+                break;
+            case 3: 
+                gencode_function("\tfdiv\n");
+                break;
+        }
+    }
+    /* Both var1 and var2 are int */
+    else {
+        switch(cal_type) {
+            case 0:
+                gencode_function("\tiadd\n");
+                break;
+            case 1:
+                gencode_function("\tisub\n");
+                break;
+            case 2:
+                gencode_function("\timul\n");
+                break;
+            case 3: 
+                gencode_function("\tidiv\n");
+                break;
+            case 4:
+                gencode_function("\tirem\n");
+                break;
+        }
+    }
+}
+
+void gencode_relational(float* var1, float* var2, int rel_type) {
+/* If there's no code gen for var1 */
+    if(!var1[5]){
+        /* var1 is const */
+        if(!var1[4]){
+            gencode_function("\tldc ");
+            char value[64];
+            /* var1 is int */
+            if(var1[0] == 0)
+                sprintf(value, "%d\n", (int)var1[1]);
+            /* var1 is float */ 
+            else if(var1[0] == 1)
+                sprintf(value, "%f\n", (float)var1[1]);
+            gencode_function(value);
+        }
+        /* var1 is id */
+        else if(var1[4]){
+            /* var1 is global */
+            if(!var1[2]){
+                gencode_function("\tgetstatic compiler_hw3/");
+                Symbol_table *global_symbol = get_global_symbol(var1[3]);
+                gencode_function(global_symbol->name);
+                /* var1 is int */
+                if(var1[0] == 0)
+                    gencode_function(" I\n");
+                /* var1 is float */
+                else if(var1[0] == 1)
+                    gencode_function(" F\n");
+            }
+            /* var1 is local */
+            else if(var1[2]){
+                char stack_num[64];
+                /* var1 is int */
+                if(var1[0] == 0)
+                    gencode_function("\tiload ");
+                /* var1 is float */
+                else if(var1[0] == 1)
+                    gencode_function("\tfload ");
+                sprintf(stack_num, "%d\n", (int)var1[3]);
+                gencode_function(stack_num);
+            }
+        }
+    }
+    /* If var1 is int, var2 is float, need to casting var1 */
+    if(var1[0] == 0 && var2[0] == 1)
+        gencode_function("\ti2f\n");
+
+
+    /* If there's no code gen for var2 */
+    if(!var2[5]){
+        /* var2 is const */
+        if(!var2[4]){
+            gencode_function("\tldc ");
+            char value[64];
+            /* var2 is int */
+            if(var2[0] == 0)
+                sprintf(value, "%d\n", (int)var2[1]);
+            /* var2 is float */ 
+            else if(var2[0] == 1)
+                sprintf(value, "%f\n", (float)var2[1]);
+            gencode_function(value);
+        }
+        /* var2 is id */
+        else if(var2[4]){
+            /* var2 is global */
+            if(!var2[2]){
+                gencode_function("\tgetstatic compiler_hw3/");
+                Symbol_table *global_symbol = get_global_symbol(var2[3]);
+                gencode_function(global_symbol->name);
+                /* var2 is int */
+                if(var2[0] == 0)
+                    gencode_function(" I\n");
+                /* var2 is float */
+                else if(var2[1] == 1)
+                    gencode_function(" F\n");
+            }
+            /* var2 is local */
+            else if(var2[2]){
+                char stack_num[64];
+                /* var2 is int */
+                if(var2[0] == 0)
+                    gencode_function("\tiload ");
+                /* var2 is float */
+                else if(var2[0] == 1)
+                    gencode_function("\tfload ");
+                sprintf(stack_num, "%d\n", (int)var2[3]);
+                gencode_function(stack_num);
+            }
+        }
+    }
+    /* If var1 is float, var2 is int, need to casting var2 */
+    if(var1[0] == 1 && var2[0] == 0)
+        gencode_function("\ti2f\n");
+
+    /* Either var1 or var2 is float, calculating in float, and change back to int for relation */
+    if(var1[0] == 1 || var2[0] == 1) {
+        gencode_function("\tfsub\n\tf2i\n");
+    }
+    /* Both var1 and var2 are int */
+    else
+        gencode_function("\tisub\n");
+    relational_type = rel_type;
+}
+
+void gencode_print_function(float* var){
+    gencode_function("\tgetstatic java/lang/System/out Ljava/io/PrintStream;\n");
+    gencode_function("\tswap\n");
+    gencode_function("\tinvokevirtual java/io/PrintStream/println(");
+    switch((int)var[0]) {
+        /* print int / bool */
+        case 0: case 2:
+            gencode_function("I)V\n");
+            break;
+        /* print float */
+        case 1:
+            gencode_function("F)V\n");
+            break;
+        /* print string */
+        case 3:
+            gencode_function("Ljava/lang/String;)V\n");
+            break;
+    }
+}
+
+int is_parameter_match(char* name, int has_parameter) {
+    Symbol_table* symbol = symbol_table_tail;
+    while(symbol != symbol_table_head){
+        /* If found function */
+        if(!strcmp(symbol->name, name)){
+            int parameter_num = 0;
+            float parameter_type[64];
+            /* If this function has paramters */
+            if(has_parameter) {
+                /* Get first parameter in list */
+                char* para_type = strtok(symbol->attribute, ", ");
+                /* Count parameter's number */
+                while(para_type != NULL) {
+                    if(!strcmp(para_type, "int")) 
+                        parameter_type[parameter_num] = 0;
+                    else if(!strcmp(para_type, "float")) 
+                        parameter_type[parameter_num] = 1;
+                    else if(!strcmp(para_type, "bool")) 
+                        parameter_type[parameter_num] = 2;
+                    else if(!strcmp(para_type, "string")) 
+                        parameter_type[parameter_num] = 3;
+                    ++parameter_num;
+                    para_type = strtok(NULL, ", ");
+                }
+                /* If number of parameter and argument is not the same, raise error */
+                if(parameter_num != argument_num) {
+                    semantic_error("Number of passing arguments isn't match number of parameters\n", "");
+                    argument_num = 0;
+                    return 0;
+                }
+                for(int i = 0; i < argument_num; ++i) {
+                    gencode_load_value(argument_spec[i]);
+                    /* If parameter is float, argument is int or bool, do casting*/
+                    if(parameter_type[i] == 1 && (argument_spec[i][0] == 0 || argument_spec[i][0] == 2)) 
+                        gencode_function("\ti2f\n");
+                    /* If parameter is int or bool, argument is float, do casting*/
+                    else if((parameter_type[i] == 0 || parameter_type[i] == 2) && argument_spec[i][0] == 1) 
+                        gencode_function("\tf2i\n");
+                    /* If type of parameter and argument aren't the same, raise error */
+                    else if(parameter_type[i] != argument_spec[i][0]) {
+                        semantic_error("Type of passing arguments isn't match type of parameters", "");
+                        argument_num = 0;
+                        return 0;
+                    }
+                }
+            }
+            return 1;
+        }
+        symbol = symbol->prev;
+    }
+    return 1;
+}
+
+void gencode_call_function(char* name) {
+    gencode_function("\tinvokestatic compiler_hw3/");
+    gencode_function(name);
+    gencode_function("(");
+    Symbol_table* symbol = symbol_table_tail;
+    /* Find the symbol of this function */
+    while(symbol != symbol_table_head) {
+        if(!strcmp(symbol->name, name) && !strcmp(symbol->kind, "function"))
+            break;
+        symbol = symbol->prev;
+    }
+    for(int i = 0; i < argument_num; ++i){
+        switch((int)argument_spec[i][0]) {
+            case 0:
+                gencode_function("I");
+                break;
+            case 1:
+                gencode_function("F");
+                break;
+            case 2:
+                gencode_function("Z");
+                break;
+            case 3:
+                gencode_function("Ljava/lang/String;");
+                break;
+        }
+    }
+    /* Reset the argument list */
+    argument_num = 0;
+
+    gencode_function(")");
+    if(!strcmp(symbol->type, "int"))
+        gencode_function("I\n");
+    else if(!strcmp(symbol->type, "float"))
+        gencode_function("F\n");
+    else if(!strcmp(symbol->type, "bool"))
+        gencode_function("Z\n");
+    else if(!strcmp(symbol->type, "string"))
+        gencode_function("Ljava/lang/String;\n");
+    else if(!strcmp(symbol->type, "void"))
+        gencode_function("V\n");
 
 }

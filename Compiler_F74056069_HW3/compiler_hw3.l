@@ -25,8 +25,8 @@ void printLine();
 newline		[\n]
 digit		[0-9]
 letter		[a-zA-Z]
-integer     {digit}+
-float      {digit}+"."{digit}+
+integer     ("-"|"+")?{digit}+
+float       ("-"|"+")?{digit}+"."{digit}+
 id			{letter}+({letter}|{digit})*
 
 %option yylineno
