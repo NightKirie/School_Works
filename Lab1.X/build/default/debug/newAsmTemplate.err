@@ -1,0 +1,4 @@
+Warning[205] D:\CODE\MCU\LAB1.X\NEWASMTEMPLATE.ASM 1 : Found directive in column 1. (LIST)
+Warning[215] D:\CODE\MCU\LAB1.X\NEWASMTEMPLATE.ASM 1 : Processor superseded by command line.  Verify processor symbol.
+Message[301] C:\PROGRAM FILES (X86)\MICROCHIP\MPLABX\V5.05\MPASMX\P18F4520.INC 34 : MESSAGE: (Processor-header file mismatch.  Verify selected processor.)
+Warning[205] D:\CODE\MCU\LAB1.X\NEWASMTEMPLATE.ASM 18 : Found directive in column 1. (end)
