@@ -1,0 +1,10 @@
+#include <linux/module.h>
+#include <linux/string.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <net/sock.h>
+#include <net/netlink.h>
+#include <linux/skbuff.h>
+#include <linux/pid.h>
+#include <linux/list.h>
+#include <linux/sched.h>
