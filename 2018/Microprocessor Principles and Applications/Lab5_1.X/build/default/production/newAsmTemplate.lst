@@ -1,0 +1,80 @@
+
+
+Microchip Technology PIC18 Macro Assembler V2.00 build -1524193055 
+                                                                                                           Mon Oct 29 18:47:30 2018
+
+
+     1                           	processor	18F4520
+     2                           	opt	pw 132
+     3                           	psect	mytext,local,reloc=2,class=CODE,delta=1
+     4  0000                     stk_offset	set	0
+     5  0000                     auto_size	set	0
+     6                           
+     7                           ; stack_auto defines a symbol /name/_offset which equates to the
+     8                           ; stack offset of the auto object in question
+     9  0000                     
+    10                           ; stack_param defines a symbol /name/_offset which equates to the
+    11                           ; stack offset of the parameter object in question
+    12  0000                     
+    13                           ; alloc_stack adjusts the SP to allocate space for auto objects
+    14                           ; it also links in to the btemp symbol so that can be used
+    15  0000                     
+    16                           ; restore_stack adjusts the SP to remove all auto and parameter
+    17                           ; objects from the stack prior to returning from a function
+    18  0000                     
+    19                           	psect	mytext
+    20  007FAC                     _mul:
+    21                           	opt stack 0
+    22  007FAC  C001 FF8B          	movff	1,3979
+    23  007FB0  C003 FF8C          	movff	3,3980
+    24  007FB4  0E07               	movlw	7
+    25  007FB6  6E89               	movwf	3977,c
+    26  007FB8  6AF3               	clrf	prodl,c
+    27  007FBA  6AF4               	clrf	prodh,c
+    28  007FBC  6AE8               	clrf	wreg,c
+    29  007FBE                     start:
+    30  007FBE  BE8C               	btfsc	3980,7,c
+    31  007FC0  D012               	bra	multi
+    32  007FC2                     aftermulti:
+    33  007FC2  D016               	bra	shift
+    34  007FC4                     aftershift:
+    35  007FC4  2E89               	decfsz	3977,f,c
+    36  007FC6  D7FB               	bra	start
+    37  007FC8  CFF3 F001          	movff	prodl,1
+    38  007FCC  CFF4 F002          	movff	prodh,2
+    39  007FD0  AE8C               	btfss	3980,7,c
+    40  007FD2  0012               	return	
+    41  007FD4  508B               	movf	3979,w,c
+    42  007FD6  26F3               	addwf	prodl,f,c
+    43  007FD8  6AE8               	clrf	wreg,c
+    44  007FDA  22F4               	addwfc	prodh,f,c
+    45  007FDC  CFF3 F001          	movff	prodl,1
+    46  007FE0  CFF4 F002          	movff	prodh,2
+    47  007FE4  0012               	return	
+    48  007FE6                     multi:
+    49  007FE6  508B               	movf	3979,w,c
+    50  007FE8  26F3               	addwf	prodl,f,c
+    51  007FEA  6AE8               	clrf	wreg,c
+    52  007FEC  22F4               	addwfc	prodh,f,c
+    53  007FEE  D7E9               	bra	aftermulti
+    54  007FF0                     shift:
+    55  007FF0  368C               	rlcf	3980,f,c
+    56  007FF2  46F4               	rlncf	prodh,f,c
+    57  007FF4  BEF3               	btfsc	prodl,7,c
+    58  007FF6  22F4               	addwfc	prodh,f,c
+    59  007FF8  46F3               	rlncf	prodl,f,c
+    60  007FFA  90F3               	bcf	prodl,0,c
+    61  007FFC  6AE8               	clrf	wreg,c
+    62  007FFE  D7E2               	bra	aftershift
+    63                           prodh	equ	0xFF4
+    64                           prodl	equ	0xFF3
+    65                           wreg	equ	0xFE8
+
+
+Microchip Technology PIC18 Macro Assembler V2.00 build -1524193055 
+Symbol Table                                                                                               Mon Oct 29 18:47:30 2018
+
+                        LATA 000F89                          LATC 000F8B                          LATD 000F8C  
+                        WREG 000FE8                          _mul 7FAC                         PRODH 000FF4  
+                       PRODL 000FF3                         shift 7FF0                         multi 7FE6  
+                       start 7FBE                    aftershift 7FC4                    aftermulti 7FC2  

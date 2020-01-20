@@ -1,2 +1,3 @@
 # School_Works
-Store school works from NCKU
+Store school homeworks from NCKU, except projects
+

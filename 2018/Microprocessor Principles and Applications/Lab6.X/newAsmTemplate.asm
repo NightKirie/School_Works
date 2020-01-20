@@ -1,0 +1,101 @@
+LIST p=18f4520
+#include<p18f4520.inc>
+CONFIG OSC = INTIO67
+CONFIG WDT = OFF
+CONFIG LVP = OFF
+   ORG 0X00
+
+#define SWITCH PORTA, 4
+   L1 EQU 0x14
+   L2 EQU 0x15
+
+   
+DELAY MACRO
+   local LOOP1
+   local LOOP2
+   MOVLW d'100'
+   MOVWF L2
+   LOOP2:
+	MOVLW d'100'
+	MOVWF L1
+   LOOP1:
+	NOP
+	NOP
+	NOP
+	MOVFF PORTA, LATC
+	BTFSS LATC, 4, 0    
+	BRA S2
+	NOP
+	NOP
+	DECFSZ L1, 1
+	BRA LOOP1
+	DECFSZ L2, 1
+	BRA LOOP2
+ENDM	
+DELAY1 MACRO
+   local LOOP1
+   local LOOP2
+   MOVLW d'100'
+   MOVWF L2
+   LOOP2:
+	MOVLW d'100'
+	MOVWF L1
+   LOOP1:
+	NOP
+	NOP
+	NOP
+	MOVFF PORTA, LATC
+	BTFSS LATC, 4, 0
+	BRA S1
+	NOP
+	NOP
+	DECFSZ L1, 1
+	BRA LOOP1
+	DECFSZ L2, 1
+	BRA LOOP2
+ENDM	
+   
+   
+INIT: CLRF LATA
+      CLRF LATC
+      CLRF LATD
+      CLRF TRISA
+      CLRF TRISD
+      MOVLW 0x10
+      MOVWF TRISA
+S1:   
+      NOP
+       
+      MOVLW 0x01
+      MOVWF LATD
+      DELAY
+      MOVLW 0x02
+      MOVWF LATD
+      DELAY 
+      MOVLW 0x04
+      MOVWF LATD
+      DELAY 
+      MOVLW 0x08
+      MOVWF LATD
+      DELAY 
+      BRA S1
+      
+S2: 
+      MOVLW 0x00
+      MOVWF LATD
+      MOVLW 0x01
+      MOVWF LATC
+      BTFSC PORTA, 4 ,0
+      MOVFF PORTA, LATC
+      DELAY1
+      BRA S2
+      
+     
+      
+      END
+    
+
+
+
+
+
