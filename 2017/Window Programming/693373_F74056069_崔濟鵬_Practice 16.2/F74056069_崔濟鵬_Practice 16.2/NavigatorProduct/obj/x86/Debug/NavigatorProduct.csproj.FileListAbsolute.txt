@@ -1,0 +1,82 @@
+C:\cs2010\NavigatorProduct\bin\Debug\Northwind.mdf
+C:\cs2010\NavigatorProduct\bin\Debug\Northwind_log.ldf
+C:\cs2010\NavigatorProduct\bin\Debug\NavigatorProduct.exe
+C:\cs2010\NavigatorProduct\bin\Debug\NavigatorProduct.pdb
+C:\cs2010\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Form1.resources
+C:\cs2010\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Properties.Resources.resources
+C:\cs2010\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csproj.GenerateResource.Cache
+C:\cs2010\NavigatorProduct\obj\x86\Debug\NavigatorProduct.exe
+C:\cs2010\NavigatorProduct\obj\x86\Debug\NavigatorProduct.pdb
+C:\Users\jasper\Desktop\cs2010\ch15\NavigatorProduct-4\obj\x86\Debug\NavigatorProduct.exe
+C:\Users\jasper\Desktop\cs2010\ch15\NavigatorProduct-4\obj\x86\Debug\NavigatorProduct.pdb
+C:\Users\jasper\Desktop\cs2010\ch15\NavigatorProduct-4\bin\Debug\Northwind.mdf
+C:\Users\jasper\Desktop\cs2010\ch15\NavigatorProduct-4\bin\Debug\Northwind_log.ldf
+C:\Users\jasper\Desktop\cs2010\ch15\NavigatorProduct-4\bin\Debug\NavigatorProduct.exe
+C:\Users\jasper\Desktop\cs2010\ch15\NavigatorProduct-4\bin\Debug\NavigatorProduct.pdb
+C:\Users\jasper\Desktop\cs2010\ch15\NavigatorProduct-4\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\jasper\Desktop\cs2010\ch15\NavigatorProduct-4\obj\x86\Debug\NavigatorProduct.Form1.resources
+C:\Users\jasper\Desktop\cs2010\ch15\NavigatorProduct-4\obj\x86\Debug\NavigatorProduct.Properties.Resources.resources
+C:\Users\jasper\Desktop\cs2010\ch15\NavigatorProduct-4\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\jasper\Desktop\cs2010\ch15\NavigatorProduct-4\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\jasper\Desktop\cs2012\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.exe
+C:\Users\jasper\Desktop\cs2012\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.pdb
+C:\Users\jasper\Desktop\cs2012\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.exe
+C:\Users\jasper\Desktop\cs2012\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.pdb
+C:\Users\jasper\Desktop\cs2012\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Form1.resources
+C:\Users\jasper\Desktop\cs2012\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Properties.Resources.resources
+C:\Users\jasper\Desktop\cs2012\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csproj.GenerateResource.Cache
+C:\cs2013\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.exe
+C:\cs2013\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.pdb
+C:\cs2013\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.exe
+C:\cs2013\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.pdb
+C:\cs2013\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Form1.resources
+C:\cs2013\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Properties.Resources.resources
+C:\cs2013\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csproj.GenerateResource.Cache
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050602\1050602_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.exe
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050602\1050602_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.pdb
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050602\1050602_doc\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.exe
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050602\1050602_doc\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.pdb
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050602\1050602_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csprojResolveAssemblyReference.cache
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050602\1050602_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Form1.resources
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050602\1050602_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Properties.Resources.resources
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050602\1050602_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csproj.GenerateResource.Cache
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.exe
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.pdb
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.exe
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.pdb
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csprojResolveAssemblyReference.cache
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Form1.resources
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Properties.Resources.resources
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csproj.GenerateResource.Cache
+D:\ncku_school\開課課程\105_下學期\1060615_17\1060615_stu_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.exe
+D:\ncku_school\開課課程\105_下學期\1060615_17\1060615_stu_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.pdb
+D:\ncku_school\開課課程\105_下學期\1060615_17\1060615_stu_doc\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.exe
+D:\ncku_school\開課課程\105_下學期\1060615_17\1060615_stu_doc\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.pdb
+D:\ncku_school\開課課程\105_下學期\1060615_17\1060615_stu_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csprojResolveAssemblyReference.cache
+D:\ncku_school\開課課程\105_下學期\1060615_17\1060615_stu_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Form1.resources
+D:\ncku_school\開課課程\105_下學期\1060615_17\1060615_stu_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Properties.Resources.resources
+D:\ncku_school\開課課程\105_下學期\1060615_17\1060615_stu_doc\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csproj.GenerateResource.Cache
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.exe
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.pdb
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.exe
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.pdb
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csprojResolveAssemblyReference.cache
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Form1.resources
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Properties.Resources.resources
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csproj.GenerateResource.Cache
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.exe
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.pdb
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.exe
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch16\NavigatorProduct\bin\Debug\NavigatorProduct.pdb
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csprojResolveAssemblyReference.cache
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Form1.resources
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Properties.Resources.resources
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch16\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csproj.GenerateResource.Cache
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 16.2\NavigatorProduct\obj\x86\Debug\NavigatorProduct.exe
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 16.2\NavigatorProduct\obj\x86\Debug\NavigatorProduct.pdb
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 16.2\NavigatorProduct\bin\Debug\NavigatorProduct.exe
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 16.2\NavigatorProduct\bin\Debug\NavigatorProduct.pdb
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 16.2\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csprojResolveAssemblyReference.cache
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 16.2\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Form1.resources
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 16.2\NavigatorProduct\obj\x86\Debug\NavigatorProduct.Properties.Resources.resources
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 16.2\NavigatorProduct\obj\x86\Debug\NavigatorProduct.csproj.GenerateResource.Cache

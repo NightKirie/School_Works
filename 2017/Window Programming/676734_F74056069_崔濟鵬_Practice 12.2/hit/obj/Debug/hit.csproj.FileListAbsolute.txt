@@ -1,0 +1,30 @@
+C:\cs\ch12\hit\bin\Debug\hit.exe.config
+C:\cs\ch12\hit\bin\Debug\hit.exe
+C:\cs\ch12\hit\bin\Debug\hit.pdb
+C:\cs\ch12\hit\obj\Debug\hit.csprojResolveAssemblyReference.cache
+C:\cs\ch12\hit\obj\Debug\hit.Form1.resources
+C:\cs\ch12\hit\obj\Debug\hit.Properties.Resources.resources
+C:\cs\ch12\hit\obj\Debug\hit.csproj.GenerateResource.Cache
+C:\cs\ch12\hit\obj\Debug\hit.exe
+C:\cs\ch12\hit\obj\Debug\hit.pdb
+D:\00000- 松崗 松崗  Visual C# 2013 學習經典 排版(一校搞)\四校稿 - C#2013 學習經典完稿\松崗- C# 2013學習經典範例程式\ch12\hit\bin\Debug\hit.exe.config
+D:\00000- 松崗 松崗  Visual C# 2013 學習經典 排版(一校搞)\四校稿 - C#2013 學習經典完稿\松崗- C# 2013學習經典範例程式\ch12\hit\obj\Debug\hit.exe
+D:\00000- 松崗 松崗  Visual C# 2013 學習經典 排版(一校搞)\四校稿 - C#2013 學習經典完稿\松崗- C# 2013學習經典範例程式\ch12\hit\obj\Debug\hit.pdb
+D:\ncku_school\開課課程\106下學期\正式上課簡報\1070329_05\1070329_true_doc\ch12\hit\bin\Debug\hit.exe.config
+D:\ncku_school\開課課程\106下學期\正式上課簡報\1070329_05\1070329_true_doc\ch12\hit\obj\Debug\hit.exe
+D:\ncku_school\開課課程\106下學期\正式上課簡報\1070329_05\1070329_true_doc\ch12\hit\obj\Debug\hit.pdb
+D:\ncku_school\開課課程\106下學期\正式上課簡報\1070329_05\1070329_true_doc\ch12\hit\bin\Debug\hit.exe
+D:\ncku_school\開課課程\106下學期\正式上課簡報\1070329_05\1070329_true_doc\ch12\hit\bin\Debug\hit.pdb
+D:\ncku_school\開課課程\106下學期\正式上課簡報\1070329_05\1070329_true_doc\ch12\hit\obj\Debug\hit.csprojResolveAssemblyReference.cache
+D:\ncku_school\開課課程\106下學期\正式上課簡報\1070329_05\1070329_true_doc\ch12\hit\obj\Debug\hit.Form1.resources
+D:\ncku_school\開課課程\106下學期\正式上課簡報\1070329_05\1070329_true_doc\ch12\hit\obj\Debug\hit.Properties.Resources.resources
+D:\ncku_school\開課課程\106下學期\正式上課簡報\1070329_05\1070329_true_doc\ch12\hit\obj\Debug\hit.csproj.GenerateResource.Cache
+C:\Users\NightKirie\Desktop\C#\Example code ch9, 12\ch12\hit\bin\Debug\hit.exe.config
+C:\Users\NightKirie\Desktop\C#\Example code ch9, 12\ch12\hit\obj\Debug\hit.exe
+C:\Users\NightKirie\Desktop\C#\Example code ch9, 12\ch12\hit\obj\Debug\hit.pdb
+C:\Users\NightKirie\Desktop\C#\Example code ch9, 12\ch12\hit\bin\Debug\hit.exe
+C:\Users\NightKirie\Desktop\C#\Example code ch9, 12\ch12\hit\bin\Debug\hit.pdb
+C:\Users\NightKirie\Desktop\C#\Example code ch9, 12\ch12\hit\obj\Debug\hit.csprojResolveAssemblyReference.cache
+C:\Users\NightKirie\Desktop\C#\Example code ch9, 12\ch12\hit\obj\Debug\hit.Form1.resources
+C:\Users\NightKirie\Desktop\C#\Example code ch9, 12\ch12\hit\obj\Debug\hit.Properties.Resources.resources
+C:\Users\NightKirie\Desktop\C#\Example code ch9, 12\ch12\hit\obj\Debug\hit.csproj.GenerateResource.Cache

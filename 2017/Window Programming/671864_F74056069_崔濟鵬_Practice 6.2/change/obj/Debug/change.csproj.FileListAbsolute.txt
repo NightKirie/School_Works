@@ -1,0 +1,39 @@
+C:\Users\banana\Desktop\practice 1\change\change\bin\Debug\change.exe.config
+C:\Users\banana\Desktop\practice 1\change\change\bin\Debug\change.exe
+C:\Users\banana\Desktop\practice 1\change\change\bin\Debug\change.pdb
+C:\Users\banana\Desktop\practice 1\change\change\obj\Debug\change.csprojResolveAssemblyReference.cache
+C:\Users\banana\Desktop\practice 1\change\change\obj\Debug\change.Form1.resources
+C:\Users\banana\Desktop\practice 1\change\change\obj\Debug\change.Properties.Resources.resources
+C:\Users\banana\Desktop\practice 1\change\change\obj\Debug\change.csproj.GenerateResource.Cache
+C:\Users\banana\Desktop\practice 1\change\change\obj\Debug\change.exe
+C:\Users\banana\Desktop\practice 1\change\change\obj\Debug\change.pdb
+D:\ncku_school\開課課程\104_上學期\104_01_教材_上課版本\計慨_1041223_15\True\practice 1\change\change\bin\Debug\change.exe.config
+D:\ncku_school\開課課程\104_上學期\104_01_教材_上課版本\計慨_1041223_15\True\practice 1\change\change\obj\Debug\change.exe
+D:\ncku_school\開課課程\104_上學期\104_01_教材_上課版本\計慨_1041223_15\True\practice 1\change\change\obj\Debug\change.pdb
+D:\ncku_school\開課課程\104_上學期\104_01_教材_上課版本\計慨_1041223_15\True\practice 1\change\change\bin\Debug\change.exe
+D:\ncku_school\開課課程\104_上學期\104_01_教材_上課版本\計慨_1041223_15\True\practice 1\change\change\bin\Debug\change.pdb
+D:\ncku_school\開課課程\104_上學期\104_01_教材_上課版本\計慨_1041223_15\True\practice 1\change\change\obj\Debug\change.csprojResolveAssemblyReference.cache
+D:\ncku_school\開課課程\104_上學期\104_01_教材_上課版本\計慨_1041223_15\True\practice 1\change\change\obj\Debug\change.Form1.resources
+D:\ncku_school\開課課程\104_上學期\104_01_教材_上課版本\計慨_1041223_15\True\practice 1\change\change\obj\Debug\change.Properties.Resources.resources
+D:\ncku_school\開課課程\104_上學期\104_01_教材_上課版本\計慨_1041223_15\True\practice 1\change\change\obj\Debug\change.csproj.GenerateResource.Cache
+D:\ncku_school\開課課程\105上學期\1051221_15\true\practice 1\change\change\bin\Debug\change.exe.config
+D:\ncku_school\開課課程\105上學期\1051221_15\true\practice 1\change\change\obj\Debug\change.exe
+D:\ncku_school\開課課程\105上學期\1051221_15\true\practice 1\change\change\obj\Debug\change.pdb
+C:\Users\wwolfyTC\Downloads\1070315_stu_doc_y2\change\change\change\bin\Debug\change.exe.config
+C:\Users\wwolfyTC\Downloads\1070315_stu_doc_y2\change\change\change\obj\Debug\change.exe
+C:\Users\wwolfyTC\Downloads\1070315_stu_doc_y2\change\change\change\obj\Debug\change.pdb
+C:\Users\wwolfyTC\Downloads\1070315_stu_doc_y2\change\change\change\bin\Debug\change.exe
+C:\Users\wwolfyTC\Downloads\1070315_stu_doc_y2\change\change\change\bin\Debug\change.pdb
+C:\Users\wwolfyTC\Downloads\1070315_stu_doc_y2\change\change\change\obj\Debug\change.csprojResolveAssemblyReference.cache
+C:\Users\wwolfyTC\Downloads\1070315_stu_doc_y2\change\change\change\obj\Debug\change.Form1.resources
+C:\Users\wwolfyTC\Downloads\1070315_stu_doc_y2\change\change\change\obj\Debug\change.Properties.Resources.resources
+C:\Users\wwolfyTC\Downloads\1070315_stu_doc_y2\change\change\change\obj\Debug\change.csproj.GenerateResource.Cache
+C:\Users\qwer5\Desktop\change\change\bin\Debug\change.exe.config
+C:\Users\qwer5\Desktop\change\change\obj\Debug\change.exe
+C:\Users\qwer5\Desktop\change\change\obj\Debug\change.pdb
+C:\Users\qwer5\Desktop\change\change\bin\Debug\change.exe
+C:\Users\qwer5\Desktop\change\change\bin\Debug\change.pdb
+C:\Users\qwer5\Desktop\change\change\obj\Debug\change.csprojResolveAssemblyReference.cache
+C:\Users\qwer5\Desktop\change\change\obj\Debug\change.Form1.resources
+C:\Users\qwer5\Desktop\change\change\obj\Debug\change.Properties.Resources.resources
+C:\Users\qwer5\Desktop\change\change\obj\Debug\change.csproj.GenerateResource.Cache

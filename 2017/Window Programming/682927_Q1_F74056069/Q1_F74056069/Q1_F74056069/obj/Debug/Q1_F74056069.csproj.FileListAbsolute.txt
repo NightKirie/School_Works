@@ -1,0 +1,6 @@
+C:\Users\NightKirie\Desktop\Q1_F74056069\Q1_F74056069\Q1_F74056069\bin\Debug\Q1_F74056069.exe.config
+C:\Users\NightKirie\Desktop\Q1_F74056069\Q1_F74056069\Q1_F74056069\bin\Debug\Q1_F74056069.exe
+C:\Users\NightKirie\Desktop\Q1_F74056069\Q1_F74056069\Q1_F74056069\bin\Debug\Q1_F74056069.pdb
+C:\Users\NightKirie\Desktop\Q1_F74056069\Q1_F74056069\Q1_F74056069\obj\Debug\Q1_F74056069.csprojResolveAssemblyReference.cache
+C:\Users\NightKirie\Desktop\Q1_F74056069\Q1_F74056069\Q1_F74056069\obj\Debug\Q1_F74056069.exe
+C:\Users\NightKirie\Desktop\Q1_F74056069\Q1_F74056069\Q1_F74056069\obj\Debug\Q1_F74056069.pdb

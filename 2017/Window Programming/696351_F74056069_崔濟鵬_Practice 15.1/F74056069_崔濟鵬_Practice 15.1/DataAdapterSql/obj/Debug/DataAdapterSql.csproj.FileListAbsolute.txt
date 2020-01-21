@@ -1,0 +1,74 @@
+C:\Users\jasper\Desktop\cs2012\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe.config
+C:\Users\jasper\Desktop\cs2012\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe
+C:\Users\jasper\Desktop\cs2012\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.pdb
+C:\Users\jasper\Desktop\cs2012\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Form1.resources
+C:\Users\jasper\Desktop\cs2012\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Properties.Resources.resources
+C:\Users\jasper\Desktop\cs2012\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csproj.GenerateResource.Cache
+C:\Users\jasper\Desktop\cs2012\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.exe
+C:\Users\jasper\Desktop\cs2012\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.pdb
+C:\cs2013\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe.config
+C:\cs2013\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.exe
+C:\cs2013\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.pdb
+C:\cs2013\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe
+C:\cs2013\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.pdb
+C:\cs2013\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csprojResolveAssemblyReference.cache
+C:\cs2013\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Form1.resources
+C:\cs2013\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Properties.Resources.resources
+C:\cs2013\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csproj.GenerateResource.Cache
+D:\ncku_school\開課課程\104\104上課講義\12\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe.config
+D:\ncku_school\開課課程\104\104上課講義\12\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.exe
+D:\ncku_school\開課課程\104\104上課講義\12\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.pdb
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050526\1050526_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe.config
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050526\1050526_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.exe
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050526\1050526_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.pdb
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050526\1050526_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050526\1050526_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.pdb
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050526\1050526_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csprojResolveAssemblyReference.cache
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050526\1050526_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Form1.resources
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050526\1050526_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Properties.Resources.resources
+D:\ncku_school\開課課程\104_下學期\上課簡報\1050526\1050526_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csproj.GenerateResource.Cache
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe.config
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.exe
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.pdb
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.pdb
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csprojResolveAssemblyReference.cache
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Form1.resources
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Properties.Resources.resources
+D:\ncku_school\開課課程\105_下學期\1060525_14\106_0525_true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csproj.GenerateResource.Cache
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070531_14\true_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe.config
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070531_14\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.exe
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070531_14\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.pdb
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070531_14\true_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070531_14\true_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.pdb
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070531_14\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csprojResolveAssemblyReference.cache
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070531_14\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Form1.resources
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070531_14\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Properties.Resources.resources
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070531_14\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csproj.GenerateResource.Cache
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070607_15\true_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe.config
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070607_15\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.exe
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070607_15\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.pdb
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070607_15\true_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070607_15\true_doc\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.pdb
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070607_15\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csprojResolveAssemblyReference.cache
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070607_15\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Form1.resources
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070607_15\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Properties.Resources.resources
+D:\ncku_school\開課課程\106下學期\106_02_正式上課簡報\1070607_15\true_doc\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csproj.GenerateResource.Cache
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe.config
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.pdb
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csprojResolveAssemblyReference.cache
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Form1.resources
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Properties.Resources.resources
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csproj.GenerateResource.Cache
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.exe
+C:\Users\wwolfyTC\Downloads\stu_doc_1070607\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.pdb
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe.config
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.exe
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.pdb
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.exe
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch15\DataAdapterSql\bin\Debug\DataAdapterSql.pdb
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csprojResolveAssemblyReference.cache
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Form1.resources
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.Properties.Resources.resources
+C:\Users\qwer5\Desktop\Example code ch15,16,18\ch15\DataAdapterSql\obj\Debug\DataAdapterSql.csproj.GenerateResource.Cache

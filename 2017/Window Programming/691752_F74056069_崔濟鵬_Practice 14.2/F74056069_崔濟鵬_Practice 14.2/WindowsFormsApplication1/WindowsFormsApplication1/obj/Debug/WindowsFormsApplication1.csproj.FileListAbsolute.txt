@@ -1,0 +1,11 @@
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 14.2\WindowsFormsApplication1\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe.config
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 14.2\WindowsFormsApplication1\WindowsFormsApplication1\bin\Debug\Database1.mdf
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 14.2\WindowsFormsApplication1\WindowsFormsApplication1\bin\Debug\Database1_log.ldf
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 14.2\WindowsFormsApplication1\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 14.2\WindowsFormsApplication1\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 14.2\WindowsFormsApplication1\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.csprojResolveAssemblyReference.cache
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 14.2\WindowsFormsApplication1\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.Form1.resources
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 14.2\WindowsFormsApplication1\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 14.2\WindowsFormsApplication1\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.csproj.GenerateResource.Cache
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 14.2\WindowsFormsApplication1\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.exe
+C:\Users\qwer5\Desktop\F74056069_崔濟鵬_Practice 14.2\WindowsFormsApplication1\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.pdb

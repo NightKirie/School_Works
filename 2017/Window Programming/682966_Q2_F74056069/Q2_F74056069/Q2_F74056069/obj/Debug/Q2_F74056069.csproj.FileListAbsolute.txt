@@ -1,0 +1,9 @@
+C:\Users\NightKirie\Desktop\Q2_F74056069\Q2_F74056069\Q2_F74056069\bin\Debug\Q2_F74056069.exe.config
+C:\Users\NightKirie\Desktop\Q2_F74056069\Q2_F74056069\Q2_F74056069\bin\Debug\Q2_F74056069.exe
+C:\Users\NightKirie\Desktop\Q2_F74056069\Q2_F74056069\Q2_F74056069\bin\Debug\Q2_F74056069.pdb
+C:\Users\NightKirie\Desktop\Q2_F74056069\Q2_F74056069\Q2_F74056069\obj\Debug\Q2_F74056069.csprojResolveAssemblyReference.cache
+C:\Users\NightKirie\Desktop\Q2_F74056069\Q2_F74056069\Q2_F74056069\obj\Debug\Q2_F74056069.Form1.resources
+C:\Users\NightKirie\Desktop\Q2_F74056069\Q2_F74056069\Q2_F74056069\obj\Debug\Q2_F74056069.Properties.Resources.resources
+C:\Users\NightKirie\Desktop\Q2_F74056069\Q2_F74056069\Q2_F74056069\obj\Debug\Q2_F74056069.csproj.GenerateResource.Cache
+C:\Users\NightKirie\Desktop\Q2_F74056069\Q2_F74056069\Q2_F74056069\obj\Debug\Q2_F74056069.exe
+C:\Users\NightKirie\Desktop\Q2_F74056069\Q2_F74056069\Q2_F74056069\obj\Debug\Q2_F74056069.pdb

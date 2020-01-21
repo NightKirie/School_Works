@@ -1,0 +1,30 @@
+C:\cs2013\ch13\FileOperate\bin\Debug\FileOperate.exe.config
+C:\cs2013\ch13\FileOperate\bin\Debug\FileOperate.exe
+C:\cs2013\ch13\FileOperate\bin\Debug\FileOperate.pdb
+C:\cs2013\ch13\FileOperate\obj\Debug\FileOperate.csprojResolveAssemblyReference.cache
+C:\cs2013\ch13\FileOperate\obj\Debug\FileOperate.Form1.resources
+C:\cs2013\ch13\FileOperate\obj\Debug\FileOperate.Properties.Resources.resources
+C:\cs2013\ch13\FileOperate\obj\Debug\FileOperate.csproj.GenerateResource.Cache
+C:\cs2013\ch13\FileOperate\obj\Debug\FileOperate.exe
+C:\cs2013\ch13\FileOperate\obj\Debug\FileOperate.pdb
+D:\Do\do_VC#\C#2013學習經典(松崗)\三校\ch13-1027\ch13範例\FileOperate\bin\Debug\FileOperate.exe.config
+D:\Do\do_VC#\C#2013學習經典(松崗)\三校\ch13-1027\ch13範例\FileOperate\obj\Debug\FileOperate.exe
+D:\Do\do_VC#\C#2013學習經典(松崗)\三校\ch13-1027\ch13範例\FileOperate\obj\Debug\FileOperate.pdb
+D:\code\C#\F74056069_崔濟鵬_Practice 13.1\FileOperate\bin\Debug\FileOperate.exe.config
+D:\code\C#\F74056069_崔濟鵬_Practice 13.1\FileOperate\obj\Debug\FileOperate.exe
+D:\code\C#\F74056069_崔濟鵬_Practice 13.1\FileOperate\obj\Debug\FileOperate.pdb
+D:\code\C#\F74056069_崔濟鵬_Practice 13.1\FileOperate\bin\Debug\FileOperate.exe
+D:\code\C#\F74056069_崔濟鵬_Practice 13.1\FileOperate\bin\Debug\FileOperate.pdb
+D:\code\C#\F74056069_崔濟鵬_Practice 13.1\FileOperate\obj\Debug\FileOperate.csprojResolveAssemblyReference.cache
+D:\code\C#\F74056069_崔濟鵬_Practice 13.1\FileOperate\obj\Debug\FileOperate.Form1.resources
+D:\code\C#\F74056069_崔濟鵬_Practice 13.1\FileOperate\obj\Debug\FileOperate.Properties.Resources.resources
+D:\code\C#\F74056069_崔濟鵬_Practice 13.1\FileOperate\obj\Debug\FileOperate.csproj.GenerateResource.Cache
+D:\code\C#\F74056069_崔濟鵬_Practice 13.2\FileOperate\bin\Debug\FileOperate.exe.config
+D:\code\C#\F74056069_崔濟鵬_Practice 13.2\FileOperate\obj\Debug\FileOperate.exe
+D:\code\C#\F74056069_崔濟鵬_Practice 13.2\FileOperate\obj\Debug\FileOperate.pdb
+D:\code\C#\F74056069_崔濟鵬_Practice 13.2\FileOperate\bin\Debug\FileOperate.exe
+D:\code\C#\F74056069_崔濟鵬_Practice 13.2\FileOperate\bin\Debug\FileOperate.pdb
+D:\code\C#\F74056069_崔濟鵬_Practice 13.2\FileOperate\obj\Debug\FileOperate.csprojResolveAssemblyReference.cache
+D:\code\C#\F74056069_崔濟鵬_Practice 13.2\FileOperate\obj\Debug\FileOperate.Form1.resources
+D:\code\C#\F74056069_崔濟鵬_Practice 13.2\FileOperate\obj\Debug\FileOperate.Properties.Resources.resources
+D:\code\C#\F74056069_崔濟鵬_Practice 13.2\FileOperate\obj\Debug\FileOperate.csproj.GenerateResource.Cache
